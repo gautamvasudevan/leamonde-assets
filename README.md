@@ -13,6 +13,7 @@ Public assets, icons, and avatars for **Lea Monde AI** staff on Discord.
 | **Scout** | Tech & Gear Specialist | [`avatars/scout.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/scout.jpg) |
 | **Sloan** | Interior Designer | [`avatars/sloan.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/sloan.jpg) |
 | **Cookie** | Personal Chef | [`avatars/cookie.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/cookie.jpg) |
+| **Sterling** | Cards, Perks & Travel Strategist | [`avatars/sterling.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/sterling.jpg) |
 | **Lea Monde Crest** | Discord Bot Profile | [`avatars/crest.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/crest.jpg) |
 | **Lea Monde Server Icon** | Discord Server Logo (Atelier Pavilion) | [`avatars/server_icon.jpg`](https://raw.githubusercontent.com/gautamvasudevan/leamonde-assets/main/avatars/server_icon.jpg) |
 
