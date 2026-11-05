@@ -70,11 +70,23 @@
         animation: signalFlow 1.5s linear infinite;
       }
       .fade-swap {
-        animation: fadeSwap 0.2s ease-out;
+        animation: fadeSwap 0.24s cubic-bezier(0.16, 1, 0.3, 1);
       }
       @keyframes fadeSwap {
-        from { opacity: 0; transform: translateY(4px); }
+        from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
+      }
+      .studio-art-motion {
+        animation: studioReveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards, studioBreath 14s ease-in-out 1.1s infinite alternate;
+        transform-origin: center center;
+      }
+      @keyframes studioReveal {
+        0% { opacity: 0; transform: scale(1.08) translateY(6px); filter: saturate(0.85); }
+        100% { opacity: 1; transform: scale(1.01) translateY(0); filter: saturate(1); }
+      }
+      @keyframes studioBreath {
+        0% { transform: scale(1.01) translate(0px, 0px); }
+        100% { transform: scale(1.045) translate(-4px, -2px); }
       }
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -239,73 +251,105 @@
                 Tazza
               </button>
             </div>
+
+            <!-- Live Specialist-at-Work Mini Studio Drawer (opens when a specialist is clicked in the 3D Pavilion) -->
+            <div id="pavilion-studio-drawer" class="hidden rounded-xl border border-[var(--border)] bg-[var(--background)] overflow-hidden fade-swap"></div>
           </div>
         </div>
       </div>
 
-      <!-- ABOVE-THE-FOLD INTERACTIVE PRODUCT WINDOW -->
-      <div id="live-demo" class="scroll-mt-20 lm-frame bg-[var(--card)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border)] pb-3.5">
+      <!-- ABOVE-THE-FOLD INTERACTIVE PRODUCT WALKTHROUGH (REDESIGNED FOR INSTANT LEGIBILITY) -->
+      <div id="live-demo" class="scroll-mt-20 lm-frame bg-[var(--card)] rounded-2xl p-4 sm:p-7 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-[var(--border)] pb-4">
           <div>
-            <span class="text-xs font-semibold text-[var(--muted-foreground)]">Interactive Product Walkthrough</span>
-            <h2 class="text-base sm:text-lg font-bold">Watch how a request moves from Discord to the home server</h2>
+            <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Interactive Product Walkthrough</span>
+            <h2 class="font-serif-display text-2xl sm:text-3xl font-normal tracking-tight mt-0.5">See how a family request moves from Discord to the home server.</h2>
           </div>
-          <span class="text-xs text-[var(--muted-foreground)]">Pick a workflow and tap <strong>Next ▶</strong></span>
+          <span class="text-xs sm:text-sm text-[var(--muted-foreground)]">1. Pick a workflow below · 2. Tap <strong>Next Step ▶</strong></span>
         </div>
 
-        <!-- 3 Scenario Tabs (44px height) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Workflow examples">
-          <button type="button" role="tab" aria-selected="true" onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
-            1. Dinner &amp; Groceries (Aida to Cookie)
+        <!-- Step 1: Pick a Workflow (3 Clear Tabs, 48px+ touch targets) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" role="tablist" aria-label="Workflow examples">
+          <button type="button" role="tab" aria-selected="true" onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-4 py-3 rounded-xl border text-left min-h-[52px] transition">
+            <span class="block text-[11px] uppercase tracking-wider opacity-75 font-semibold">Workflow 1 · Multi-Agent</span>
+            <span class="block text-sm font-bold mt-0.5">Dinner &amp; Groceries (Aida → Cookie)</span>
           </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
-            2. Sourcing a Rug (3 Parallel Sub-Agents)
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('research')" id="scen-research" class="scen-btn px-4 py-3 rounded-xl border text-left min-h-[52px] transition">
+            <span class="block text-[11px] uppercase tracking-wider opacity-75 font-semibold">Workflow 2 · Web Research</span>
+            <span class="block text-sm font-bold mt-0.5">Sourcing a Rug (3 Sub-Agents)</span>
           </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
-            3. Filing a Superbill (1Password + Gate)
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-4 py-3 rounded-xl border text-left min-h-[52px] transition">
+            <span class="block text-[11px] uppercase tracking-wider opacity-75 font-semibold">Workflow 3 · Private Desk</span>
+            <span class="block text-sm font-bold mt-0.5">Filing a Superbill (1Password + Gate)</span>
           </button>
         </div>
 
-        <!-- Stepper Bar -->
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span id="sim-step-badge" class="text-xs font-bold px-2.5 py-1.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Step 1 of 4</span>
+        <!-- Primary Focal Point: High-Contrast Step Headline Banner -->
+        <div class="rounded-xl bg-[var(--band-bg)] text-[var(--band-fg)] border border-[var(--band-border)] p-4 sm:p-5 space-y-3 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--band-border)] pb-3">
+            <!-- Numbered Step Pills -->
+            <div class="flex items-center gap-1.5" id="sim-progress-bars" role="group" aria-label="Walkthrough steps"></div>
+
+            <!-- Stepper Controls -->
             <div class="flex items-center gap-2">
-              <button type="button" onclick="toggleAutoPlay()" id="btn-autoplay" aria-label="Auto-play steps" class="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[44px] transition">
+              <button type="button" onclick="toggleAutoPlay()" id="btn-autoplay" aria-label="Auto-play steps" class="px-3 py-2 rounded-lg border border-[var(--band-border)] bg-white/10 hover:bg-white/20 text-xs font-semibold min-h-[44px] transition">
                 ▶ Auto
               </button>
-              <button type="button" onclick="stepSim(-1)" id="btn-prev" aria-label="Previous step" class="px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[44px] disabled:opacity-35 transition">
+              <button type="button" onclick="stepSim(-1)" id="btn-prev" aria-label="Previous step" class="px-3.5 py-2 rounded-lg border border-[var(--band-border)] bg-white/10 hover:bg-white/20 text-xs font-semibold min-h-[44px] disabled:opacity-30 transition">
                 ◀ Prev
               </button>
-              <button type="button" onclick="stepSim(1)" id="btn-next" aria-label="Next step" class="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 text-xs font-semibold min-h-[44px] disabled:opacity-35 transition">
-                Next ▶
+              <button type="button" onclick="stepSim(1)" id="btn-next" aria-label="Next step" class="px-4 py-2 rounded-lg bg-[#C5A059] text-[#141A24] hover:opacity-90 text-xs sm:text-sm font-bold min-h-[44px] disabled:opacity-30 transition shadow-sm">
+                Next Step ▶
               </button>
             </div>
           </div>
 
-          <div class="grid grid-cols-4 gap-2" id="sim-progress-bars"></div>
-          <p id="sim-why-label" class="text-xs text-[var(--muted-foreground)]"></p>
+          <!-- Big Unmistakable Step Headline (What is happening right now) -->
+          <div class="space-y-1">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#D4B26F]" id="sim-step-badge">STEP 1 OF 4</div>
+            <h3 class="font-serif-display text-xl sm:text-2xl font-normal leading-snug" id="sim-step-headline"></h3>
+          </div>
         </div>
 
-        <!-- Split Screen: Phone Discord vs Home Server Backstage -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" aria-live="polite">
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
-            <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
-              <span class="font-bold" id="sim-channel">#lobby</span>
-              <span class="text-[var(--muted-foreground)]" id="sim-thread-badge"></span>
+        <!-- Split Screen: Left = Phone Chat (Cumulative with Spotlight), Right = Structured Server Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch" aria-live="polite">
+          <!-- Left Column (6 cols): Phone Discord View -->
+          <div class="lg:col-span-6 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-bold">1</span>
+                  <span class="text-xs sm:text-sm font-bold uppercase tracking-wide">On Your Phone (Discord)</span>
+                </div>
+                <div class="text-xs font-semibold px-2.5 py-1 rounded-md bg-[var(--card)] border border-[var(--border)]">
+                  <span id="sim-channel">#lobby</span> · <span class="text-[var(--muted-foreground)]" id="sim-thread-badge"></span>
+                </div>
+              </div>
+              <div id="sim-discord-feed" class="space-y-2.5 fade-swap"></div>
             </div>
-            <div id="sim-discord-feed" class="space-y-2.5 fade-swap"></div>
+            <div id="sim-why-label" class="text-xs text-[var(--muted-foreground)] pt-2.5 border-t border-[var(--border)]"></div>
           </div>
 
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
-                <span class="font-bold" id="sim-stage-title">Home Server</span>
-                <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-medium" id="sim-stage-chip"></span>
+          <!-- Right Column (6 cols): Structured Home Server View -->
+          <div class="lg:col-span-6 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-bold">2</span>
+                  <span class="text-xs sm:text-sm font-bold uppercase tracking-wide" id="sim-stage-title">Inside the Home Server</span>
+                </div>
+                <span class="text-xs px-2.5 py-1 rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold" id="sim-stage-chip"></span>
               </div>
-              <div id="sim-backstage-body" class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed fade-swap"></div>
+
+              <!-- Structured 3-Part Visual Server Breakdown -->
+              <div id="sim-backstage-body" class="space-y-3.5 fade-swap"></div>
             </div>
-            <div id="sim-tech-note" class="text-xs font-medium text-[var(--foreground)] pt-2.5 border-t border-[var(--border)]"></div>
+
+            <!-- Key Guardrail / Architecture Takeaway Box -->
+            <div class="rounded-xl bg-[var(--card)] border-l-4 border-l-[var(--brass)] border border-[var(--border)] p-3.5">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Key Guardrail in This Step</div>
+              <div id="sim-tech-note" class="text-sm font-semibold text-[var(--foreground)] mt-0.5 leading-snug"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -347,79 +391,79 @@
       </div>
     </section>
 
-    <!-- SECTION 2: THE AGENCY ROSTER & MODULAR HIRING (INTERACTIVE SWITCHBOARD) -->
+    <!-- SECTION 2: THE AGENCY ROSTER & LIVE STUDIO STAGE (INTERACTIVE SHOWCASE) -->
     <section id="roster" class="reveal scroll-mt-20 space-y-6">
-      <div class="max-w-2xl space-y-2">
-        <p class="text-xs font-semibold text-[var(--muted-foreground)]">The Agency Model</p>
-        <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight">
-          Narrow specialists instead of one giant prompt.
-        </h2>
-        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
-          Each specialist is a separate <code>Agent</code> instance with its own instructions, memory, and tool allowlist. Cookie can edit the grocery cart, but she cannot read your email. Whenever a new household domain comes up, we add a folder in Git and a new specialist desk comes online in 60 seconds.
-        </p>
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div class="max-w-2xl space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">The Agency at Work</p>
+          <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight">
+            Narrow specialists instead of one giant prompt.
+          </h2>
+          <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+            Each specialist is an isolated <code>Agent</code> instance with its own handbook, memory, and tool allowlist. Tap any specialist below to step inside their workspace and watch how they work, or see how we commission a new desk in Git.
+          </p>
+        </div>
+        <div class="text-xs font-semibold text-[var(--muted-foreground)] shrink-0">
+          Tap a specialist to play their studio scene
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        <!-- Touch Selector + How We Hire -->
-        <div class="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5" role="tablist" aria-label="Agency specialists and hiring">
-          <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="aida" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Aida</div>
-              <div class="text-xs opacity-80">Chief of Staff</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="cookie" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Cookie</div>
-              <div class="text-xs opacity-80">Personal Chef</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="scout" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Scout</div>
-              <div class="text-xs opacity-80">Product Scout</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="sterling" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Sterling</div>
-              <div class="text-xs opacity-80">Cards &amp; Perks</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="sloan" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Sloan</div>
-              <div class="text-xs opacity-80">Interiors</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <img data-avatar="tazza" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Tazza</div>
-              <div class="text-xs opacity-80">Coffee</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('newhire')" id="ag-btn-newhire" class="ag-btn col-span-2 sm:col-span-3 lg:col-span-2 flex items-center justify-between gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
-            <div class="flex items-center gap-2.5">
-              <img data-avatar="pavilion" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-              <div>
-                <div class="font-bold text-sm leading-tight">+ Hire a New Specialist</div>
-                <div class="text-xs opacity-80">Declarative YAML &amp; 60s Git hot-reload</div>
-              </div>
-            </div>
-            <span class="text-xs font-bold px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">How it scales</span>
-          </button>
-        </div>
+      <!-- Horizontal Agency Call Sheet (44px+ touch targets) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2" role="tablist" aria-label="Agency specialists and hiring">
+        <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="aida" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Aida</div>
+            <div class="text-[11px] opacity-80 truncate">Chief of Staff</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="cookie" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Cookie</div>
+            <div class="text-[11px] opacity-80 truncate">Personal Chef</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="scout" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Scout</div>
+            <div class="text-[11px] opacity-80 truncate">Product Scout</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="sterling" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Sterling</div>
+            <div class="text-[11px] opacity-80 truncate">Cards &amp; Perks</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="sloan" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Sloan</div>
+            <div class="text-[11px] opacity-80 truncate">Interiors</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="tazza" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">Tazza</div>
+            <div class="text-[11px] opacity-80 truncate">Coffee</div>
+          </div>
+        </button>
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('newhire')" id="ag-btn-newhire" class="ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+          <img data-avatar="pavilion" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <div class="min-w-0">
+            <div class="font-bold text-sm leading-tight truncate">+ New Hire</div>
+            <div class="text-[11px] opacity-80 truncate">60s Git Deploy</div>
+          </div>
+        </button>
+      </div>
 
-        <!-- Specialist Dossier Panel -->
-        <div id="agent-dossier" role="tabpanel" aria-live="polite" class="lg:col-span-7 lm-frame bg-[var(--card)] rounded-2xl p-5 sm:p-6 space-y-4 fade-swap">
-          <!-- Populated by JS -->
-        </div>
+      <!-- Full-Width Cinema-Scale Specialist Studio Stage -->
+      <div id="agent-dossier" role="tabpanel" aria-live="polite" class="lm-frame bg-[var(--card)] rounded-2xl p-4 sm:p-6 shadow-sm fade-swap">
+        <!-- Populated by JS -->
       </div>
     </section>
 
@@ -850,18 +894,41 @@
         if (AVATARS[key]) img.src = AVATARS[key];
       });
     }
+    const SCENE_KEYS = ['aida', 'cookie', 'scout', 'sterling', 'sloan', 'tazza', 'newhire'];
+    function bindScenes(root = document) {
+      root.querySelectorAll('img[data-scene]').forEach(img => {
+        const key = img.getAttribute('data-scene');
+        if (!key) return;
+        img.onerror = function() {
+          if (!img.dataset.fallbackTried) {
+            img.dataset.fallbackTried = '1';
+            img.src = 'https://gautamvasudevan.github.io/leamonde-assets/scenes/' + key + '.jpg';
+          }
+        };
+        img.src = './scenes/' + key + '.jpg';
+      });
+    }
+    // Preload widescreen studio scenes in background
+    setTimeout(() => {
+      SCENE_KEYS.forEach(k => {
+        const pre = new Image();
+        pre.src = './scenes/' + k + '.jpg';
+      });
+    }, 300);
     bindAvatars();
+    bindScenes();
 
     // 4B. Interactive 3D Lea Monde Atelier Pavilion & Orbiting Specialist Constellation
     let pavilionPaused = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || false;
     let activePavilionAgent = 'all';
+    let pavilionTargetRotY = null;
     const PAVILION_AGENTS = [
-      { id: 'aida', name: 'Aida', role: 'Chief of Staff · Calendar, Gmail, Superbills', room: '#lobby · #foothills', angle: 0, tilt: 0.22 },
-      { id: 'cookie', name: 'Cookie', role: 'Personal Chef · NYT Cooking & 6 Instacart Stores', room: '#kitchen', angle: Math.PI / 3, tilt: -0.20 },
-      { id: 'scout', name: 'Scout', role: 'Product Scout · Retail Research & Package Tracking', room: '#shopping', angle: (2 * Math.PI) / 3, tilt: 0.24 },
-      { id: 'sterling', name: 'Sterling', role: 'Card Strategist · Perks DB, Monarch, Points', room: '#shopping', angle: Math.PI, tilt: -0.22 },
-      { id: 'sloan', name: 'Sloan', role: 'Interior Designer · Trade Sourcing & Dimensions', room: '#interiors', angle: (4 * Math.PI) / 3, tilt: 0.20 },
-      { id: 'tazza', name: 'Tazza', role: 'Head Barista · Dial-In & Fellow Aiden Profiles', room: '#coffee', angle: (5 * Math.PI) / 3, tilt: -0.24 }
+      { id: 'aida', name: 'Aida', role: 'Chief of Staff · Calendar, Gmail, Superbills', room: '#lobby · #foothills', liveNote: 'Syncing family calendar & 7 AM briefing', angle: 0, tilt: 0.22 },
+      { id: 'cookie', name: 'Cookie', role: 'Personal Chef · NYT Cooking & 6 Instacart Stores', room: '#kitchen', liveNote: 'Comparing 6 grocery stores & planning dinner', angle: Math.PI / 3, tilt: -0.20 },
+      { id: 'scout', name: 'Scout', role: 'Product Scout · Retail Research & Package Tracking', room: '#shopping', liveNote: 'Running 3 parallel retail sub-agents', angle: (2 * Math.PI) / 3, tilt: 0.24 },
+      { id: 'sterling', name: 'Sterling', role: 'Card Strategist · Perks DB, Monarch, Points', room: '#shopping', liveNote: 'Auditing statement credits & award flights', angle: Math.PI, tilt: -0.22 },
+      { id: 'sloan', name: 'Sloan', role: 'Interior Designer · Trade Sourcing & Dimensions', room: '#interiors', liveNote: 'Checking 8x10 rug dimensions & wool pile', angle: (4 * Math.PI) / 3, tilt: 0.20 },
+      { id: 'tazza', name: 'Tazza', role: 'Head Barista · Dial-In & Fellow Aiden Profiles', room: '#coffee', liveNote: 'Dialing in 93°C bloom profile for Fellow Aiden', angle: (5 * Math.PI) / 3, tilt: -0.24 }
     ];
     const pavilionImages = {};
     PAVILION_AGENTS.forEach(ag => {
@@ -894,20 +961,65 @@
       });
       const titleEl = document.getElementById('pavilion-focus-title');
       const roomEl = document.getElementById('pavilion-focus-room');
+      const drawer = document.getElementById('pavilion-studio-drawer');
       if (activePavilionAgent === 'all') {
         if (titleEl) titleEl.textContent = 'Active specialist desks orbiting the home server';
         if (roomEl) roomEl.textContent = 'Proxmox VE · Discord';
+        if (drawer) {
+          drawer.classList.add('hidden');
+          drawer.innerHTML = '';
+        }
       } else {
         const found = PAVILION_AGENTS.find(a => a.id === activePavilionAgent);
         if (found) {
           if (titleEl) titleEl.textContent = found.name + ' · ' + found.role;
           if (roomEl) roomEl.textContent = found.room;
+          if (drawer) {
+            drawer.classList.remove('hidden');
+            drawer.innerHTML = `
+              <div class="grid grid-cols-1 sm:grid-cols-12 items-stretch">
+                <div class="sm:col-span-5 relative h-32 sm:h-auto overflow-hidden bg-[#141A24]">
+                  <img data-scene="${found.id}" alt="${found.name} at work" class="w-full h-full object-cover studio-art-motion" />
+                  <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#141A24]/85 text-[#F8F5EE] border border-[#C5A059]/60 text-[10px] font-bold uppercase tracking-wider">● Live in Studio</span>
+                </div>
+                <div class="sm:col-span-7 p-3 flex flex-col justify-between gap-2">
+                  <div>
+                    <div class="text-xs font-bold text-[var(--foreground)]">${found.name} at Work · <span class="text-[var(--muted-foreground)] font-medium">${found.room}</span></div>
+                    <p class="text-xs text-[var(--muted-foreground)] mt-0.5 leading-snug">${found.liveNote}</p>
+                  </div>
+                  <div class="flex items-center justify-between gap-2 pt-1">
+                    <button type="button" onclick="jumpToAgentStudio('${found.id}')" class="px-3 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold min-h-[36px] hover:opacity-90 transition">
+                      Open Full Studio Stage ↓
+                    </button>
+                    <button type="button" onclick="focusPavilionAgent('all')" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium min-h-[36px] hover:bg-[var(--secondary)] transition">
+                      All Desks
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+            bindScenes(drawer);
+          }
         }
       }
     }
 
+    function jumpToAgentStudio(id) {
+      if (typeof selectAgent === 'function') selectAgent(id);
+      const rosterEl = document.getElementById('agent-dossier');
+      if (rosterEl) rosterEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     function focusPavilionAgent(id) {
       activePavilionAgent = id;
+      if (id !== 'all') {
+        const found = PAVILION_AGENTS.find(a => a.id === id);
+        if (found) {
+          pavilionTargetRotY = (-Math.PI / 2 - found.angle) / 1.85;
+        }
+      } else {
+        pavilionTargetRotY = null;
+      }
       updatePavilionPills();
       spawnPavilionPulses(id);
       if (id !== 'all' && typeof selectAgent === 'function') {
@@ -1036,7 +1148,13 @@
         const pageBg = styles.getPropertyValue('--background').trim() || '#f5f1e6';
         const scaleMul = Math.min(cw, ch) / 335;
 
-        if (!pavilionPaused && !dragging) {
+        if (dragging) {
+          pavilionTargetRotY = null;
+        } else if (pavilionTargetRotY !== null) {
+          const diff = pavilionTargetRotY - rotY;
+          rotY += diff * 0.08;
+          if (Math.abs(diff) < 0.005) pavilionTargetRotY = null;
+        } else if (!pavilionPaused) {
           rotY += velY;
         }
 
@@ -1426,76 +1544,408 @@
       renderMap();
     }
 
-    // 6. Chapter 02: Compact 6-Agent Switchboard
+    // 6. Chapter 02: Full-Width Specialist Studio Stage + Live 60fps Domain Animation Engine
     const AGENTS = {
       aida: {
+        deskNum: '01',
         name: 'Aida',
         role: 'Chief of Staff',
         rooms: '#lobby · #foothills · Private Desks',
-        summary: 'Coordinates family calendars, sends the 7 AM voice briefing, books tennis courts, watches email inboxes, and handles private-desk tasks like medical superbills.',
+        sceneAlt: 'Editorial illustration of Aida at her Chief of Staff desk with wall calendar and briefing microphone',
+        studioCaption: 'Pavilion Rotunda Office · Morning Briefing & Family Schedule',
+        summary: 'Coordinates family calendars, voices the 7 AM audio briefing, books tennis courts, watches email inboxes, and runs private-desk workflows like medical superbills.',
+        reelSteps: [
+          { title: '07:00 Voice Briefing', detail: 'Reads iCloud calendars and overnight watches in a fresh session and posts a 60-second audio note.' },
+          { title: 'Court 4 Reservation', detail: 'Checks partner availability and locks in an open afternoon court at the local tennis club.' },
+          { title: 'Cross-Desk Handoff', detail: 'Answers the calendar part of a question, then calls handoff("Cookie") or handoff("Scout") in the same thread.' }
+        ],
         allowed: ['iCloud Calendar', 'Tennis Club', 'Routines & Watches', 'Google (Private Desks)', 'Insurance Claims Skill'],
         blocked: ['Kitchen DB & Instacart', 'Monarch Money', 'Fellow Aiden Brewer']
       },
       cookie: {
+        deskNum: '02',
         name: 'Cookie',
         role: 'Personal Chef',
         rooms: '#kitchen',
-        summary: 'Plans Sunday batch cooking, tracks what is in the fridge and pantry, rotates the kid\'s school lunchboxes, and compares prices across six grocery stores on Instacart.',
+        sceneAlt: 'Editorial illustration of Cookie tasting from a simmering Dutch oven in a sunlit marble kitchen',
+        studioCaption: 'Household Kitchen · NYT Cooking & 6-Store Instacart Pricing',
+        summary: 'Plans Sunday batch cooking, tracks what is in the fridge and pantry, rotates the kid\'s school lunchboxes, and compares live prices across six local grocery stores.',
+        reelSteps: [
+          { title: 'Menu & Recipe Box', detail: 'Pulls saved NYT Cooking recipes and checks kitchen.sqlite so pantry staples are not bought twice.' },
+          { title: '6-Store Price Race', detail: 'Queries Sprouts, Safeway, Draeger\'s, Costco, Target, and Mollie Stone\'s in parallel for each ingredient.' },
+          { title: 'Shared Family Cart', detail: 'Loads the winning items into the shared Instacart Family Cart while leaving checkout to a human.' }
+        ],
         allowed: ['Kitchen SQLite DB', 'NYT Cooking', 'Instacart (6 Stores & Family Cart)', 'Shared Calendar Read'],
         blocked: ['Personal Gmail', 'Monarch Money', 'Instacart Checkout (Not in Code)']
       },
       scout: {
+        deskNum: '03',
         name: 'Scout',
         role: 'Product Scout',
         rooms: '#shopping',
+        sceneAlt: 'Editorial illustration of Scout inspecting hardware with brass calipers at his studio workbench',
+        studioCaption: 'Design & Logistics Bench · Parallel Retail Sub-Agents',
         summary: 'Compares products across retailers using parallel web sub-agents, builds one-tap Amazon cart links from verified product IDs, and tracks incoming deliveries.',
+        reelSteps: [
+          { title: 'Parallel Flash Sub-Agents', detail: 'Spawns up to 4 throwaway Gemini Flash sessions to scrape specs and studio photos via Browserless.' },
+          { title: 'ASIN & Link Verification', detail: 'Backstage QC confirms every URL and Amazon ASIN came from a real tool output before posting.' },
+          { title: 'Live Parcel Tracking', detail: 'Watches carrier updates and alerts #shopping when packages are out for delivery or delayed.' }
+        ],
         allowed: ['Browserless Sub-Agents', 'MaxWorth Portals', 'Order Tracker', 'Grocery List Add'],
         blocked: ['Monarch Transactions', 'NYT Cooking', 'Personal Google Drive']
       },
       sterling: {
+        deskNum: '04',
         name: 'Sterling',
-        role: 'Cards & Perks',
+        role: 'Cards & Perks Strategist',
         rooms: '#shopping',
-        summary: 'Tracks statement credits before they reset, checks recurring subscriptions against card perks, and summarizes household card spending from Monarch Money.',
+        sceneAlt: 'Editorial illustration of Sterling at his walnut study desk with reserve card, ledger, and flight departure board',
+        studioCaption: 'Financial & Travel Study · Perks Ledger & Award Routes',
+        summary: 'Tracks statement credits before they reset, audits recurring subscriptions against card perks, and spots high-value airline and hotel transfer sweet spots.',
+        reelSteps: [
+          { title: 'Statement Credit Ledger', detail: 'Syncs card charges from Monarch Money into perks.sqlite to mark monthly and annual credits used.' },
+          { title: 'Subscription Audit', detail: 'Flags recurring bills that could be comped by an existing Amex, Chase, or Capital One card benefit.' },
+          { title: 'Award Sweet Spots', detail: 'Checks CardStack transfer bonuses and MaxWorth merchant offers before big household purchases or trips.' }
+        ],
         allowed: ['Perks SQLite DB', 'Monarch (Cards & Bills Only)', 'CardStack', 'MaxWorth Offers'],
         blocked: ['Bank Balances, Paychecks & Net Worth', 'Instacart Cart', 'Fellow Aiden']
       },
       sloan: {
+        deskNum: '05',
         name: 'Sloan',
-        role: 'Interiors',
+        role: 'Interior Designer',
         rooms: '#interiors',
-        summary: 'Finds furniture, rugs, and lighting with studio photos, exact dimensions, and weave details, working from room photos and floor plans inside dedicated threads.',
+        sceneAlt: 'Editorial illustration of Sloan measuring a floor plan with brass dividers in her design atelier',
+        studioCaption: 'Architectural Atelier · Floor Plans, Swatches & Trade Sourcing',
+        summary: 'Finds furniture, rugs, and lighting with studio packshots, exact dimensions, and material weave details, working from room photos and floor plans in dedicated threads.',
+        reelSteps: [
+          { title: 'Room & Scale Check', detail: 'Reads room dimensions and photos from the House Binder so every recommendation fits the floor plan.' },
+          { title: 'Material & Weave Audit', detail: 'Extracts pile height, knot density, wood species, and studio packshots while filtering out review clutter.' },
+          { title: '10-Minute Spec Cache', detail: 'Caches parsed product pages on disk so follow-up questions about care or dimensions answer in milliseconds.' }
+        ],
         allowed: ['Browserless Sub-Agents', 'Room Photo Analysis', 'House Binder (Room Specs)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Personal Gmail']
       },
       tazza: {
+        deskNum: '06',
         name: 'Tazza',
-        role: 'Coffee',
+        role: 'Head Barista',
         rooms: '#coffee',
-        summary: 'Reads photos of new coffee bags, dials in grind and temperature for espresso or pour-over, logs tasting notes, and pushes brew profiles straight to the Fellow Aiden brewer.',
+        sceneAlt: 'Editorial illustration of Tazza pouring from a brass gooseneck kettle into a glass carafe at his coffee bar',
+        studioCaption: 'Specialty Coffee Bar · Bean Intake & Fellow Aiden Profiles',
+        summary: 'Reads photos of new coffee bags, dials in grind and water temperature for espresso or pour-over, logs tasting notes, and pushes brew profiles straight to the Fellow Aiden.',
+        reelSteps: [
+          { title: 'Coffee Bag Intake', detail: 'Reads origin, varietal, process, and roast level from a phone photo and looks up roaster notes.' },
+          { title: 'Grind & Temp Dial-In', detail: 'Calculates dose, grind setting, bloom ratio, and 3-stage water temperatures for the specific bean.' },
+          { title: 'Push to Fellow Aiden', detail: 'Sends the custom brew profile directly to the kitchen brewer so the next pot is ready to run.' }
+        ],
         allowed: ['Fellow Aiden Brewer', 'Roaster Web Lookup', 'House Binder (Bean Log)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Calendars & Email']
       },
       newhire: {
-        name: '+ New Specialist Desk',
+        deskNum: '07+',
+        name: 'Commissioning a New Specialist',
         avatarKey: 'pavilion',
         role: 'Declarative Git Onboarding (60s Hot Reload)',
         rooms: 'Any new or shared Discord room',
-        summary: 'The agency is not fixed to a static list of bots. Whenever a new recurring need comes up (travel planning, wine cellar, garden, home maintenance, kids\' activities), we add a folder in leamonde-agents with an AGENT.md handbook, a tool allowlist, and an illustrated portrait. Within 60 seconds, the server hot-reloads the new specialist, creates its Discord webhook, and updates the #lobby directory.',
+        sceneAlt: 'Editorial illustration of an agency drafting table inking a new specialist portrait and dossier',
+        studioCaption: 'Lea Monde Agency Drafting Table · Declarative YAML + Git Push',
+        summary: 'The agency is not a fixed list of six bots. Whenever a new recurring domain comes up (wine cellar, garden, home maintenance, travel, kids\' activities), we add a folder in Git and a new specialist desk comes online in 60 seconds.',
+        reelSteps: [
+          { title: '1. Define AGENT.md', detail: 'Write the persona handbook, model spec, custom QC rules, and strict MCP tool allowlist in YAML.' },
+          { title: '2. Generate Editorial Portrait', detail: 'Create a matching New Yorker / Monocle line-art portrait and push it to the asset CDN.' },
+          { title: '3. 60-Second Hot Reload', detail: 'On git push, the Proxmox daemon spawns the new Agent, binds its Discord webhook, and updates #lobby.' }
+        ],
         allowed: ['agents/<name>/AGENT.md', 'Scoped MCP Tool Allowlist', 'Custom QC Rules', 'Dedicated Discord Webhook', 'Handoffs to & from Aida'],
         blocked: ['Any MCP tool not explicitly listed in AGENT.md']
       }
     };
 
+    let currentAgentKey = 'aida';
+    let currentReelIdx = 0;
+    let reelTimer = null;
+    let studioAnimFrame = null;
+    let studioStartTime = 0;
+
+    function selectAgentReelStep(idx) {
+      currentReelIdx = idx;
+      updateReelHighlight();
+    }
+
+    function updateReelHighlight() {
+      const a = AGENTS[currentAgentKey];
+      if (!a) return;
+      a.reelSteps.forEach((_, i) => {
+        const card = document.getElementById('reel-step-' + i);
+        const badge = document.getElementById('reel-badge-' + i);
+        if (!card || !badge) return;
+        const active = (i === currentReelIdx);
+        card.className = 'w-full text-left p-3 rounded-xl border transition ' +
+          (active
+            ? 'bg-[var(--card)] border-[var(--primary)] ring-2 ring-[var(--primary)]/25 shadow-sm'
+            : 'bg-[var(--background)]/75 border-[var(--border)] opacity-70 hover:opacity-100');
+        badge.className = 'inline-flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold shrink-0 ' +
+          (active
+            ? 'bg-[#C5A059] text-[#141A24]'
+            : 'bg-[var(--secondary)] text-[var(--muted-foreground)]');
+      });
+    }
+
+    function replayStudioScene() {
+      const img = document.querySelector('#agent-dossier img[data-scene]');
+      if (img) {
+        img.classList.remove('studio-art-motion');
+        void img.offsetWidth;
+        img.classList.add('studio-art-motion');
+      }
+      studioStartTime = performance.now();
+      currentReelIdx = 0;
+      updateReelHighlight();
+    }
+
+    function startStudioSceneAnimation(key) {
+      if (studioAnimFrame) cancelAnimationFrame(studioAnimFrame);
+      const canvas = document.getElementById('studio-live-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      studioStartTime = performance.now();
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function drawTag(ctx, x, y, text, isAccent) {
+        ctx.save();
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+        const padX = 8;
+        const tw = ctx.measureText(text).width;
+        const bw = tw + padX * 2;
+        const bh = 22;
+        ctx.fillStyle = isAccent ? 'rgba(20, 26, 36, 0.92)' : 'rgba(248, 245, 238, 0.94)';
+        ctx.strokeStyle = isAccent ? '#C5A059' : '#182338';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.roundRect(x - bw / 2, y - bh / 2, bw, bh, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = isAccent ? '#F8F5EE' : '#182338';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y + 0.5);
+        ctx.restore();
+      }
+
+      function tick(now) {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = rect.width || 640;
+        const h = rect.height || 360;
+        if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+        }
+
+        ctx.save();
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const elapsed = (now - studioStartTime) / 1000;
+        const t = reduceMotion ? 1.5 : elapsed;
+
+        // Subtle warm vignette around the studio frame
+        const grad = ctx.createLinearGradient(0, h * 0.65, 0, h);
+        grad.addColorStop(0, 'rgba(20, 26, 36, 0)');
+        grad.addColorStop(1, 'rgba(20, 26, 36, 0.72)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, h * 0.65, w, h * 0.35);
+
+        if (key === 'aida') {
+          // 1. Acoustic soundwaves radiating from Aida's vintage microphone (x: 0.275, y: 0.63)
+          const mx = w * 0.275, my = h * 0.63;
+          for (let i = 0; i < 3; i++) {
+            const prog = (t * 0.85 + i * 0.33) % 1;
+            const r = 10 + prog * 38;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 1.8;
+            ctx.globalAlpha = (1 - prog) * 0.85;
+            ctx.beginPath();
+            ctx.arc(mx, my, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+          drawTag(ctx, mx, my - 38, '07:00 Voice Briefing · Live', true);
+
+          // 2. Brass signal arc from Aida's pen (0.47, 0.80) to the wall schedule (0.86, 0.36)
+          const px = w * 0.47, py = h * 0.80;
+          const sx = w * 0.86, sy = h * 0.38;
+          const cx = w * 0.66, cy = h * 0.32;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([5, 4]);
+          ctx.lineDashOffset = -t * 24;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.quadraticCurveTo(cx, cy, sx, sy);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const bob = Math.sin(t * 2.4) * 3;
+          drawTag(ctx, w * 0.83, h * 0.26 + bob, 'Court 4 Reserved · 4:30 PM ✓', false);
+          drawTag(ctx, w * 0.78, h * 0.52 - bob, 'handoff("Cookie") → #kitchen', true);
+
+        } else if (key === 'cookie') {
+          // 1. Rising kitchen steam wisps above the Dutch oven (x: 0.60, y: 0.64)
+          const ox = w * 0.60, oy = h * 0.64;
+          for (let i = 0; i < 3; i++) {
+            const prog = (t * 0.45 + i * 0.33) % 1;
+            const sy = oy - prog * (h * 0.34);
+            const sx = ox + Math.sin(prog * Math.PI * 2.5 + i) * 14 + (i - 1) * 12;
+            ctx.strokeStyle = '#F8F5EE';
+            ctx.lineWidth = 2.2;
+            ctx.globalAlpha = Math.sin(prog * Math.PI) * 0.78;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy + 18);
+            ctx.quadraticCurveTo(sx + 8, sy + 9, sx - 4, sy);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+          const bob = Math.sin(t * 2.2) * 3;
+          drawTag(ctx, w * 0.28, h * 0.56 + bob, 'NYT Recipe Box · White Bean Ragu', false);
+          drawTag(ctx, w * 0.77, h * 0.46 - bob, 'Sprouts $8.48 ✓ (vs $12.90)', true);
+          drawTag(ctx, w * 0.60, h * 0.76, 'Family Cart Updated · 6 Stores Checked', false);
+
+        } else if (key === 'scout') {
+          // 1. Studio camera reticle & caliper scan line
+          const camX = w * 0.175, camY = h * 0.49;
+          const partX = w * 0.54, partY = h * 0.58;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.lineDashOffset = -t * 20;
+          ctx.beginPath();
+          ctx.moveTo(camX, camY);
+          ctx.lineTo(partX, partY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Pulsing target ring on caliper hardware
+          const pulseR = 18 + Math.sin(t * 3) * 4;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(partX, partY, pulseR, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Moving delivery beacon on route map (top-left)
+          const mapProg = (t * 0.35) % 1;
+          const mx = w * (0.20 + mapProg * 0.15);
+          const my = h * (0.28 - Math.sin(mapProg * Math.PI) * 0.08);
+          ctx.fillStyle = '#C5A059';
+          ctx.beginPath();
+          ctx.arc(mx, my, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          drawTag(ctx, w * 0.28, h * 0.38, '3 Flash Sub-Agents · Scraping Specs', false);
+          drawTag(ctx, partX, partY - 34, 'ASIN Verified · Studio Packshot ✓', true);
+          drawTag(ctx, w * 0.84, h * 0.52, 'UPS Parcel · Arriving 2:15 PM', false);
+
+        } else if (key === 'sterling') {
+          // 1. Transoceanic award flight arc across world map (SFO 0.67,0.26 -> CDG 0.91,0.21)
+          const sfoX = w * 0.675, sfoY = h * 0.265;
+          const cdgX = w * 0.915, cdgY = h * 0.215;
+          const ctrlX = w * 0.79, ctrlY = h * 0.09;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(sfoX, sfoY);
+          ctx.quadraticCurveTo(ctrlX, ctrlY, cdgX, cdgY);
+          ctx.stroke();
+
+          // Gliding flight dot along arc
+          const u = (t * 0.4) % 1;
+          const inv = 1 - u;
+          const fx = inv * inv * sfoX + 2 * inv * u * ctrlX + u * u * cdgX;
+          const fy = inv * inv * sfoY + 2 * inv * u * ctrlY + u * u * cdgY;
+          ctx.fillStyle = '#C5A059';
+          ctx.beginPath();
+          ctx.arc(fx, fy, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          const bob = Math.sin(t * 2.2) * 3;
+          drawTag(ctx, w * 0.22, h * 0.46 + bob, 'SFO → HND · 85k ANA Business', true);
+          drawTag(ctx, w * 0.53, h * 0.76 - bob, '+$200 Amex Credit Marked Used ✓', false);
+          drawTag(ctx, w * 0.82, h * 0.40, 'Monarch Sync · Net Worth Stripped', false);
+
+        } else if (key === 'sloan') {
+          // 1. Rotating brass compass arc over living-room floor plan (0.52, 0.80)
+          const bx = w * 0.52, by = h * 0.81;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(bx, by, 34, -Math.PI * 0.85, -Math.PI * 0.85 + ((t * 1.2) % (Math.PI * 1.4)));
+          ctx.stroke();
+
+          const bob = Math.sin(t * 2.1) * 3;
+          drawTag(ctx, w * 0.22, h * 0.34 + bob, '100% Hand-Knotted Wool · 0.45" Pile', false);
+          drawTag(ctx, w * 0.52, h * 0.65, 'Floor Plan Verified · 8\'0" × 10\'0" ✓', true);
+          drawTag(ctx, w * 0.80, h * 0.42 - bob, '3 Options Under $1,200 · Cached 10m', false);
+
+        } else if (key === 'tazza') {
+          // 1. Aromatic steam rising from gooseneck kettle & V60 (x: 0.49, y: 0.42)
+          const kx = w * 0.48, ky = h * 0.42;
+          for (let i = 0; i < 3; i++) {
+            const prog = (t * 0.5 + i * 0.33) % 1;
+            const sy = ky - prog * (h * 0.26);
+            const sx = kx + Math.sin(prog * Math.PI * 2 + i) * 10;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = Math.sin(prog * Math.PI) * 0.82;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy + 14);
+            ctx.quadraticCurveTo(sx - 7, sy + 7, sx + 5, sy);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+
+          // Live ticking gram readout over scale
+          const grams = Math.min(288, Math.round(18 + ((t * 38) % 270)));
+          drawTag(ctx, w * 0.53, h * 0.60, `93.0°C · ${grams}g / 288g · 1:16 Ratio`, true);
+          drawTag(ctx, w * 0.26, h * 0.44, '3-Pulse Profile → Fellow Aiden ✓', false);
+          drawTag(ctx, w * 0.80, h * 0.38, 'Washed Ethiopia · Bergamot & Peach', false);
+
+        } else if (key === 'newhire') {
+          // 1. Brass seal ring drawing around the new portrait (0.645, 0.625)
+          const px = w * 0.645, py = h * 0.625;
+          ctx.strokeStyle = '#C5A059';
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.arc(px, py, 44, 0, ((t * 1.5) % (Math.PI * 2)));
+          ctx.stroke();
+
+          drawTag(ctx, w * 0.36, h * 0.44, '1. agents/<name>/AGENT.md', false);
+          drawTag(ctx, w * 0.64, h * 0.42, '2. Scoped Tools + Portrait', false);
+          drawTag(ctx, w * 0.52, h * 0.76, '3. git push → Online in 60s ✓', true);
+        }
+
+        ctx.restore();
+        if (!reduceMotion) {
+          studioAnimFrame = requestAnimationFrame(tick);
+        }
+      }
+      studioAnimFrame = requestAnimationFrame(tick);
+    }
+
     function selectAgent(key) {
       const a = AGENTS[key];
       if (!a) return;
+      currentAgentKey = key;
+      currentReelIdx = 0;
+      if (reelTimer) { clearInterval(reelTimer); reelTimer = null; }
+
       document.querySelectorAll('.ag-btn').forEach(btn => {
         btn.setAttribute('aria-selected', 'false');
         const isWide = btn.id === 'ag-btn-newhire';
         btn.className = (isWide
-          ? 'ag-btn col-span-2 sm:col-span-3 lg:col-span-2 flex items-center justify-between gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition '
-          : 'ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition ') +
+          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition '
+          : 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition ') +
           'bg-[var(--card)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const activeBtn = document.getElementById('ag-btn-' + key);
@@ -1503,205 +1953,337 @@
         activeBtn.setAttribute('aria-selected', 'true');
         const isWide = activeBtn.id === 'ag-btn-newhire';
         activeBtn.className = (isWide
-          ? 'ag-btn col-span-2 sm:col-span-3 lg:col-span-2 flex items-center justify-between gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition '
-          : 'ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition ') +
-          'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition '
+          : 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition ') +
+          'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm';
       }
 
       const avatarKey = a.avatarKey || key;
-      const allowedHeading = key === 'newhire' ? 'What a new specialist definition includes:' : `Tools available to ${a.name}:`;
-      const blockedHeading = key === 'newhire' ? 'Default permission boundary:' : `Not loaded in ${a.name}'s session:`;
+      const allowedHeading = key === 'newhire' ? 'Included in every specialist folder:' : `Tools loaded for ${a.name}:`;
+      const blockedHeading = key === 'newhire' ? 'Default permission boundary:' : `Blocked from ${a.name}'s session:`;
 
       const container = document.getElementById('agent-dossier');
       container.innerHTML = `
-        <div class="flex items-center gap-3.5">
-          <img data-avatar="${avatarKey}" alt="" width="56" height="56" class="w-14 h-14 rounded-full border border-[var(--border)] object-cover shrink-0" />
-          <div>
-            <div class="font-serif-display text-2xl leading-tight">${a.name} <span class="font-sans text-xs font-medium text-[var(--muted-foreground)]">· ${a.role}</span></div>
-            <div class="text-xs text-[var(--muted-foreground)] mt-0.5">Active in <strong>${a.rooms}</strong></div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
+          <!-- Left 7 Columns: Widescreen "At Work" Studio Viewport + Live 60fps Canvas -->
+          <div class="lg:col-span-7 space-y-2.5">
+            <div class="relative aspect-[16/9] rounded-xl overflow-hidden border border-[var(--border)] bg-[#141A24] shadow-sm">
+              <img data-scene="${key}" alt="${a.sceneAlt}" class="w-full h-full object-cover studio-art-motion" />
+              <canvas id="studio-live-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+              <!-- Top Studio Control Bar -->
+              <div class="absolute top-3 inset-x-3 flex items-center justify-between gap-2">
+                <span class="px-2.5 py-1 rounded-md bg-[#141A24]/88 text-[#F8F5EE] border border-[#C5A059]/60 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
+                  ● Desk ${a.deskNum} · ${a.rooms}
+                </span>
+                <button type="button" onclick="replayStudioScene()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE]/92 text-[#141A24] hover:bg-white border border-[#141A24]/30 text-xs font-semibold min-h-[32px] transition shadow-sm">
+                  ↻ Replay Scene
+                </button>
+              </div>
+
+              <!-- Bottom Editorial Character Introduction Plate -->
+              <div class="absolute bottom-0 inset-x-0 bg-[#141A24]/92 backdrop-blur-md text-[#F8F5EE] border-t border-[#C5A059]/50 px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img data-avatar="${avatarKey}" alt="" width="44" height="44" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-[#C5A059] object-cover shrink-0" />
+                  <div class="min-w-0">
+                    <div class="font-serif-display text-lg sm:text-xl leading-tight truncate">
+                      ${a.name} <span class="font-sans text-xs font-semibold text-[#D4B26F]">· ${a.role}</span>
+                    </div>
+                    <div class="text-[11px] text-[#D5CFC2] truncate">${a.studioCaption}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">${a.summary}</p>
-        <div class="space-y-2 pt-1">
-          <div class="text-xs font-bold">${allowedHeading}</div>
-          <div class="flex flex-wrap gap-1.5">
-            ${a.allowed.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--background)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
-          </div>
-        </div>
-        <div class="space-y-1.5 pt-3 border-t border-[var(--border)]">
-          <div class="text-xs font-bold text-[var(--muted-foreground)]">${blockedHeading}</div>
-          <div class="flex flex-wrap gap-1.5">
-            ${a.blocked.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--secondary)]/50 text-[var(--muted-foreground)] line-through">${t}</span>`).join('')}
+
+          <!-- Right 5 Columns: Live 3-Step Action Reel + Scoped Tool Allowlist -->
+          <div class="lg:col-span-5 space-y-4">
+            <p class="text-sm text-[var(--foreground)] leading-relaxed">${a.summary}</p>
+
+            <!-- 3-Step Animated Action Reel -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold uppercase tracking-wider text-[var(--muted-foreground)]">How ${a.name} Works (Live Sequence)</span>
+                <span class="text-[11px] text-[var(--muted-foreground)]">Tap any step</span>
+              </div>
+              <div class="space-y-1.5">
+                ${a.reelSteps.map((st, idx) => `
+                  <button type="button" id="reel-step-${idx}" onclick="selectAgentReelStep(${idx})" class="w-full text-left p-3 rounded-xl border transition">
+                    <div class="flex items-start gap-2.5">
+                      <span id="reel-badge-${idx}" class="inline-flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold shrink-0 mt-0.5">${idx + 1}</span>
+                      <div class="space-y-0.5">
+                        <div class="text-xs sm:text-sm font-bold text-[var(--foreground)]">${st.title}</div>
+                        <div class="text-xs text-[var(--muted-foreground)] leading-relaxed">${st.detail}</div>
+                      </div>
+                    </div>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Scoped Tool Allowlist vs Blocked Tools -->
+            <div class="space-y-2.5 pt-2 border-t border-[var(--border)]">
+              <div class="space-y-1.5">
+                <div class="text-xs font-bold">${allowedHeading}</div>
+                <div class="flex flex-wrap gap-1.5">
+                  ${a.allowed.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--background)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <div class="text-xs font-bold text-[var(--muted-foreground)]">${blockedHeading}</div>
+                <div class="flex flex-wrap gap-1.5">
+                  ${a.blocked.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--secondary)]/50 text-[var(--muted-foreground)] line-through">${t}</span>`).join('')}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       `;
       bindAvatars(container);
+      bindScenes(container);
+      updateReelHighlight();
+      startStudioSceneAnimation(key);
+
+      if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+        reelTimer = setInterval(() => {
+          currentReelIdx = (currentReelIdx + 1) % a.reelSteps.length;
+          updateReelHighlight();
+        }, 3400);
+      }
+
       container.classList.remove('fade-swap');
       void container.offsetWidth;
       container.classList.add('fade-swap');
     }
 
-    // 7. Chapter 03: Compact Turn Simulator
+    // 7. Chapter 03: High-Legibility Interactive Product Walkthrough
     const SCENARIOS = {
       handoff: {
-        why: 'Why this example: Aida reads calendars, while Cookie owns the kitchen database and Instacart. Neither agent needs the other\'s tools.',
+        why: 'Why this matters: Aida reads calendars, while Cookie owns the kitchen database and Instacart. Neither specialist needs the other\'s tools.',
         channel: '#lobby',
         thread: 'Thread: Weeknight Dinner',
         steps: [
           {
-            stageTitle: '1 · Calendar Check',
-            stageChip: 'Aida (Agent #1)',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
-                <div class="text-xs font-bold">Partner A</div>
-                <p class="text-xs">Which night is clearest for both of us to cook this week, and can we plan a batch dinner?</p>
-              </div>
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1">Checking the calendar...</div>
-            `,
-            backstageHtml: 'Aida checks both partners\' calendars and sees Wednesday evening is free. She does not have kitchen or grocery tools, so she calls handoff("Cookie").',
-            techNote: 'Aida\'s session has no access to kitchen.sqlite or Instacart.'
+            shortLabel: 'Ask in Discord',
+            headline: 'Partner A asks in #lobby which night is open to cook a batch dinner.',
+            stageTitle: 'Step 1 · Calendar Lookup',
+            stageChip: 'Aida · Chief of Staff',
+            actorAvatar: 'aida',
+            actorName: 'Aida (Chief of Staff)',
+            actorMeta: 'Running on Gemini Argon in #lobby',
+            pipeline: ['icloud_calendar: check week', 'Wed 5:30 PM open', 'handoff("Cookie")'],
+            chatMsg: {
+              sender: 'Partner A',
+              isUser: true,
+              text: 'Which night is clearest for both of us to cook this week, and can we plan a batch dinner?'
+            },
+            serverSummary: 'Aida checks both partners\' calendars and sees Wednesday evening is free. Because she has no kitchen or grocery tools, she hands the thread to Cookie.',
+            techNote: 'Aida\'s session has zero access to kitchen.sqlite or Instacart.'
           },
           {
-            stageTitle: '2 · Agent Handoff',
+            shortLabel: 'Handoff to Cookie',
+            headline: 'Aida posts the open night and hands the conversation straight to Cookie.',
+            stageTitle: 'Step 2 · Specialist Handoff',
             stageChip: 'handoff("Cookie")',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="aida" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Aida:</strong> Wednesday is open after 5:30 PM. Handing over to <strong>Cookie</strong> to pick a recipe.</div>
-              </div>
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1">Cookie is checking the kitchen...</div>
-            `,
-            backstageHtml: 'The harness starts Cookie\'s own Agent instance in the same Discord thread. Cookie checks kitchen.sqlite for pantry items and pulls saved NYT Cooking recipes.',
-            techNote: 'A Discord webhook switches the message author and portrait from Aida to Cookie.'
+            actorAvatar: 'cookie',
+            actorName: 'Cookie (Personal Chef)',
+            actorMeta: 'Takes over the same Discord thread',
+            pipeline: ['Start Cookie Agent', 'Read kitchen.sqlite pantry', 'Search NYT Recipe Box'],
+            chatMsg: {
+              sender: 'Aida',
+              avatar: 'aida',
+              text: 'Wednesday is open after 5:30 PM. Handing over to Cookie to pick a batch recipe.'
+            },
+            serverSummary: 'The server starts Cookie\'s isolated Agent session in the same Discord thread. Cookie checks the pantry in kitchen.sqlite and pulls saved NYT Cooking recipes.',
+            techNote: 'A room webhook switches the message name and portrait from Aida to Cookie automatically.'
           },
           {
-            stageTitle: '3 · Shared Cart Edit',
+            shortLabel: 'Load Family Cart',
+            headline: 'Partner B picks White Bean Ragu; Cookie updates the menu and loads Instacart.',
+            stageTitle: 'Step 3 · Database & Cart Edit',
             stageChip: 'Kitchen DB + Instacart',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
-                <div class="text-xs font-bold">Partner B</div>
-                <p class="text-xs">Let's do the Rosemary White Bean Ragu. Put it on Wednesday and add rosemary and bread to the cart.</p>
-              </div>
-            `,
-            backstageHtml: 'Partner B replies in the same thread. Cookie logs the meal in kitchen.sqlite and adds rosemary and bread to the shared Instacart Family Cart.',
-            techNote: 'Adding to the cart needs no confirmation prompt because the code has no checkout tool.'
+            actorAvatar: 'cookie',
+            actorName: 'Cookie (Personal Chef)',
+            actorMeta: 'Writing to kitchen.sqlite & Instacart MCP',
+            pipeline: ['kitchen_plan_meal (Wed)', 'Compare 6 grocery stores', 'instacart_add_to_cart (Sprouts)'],
+            chatMsg: {
+              sender: 'Partner B',
+              isUser: true,
+              text: 'Let\'s do the Rosemary White Bean Ragu. Put it on Wednesday and add rosemary and bread to the cart.'
+            },
+            serverSummary: 'Partner B replies from their phone. Cookie logs Wednesday\'s dinner in kitchen.sqlite and adds fresh rosemary and levain to the shared Sprouts Family Cart.',
+            techNote: 'Adding items to the Family Cart needs no approval popup because the checkout tool does not exist in code.'
           },
           {
-            stageTitle: '4 · Reply Check & Board',
+            shortLabel: 'Verify & Post',
+            headline: 'The server verifies Cookie\'s tool calls, posts her reply, and updates the Menu Board.',
+            stageTitle: 'Step 4 · Backstage Check & Board',
             stageChip: 'Verified & Posted',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="cookie" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Cookie:</strong> Added White Bean Ragu to Wednesday on the Menu Board, and put rosemary and levain in the Sprouts Family Cart ($8.48).</div>
-              </div>
-            `,
-            backstageHtml: 'Before Cookie\'s reply posts, the backstage check confirms kitchen_plan_meal actually ran, then updates the pinned Menu Board in #kitchen.',
-            techNote: 'The temporary status line deletes itself so phones only buzz once.'
+            actorAvatar: 'cookie',
+            actorName: 'Cookie + Backstage QC',
+            actorMeta: 'Rule check + Gemini Flash reviewer',
+            pipeline: ['Verify kitchen_plan_meal ran', 'Update pinned #kitchen Menu Board', 'Post reply to Discord'],
+            chatMsg: {
+              sender: 'Cookie',
+              avatar: 'cookie',
+              text: 'Added Rosemary White Bean Ragu to Wednesday on the Menu Board, and put rosemary and levain in the Sprouts Family Cart ($8.48).'
+            },
+            serverSummary: 'Before Cookie\'s draft appears in Discord, Backstage QC confirms the meal and cart tools actually ran, then refreshes the pinned Menu Board in #kitchen.',
+            techNote: 'The temporary "Cookie is checking..." status line deletes itself so phones only buzz once.'
           }
         ]
       },
       research: {
-        why: 'Why this example: Retail sites are full of noisy HTML, and models often invent broken product links. Sub-agents and link checks prevent both.',
+        why: 'Why this matters: Retail websites are full of noisy HTML, and AI models often invent broken links. Throwaway sub-agents and link checks solve both.',
         channel: '#interiors',
         thread: 'Thread: Warm Ivory Rugs',
         steps: [
           {
-            stageTitle: '1 · Auto-Thread',
-            stageChip: 'Flash Classifier',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
-                <div class="text-xs font-bold">Partner A</div>
-                <p class="text-xs">Find 3 low-shed 8x10 wool rugs in warm ivory under $1,200.</p>
-              </div>
-              <div class="text-xs bg-[var(--secondary)]/60 rounded-lg px-2.5 py-1.5">Opened thread: <strong>Warm Ivory Rugs</strong></div>
-            `,
-            backstageHtml: 'A quick Flash check sees that sourcing rugs will take several steps and opens a dedicated Discord thread so #interiors stays uncluttered.',
-            techNote: 'Each thread has its own conversation history.'
+            shortLabel: 'Auto-Thread',
+            headline: 'Partner A asks for rug options in #interiors; the server opens a dedicated thread.',
+            stageTitle: 'Step 1 · Auto-Thread Classifier',
+            stageChip: 'Flash Pre-Turn Filter',
+            actorAvatar: 'sloan',
+            actorName: 'Sloan (Interior Designer)',
+            actorMeta: 'Anchored to new thread: Warm Ivory Rugs',
+            pipeline: ['Classify request: multi-step research', 'Create Discord thread', 'Load House Binder room specs'],
+            chatMsg: {
+              sender: 'Partner A',
+              isUser: true,
+              text: 'Find 3 low-shed 8x10 wool rugs in warm ivory under $1,200.'
+            },
+            serverSummary: 'A fast Flash check sees that sourcing rugs will take multiple steps and opens a dedicated thread automatically so the main #interiors channel stays clean.',
+            techNote: 'Quick one-line questions stay in the main channel; deep research gets its own thread.'
           },
           {
-            stageTitle: '2 · Sub-Agents',
-            stageChip: '3 Parallel Flash Agents',
-            discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Researching across 3 parallel tasks...</div>
-            `,
-            backstageHtml: 'Sloan launches three Gemini Flash sub-agents in parallel. Each one opens retailer pages in Browserless, pulls prices, dimensions, and studio photos, and discards the raw HTML.',
-            techNote: 'Raw webpage markup stays in the throwaway sub-agents, keeping Sloan\'s main session small.'
+            shortLabel: '3 Sub-Agents',
+            headline: 'Sloan spawns three parallel Flash sub-agents to read retail pages in Browserless.',
+            stageTitle: 'Step 2 · Clean-Context Sub-Agents',
+            stageChip: '3 Parallel Flash Sessions',
+            actorAvatar: 'sloan',
+            actorName: 'Sloan → 3 Flash Sub-Agents',
+            actorMeta: 'Stealth Playwright (Browserless MCP)',
+            pipeline: ['delegate_research (3 tasks)', 'browser_read: extract JSON-LD specs', 'Discard raw HTML markup'],
+            chatMsg: {
+              sender: 'Sloan (Status)',
+              avatar: 'sloan',
+              isStatus: true,
+              text: 'Sourcing 8x10 warm-ivory wool rugs across 3 parallel sub-agents...'
+            },
+            serverSummary: 'Three read-only Gemini Flash sub-agents open retailer pages in Browserless, extract prices, dimensions, pile height, and studio photos, and throw away the raw HTML.',
+            techNote: 'Raw webpage clutter never enters Sloan\'s main conversation history, keeping token costs low.'
           },
           {
-            stageTitle: '3 · Link & Rule Check',
-            stageChip: 'Link Audit + Critic',
-            discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Checking links and specs...</div>
-            `,
-            backstageHtml: 'A rule check verifies that every URL and photo link in Sloan\'s draft actually came back from Browserless in this turn. A Flash reviewer also checks the $1,200 budget.',
-            techNote: 'Blocks invented URLs, fake Amazon product IDs, and Markdown tables that break on phones.'
+            shortLabel: 'Link & Budget Audit',
+            headline: 'Backstage QC verifies every product URL, photo link, and the $1,200 budget cap.',
+            stageTitle: 'Step 3 · Deterministic & Flash QC',
+            stageChip: 'URL Grounding + Critic',
+            actorAvatar: 'sloan',
+            actorName: 'Backstage QC Gate',
+            actorMeta: 'Deterministic rules + Flash handbook critic',
+            pipeline: ['Check every URL against tool traces', 'Verify 8x10 size & $1,200 cap', 'Block Markdown tables on mobile'],
+            chatMsg: {
+              sender: 'Sloan (Status)',
+              avatar: 'sloan',
+              isStatus: true,
+              text: 'Verifying product links, studio packshots, and dimensions...'
+            },
+            serverSummary: 'A deterministic rule check confirms every link and image URL in Sloan\'s draft came from Browserless in this turn, and a Flash reviewer checks the $1,200 budget.',
+            techNote: 'Prevents hallucinated URLs, fake Amazon ASINs, and wide tables that clip on iPhone screens.'
           },
           {
-            stageTitle: '4 · Verified Reply',
+            shortLabel: 'Verified Options',
+            headline: 'Sloan posts three verified rugs with studio photos and caches the specs for 10 minutes.',
+            stageTitle: 'Step 4 · Posted + 10m Disk Cache',
             stageChip: 'Complete',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="sloan" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Sloan:</strong> Here are 3 warm-ivory 8x10 wool options under $1,200 with verified dimensions, pile heights, and studio photos.</div>
-              </div>
-            `,
-            backstageHtml: 'Browserless keeps the parsed product pages on disk for 10 minutes, so follow-up questions about pile height or care instructions answer right away.',
-            techNote: 'If you ask a quick follow-up in the main channel, recent thread context carries over.'
+            actorAvatar: 'sloan',
+            actorName: 'Sloan (Interior Designer)',
+            actorMeta: 'Pages cached on disk for <5ms follow-ups',
+            pipeline: ['Post 3 verified rugs + studio photos', 'Cache parsed pages on disk (10m TTL)'],
+            chatMsg: {
+              sender: 'Sloan',
+              avatar: 'sloan',
+              text: 'Here are 3 warm-ivory 8x10 hand-knotted wool rugs under $1,200 with verified 0.45" pile heights, weave specs, and studio photos.'
+            },
+            serverSummary: 'Browserless caches the parsed product pages on disk for 10 minutes, so follow-up questions like "what is the backing material on #2?" answer in milliseconds.',
+            techNote: 'If you ask a quick follow-up in #interiors, recent thread context bridges over automatically.'
           }
         ]
       },
       approval: {
-        why: 'Why this example: Medical claims need personal email, insurance passwords, and a human check before records are submitted.',
+        why: 'Why this matters: Medical claims require private email access, insurance portal logins, and human review before anything is submitted.',
         channel: '#partner-b-desk',
         thread: 'Private Desk (Owner-Only)',
         steps: [
           {
-            stageTitle: '1 · Private Scope',
+            shortLabel: 'Private Desk Scope',
+            headline: 'Partner B asks inside her private desk to stage a new superbill from Gmail.',
+            stageTitle: 'Step 1 · Owner-Gated Desk & Skill',
             stageChip: 'Partner B Unlocked',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
-                <div class="text-xs font-bold">Partner B</div>
-                <p class="text-xs">Please stage that new acupuncture superbill from my email on the insurance portal.</p>
-              </div>
-            `,
-            backstageHtml: 'Because Partner B asked inside #partner-b-desk, her personal Gmail and the insurance claim workflow are available. Aida downloads the superbill PDF from Gmail.',
-            techNote: 'In shared channels, personal Gmail and private skills are not loaded at all.'
+            actorAvatar: 'aida',
+            actorName: 'Aida (Chief of Staff)',
+            actorMeta: 'Private #partner-b-desk · anthem-claims skill',
+            pipeline: ['Verify channel owner: Partner B', 'Load Gmail & anthem-claims skill', 'Download PDF superbill'],
+            chatMsg: {
+              sender: 'Partner B',
+              isUser: true,
+              text: 'Please stage that new acupuncture superbill from my email on the insurance portal.'
+            },
+            serverSummary: 'Because Partner B asked inside #partner-b-desk, her personal Gmail and the insurance claim skill unlock. Aida downloads the superbill PDF and extracts the CPT codes.',
+            techNote: 'In shared household rooms, personal Gmail and private skills are not loaded at all.'
           },
           {
-            stageTitle: '2 · 1Password Login',
-            stageChip: 'Server-Side op://',
-            discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Signing in and checking claim fields...</div>
-            `,
-            backstageHtml: 'Aida passes a 1Password reference (op://...) to Browserless. The browser container fetches the login from 1Password and fills the portal fields without exposing the password to the model.',
-            techNote: 'If any login fails, Browserless locks all credential use for 15 minutes and alerts the owner.'
+            shortLabel: '1Password Sign-In',
+            headline: 'Browserless signs in using a 1Password reference without exposing the password to AI.',
+            stageTitle: 'Step 2 · Server-Side 1Password Fill',
+            stageChip: 'op:// Vault Resolution',
+            actorAvatar: 'aida',
+            actorName: 'Browserless + 1Password Vault',
+            actorMeta: 'Zero plaintext credentials in model context',
+            pipeline: ['Pass op://LeaMonde Staff/Anthem/...', 'Browserless resolves login + TOTP', 'Stage PDF & audit portal fields'],
+            chatMsg: {
+              sender: 'Aida (Status)',
+              avatar: 'aida',
+              isStatus: true,
+              text: 'Signing in via 1Password, uploading superbill PDF, and checking portal fields...'
+            },
+            serverSummary: 'Aida passes a named op:// reference to Browserless. The browser container fetches the password and 2FA code from 1Password directly and compares the portal\'s AI fields against the PDF.',
+            techNote: 'If any login ever fails, Browserless pauses all credential use server-wide for 15 minutes.'
           },
           {
-            stageTitle: '3 · Approval Gate',
+            shortLabel: 'Approval Gate',
+            headline: 'The browser pauses before the final Submit button and sends an approval card to Partner B.',
+            stageTitle: 'Step 3 · Hard Commit Gate',
             stageChip: 'always_ask Policy',
-            discordHtml: `
-              <div class="bg-[var(--card)] border-2 border-[var(--primary)]/50 rounded-lg p-3 space-y-2">
-                <div class="text-xs font-bold">Approval Required · $165.00 Claim</div>
-                <p class="text-xs text-[var(--muted-foreground)]">Portal fields match the PDF. Review screenshot attached.</p>
-                <div class="flex gap-2">
-                  <button type="button" onclick="stepSim(1)" class="px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold">Approve (Tap to test)</button>
-                </div>
-              </div>
-            `,
-            backstageHtml: 'The browser tool refuses to click final Submit buttons during normal browsing. Calling browser_session_commit pauses the turn and posts an approval card with a screenshot.',
-            techNote: 'Only Partner B\'s Discord account can press Approve on this card.'
+            actorAvatar: 'aida',
+            actorName: 'browser_session_commit Gate',
+            actorMeta: 'Paused awaiting Partner B tap on iPhone',
+            pipeline: ['Block Submit during normal browsing', 'Attach review screenshot', 'Wait for Partner B button tap'],
+            chatMsg: {
+              sender: 'Approval Required · $165.00 Claim',
+              avatar: 'aida',
+              isApproval: true,
+              text: 'Provider, date of service, and $165.00 total match the PDF. Review screenshot attached.'
+            },
+            serverSummary: 'Normal browsing tools refuse to click final Submit buttons. Calling browser_session_commit pauses the turn and posts an interactive approval card with a screenshot.',
+            techNote: 'Only Partner B\'s Discord account is permitted to tap Approve on this card.'
           },
           {
-            stageTitle: '4 · Submitted',
-            stageChip: 'Approved & Labeled',
-            discordHtml: `
-              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="aida" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Aida:</strong> Submitted. Confirmation screenshot attached, and I labeled the email <code>Anthem-Submitted</code>.</div>
-              </div>
-            `,
-            backstageHtml: 'Once Partner B taps Approve, Browserless clicks Submit, saves a confirmation screenshot, and labels the email in Gmail so the inbox watch knows it is done.',
-            techNote: 'When you tap "Always allow" on a safe everyday tool, the harness writes that rule back to Git.'
+            shortLabel: 'Submitted',
+            headline: 'Partner B taps Approve; Browserless submits the claim and labels the email in Gmail.',
+            stageTitle: 'Step 4 · Committed & Labeled',
+            stageChip: 'Approved & Complete',
+            actorAvatar: 'aida',
+            actorName: 'Aida (Chief of Staff)',
+            actorMeta: 'Claim submitted & Gmail thread tagged',
+            pipeline: ['Click final Submit selector', 'Capture confirmation screenshot', 'Label Gmail: Anthem-Submitted'],
+            chatMsg: {
+              sender: 'Aida',
+              avatar: 'aida',
+              text: 'Submitted. Confirmation screenshot attached, and I labeled the email Anthem-Submitted so the inbox watch knows it is complete.'
+            },
+            serverSummary: 'Once Partner B taps Approve on her phone, Browserless clicks Submit, captures the confirmation receipt, and labels the email in Gmail.',
+            techNote: 'When you tap "Always allow" on a safe everyday tool, the server commits that permission back to Git.'
           }
         ]
       }
@@ -1717,12 +2299,12 @@
       currentStep = 0;
       document.querySelectorAll('.scen-btn').forEach(btn => {
         btn.setAttribute('aria-selected', 'false');
-        btn.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
+        btn.className = 'scen-btn px-4 py-3 rounded-xl border text-left min-h-[52px] transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const active = document.getElementById('scen-' + key);
       if (active) {
         active.setAttribute('aria-selected', 'true');
-        active.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+        active.className = 'scen-btn px-4 py-3 rounded-xl border text-left min-h-[52px] transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm';
       }
       renderSim();
     }
@@ -1745,12 +2327,12 @@
       if (autoPlayTimer) {
         stopAutoPlay();
       } else {
-        document.getElementById('btn-autoplay').textContent = 'Pause';
+        document.getElementById('btn-autoplay').textContent = '⏸ Pause';
         autoPlayTimer = setInterval(() => {
           const scen = SCENARIOS[currentScenario];
           currentStep = (currentStep + 1) % scen.steps.length;
           renderSim();
-        }, 3000);
+        }, 3600);
       }
     }
 
@@ -1764,7 +2346,8 @@
       const scen = SCENARIOS[currentScenario];
       const step = scen.steps[currentStep];
 
-      document.getElementById('sim-step-badge').textContent = `Step ${currentStep + 1} of ${scen.steps.length} · ${step.stageTitle.split('· ')[1]}`;
+      document.getElementById('sim-step-badge').textContent = `STEP ${currentStep + 1} OF ${scen.steps.length} · ${step.shortLabel.toUpperCase()}`;
+      document.getElementById('sim-step-headline').textContent = step.headline;
       document.getElementById('sim-why-label').textContent = scen.why;
       document.getElementById('sim-channel').textContent = scen.channel;
       document.getElementById('sim-thread-badge').textContent = scen.thread;
@@ -1772,20 +2355,99 @@
       document.getElementById('btn-prev').disabled = (currentStep === 0);
       document.getElementById('btn-next').disabled = (currentStep === scen.steps.length - 1);
 
-      document.getElementById('sim-progress-bars').innerHTML = scen.steps.map((_, i) => `
-        <button type="button" onclick="goToStep(${i})" aria-label="Go to step ${i + 1}" class="h-2.5 rounded-full transition ${i <= currentStep ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}"></button>
-      `).join('');
+      // Render clickable numbered step pills inside the headline banner
+      document.getElementById('sim-progress-bars').innerHTML = scen.steps.map((s, i) => {
+        const isCurrent = (i === currentStep);
+        const isPast = (i < currentStep);
+        return `
+          <button type="button" onclick="goToStep(${i})" aria-label="Go to step ${i + 1}: ${s.shortLabel}" class="px-2.5 py-1.5 rounded-lg text-xs font-bold min-h-[38px] transition inline-flex items-center gap-1.5 ${
+            isCurrent
+              ? 'bg-[#C5A059] text-[#141A24] shadow-sm'
+              : isPast
+                ? 'bg-white/20 text-white hover:bg-white/30'
+                : 'bg-white/10 text-white/70 hover:bg-white/20'
+          }">
+            <span>${i + 1}</span>
+            <span class="hidden sm:inline">${s.shortLabel}</span>
+          </button>
+        `;
+      }).join('');
 
+      // Left Column: Cumulative Discord Feed with current step spotlighted and past steps dimmed
+      const visibleSteps = scen.steps.slice(0, currentStep + 1);
       const feed = document.getElementById('sim-discord-feed');
-      feed.innerHTML = step.discordHtml;
+      feed.innerHTML = visibleSteps.map((st, idx) => {
+        const isLatest = (idx === currentStep);
+        const m = st.chatMsg;
+        if (!isLatest) {
+          // Compact dimmed earlier turn for context without clutter
+          return `
+            <div class="rounded-lg border border-[var(--border)] bg-[var(--card)]/60 px-3 py-2 opacity-50 text-xs flex items-center justify-between gap-2">
+              <div class="truncate"><strong>${m.sender}:</strong> ${m.text}</div>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0">Step ${idx + 1}</span>
+            </div>
+          `;
+        }
+        // Spotlighted current step message
+        return `
+          <div class="rounded-xl border-2 border-[var(--primary)] bg-[var(--card)] p-3.5 sm:p-4 shadow-sm space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                ${m.avatar ? `<img data-avatar="${m.avatar}" alt="" width="28" height="28" class="w-7 h-7 rounded-full border border-[var(--border)] object-cover shrink-0" />` : `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--secondary)] text-xs font-bold">${m.sender.slice(-1)}</span>`}
+                <span class="text-xs sm:text-sm font-bold text-[var(--foreground)]">${m.sender}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-[#C5A059] text-[#141A24] text-[10px] font-bold uppercase tracking-wider">New in Step ${idx + 1}</span>
+            </div>
+            <p class="text-sm sm:text-base text-[var(--foreground)] leading-relaxed ${m.isStatus ? 'italic text-[var(--muted-foreground)]' : ''}">${m.text}</p>
+            ${m.isApproval ? `
+              <div class="pt-1">
+                <button type="button" onclick="stepSim(1)" class="px-3.5 py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-bold min-h-[40px] hover:opacity-90 transition shadow-sm">
+                  ✓ Approve $165.00 Claim (Tap to test)
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
       bindAvatars(feed);
       feed.classList.remove('fade-swap');
       void feed.offsetWidth;
       feed.classList.add('fade-swap');
 
+      // Right Column: Structured 3-Part Visual Server Breakdown
       document.getElementById('sim-stage-title').textContent = step.stageTitle;
       document.getElementById('sim-stage-chip').textContent = step.stageChip;
-      document.getElementById('sim-backstage-body').textContent = step.backstageHtml;
+      const backstage = document.getElementById('sim-backstage-body');
+      backstage.innerHTML = `
+        <!-- 1. Active Specialist Row -->
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+          <img data-avatar="${step.actorAvatar}" alt="" width="40" height="40" class="w-10 h-10 rounded-full border border-[var(--border)] object-cover shrink-0" />
+          <div class="min-w-0">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Active Specialist</div>
+            <div class="text-sm font-bold text-[var(--foreground)] truncate">${step.actorName}</div>
+            <div class="text-xs text-[var(--muted-foreground)] truncate">${step.actorMeta}</div>
+          </div>
+        </div>
+
+        <!-- 2. Visual Tool Pipeline Pills -->
+        <div class="space-y-1.5">
+          <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Server Operations in Step ${currentStep + 1}</div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${step.pipeline.map((op, i) => `
+              <span class="px-2.5 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)]">${op}</span>
+              ${i < step.pipeline.length - 1 ? `<span class="text-xs font-bold text-[var(--muted-foreground)]" aria-hidden="true">→</span>` : ''}
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- 3. Plain-English Explanation -->
+        <p class="text-sm sm:text-base text-[var(--foreground)] leading-relaxed">${step.serverSummary}</p>
+      `;
+      bindAvatars(backstage);
+      backstage.classList.remove('fade-swap');
+      void backstage.offsetWidth;
+      backstage.classList.add('fade-swap');
+
       document.getElementById('sim-tech-note').textContent = step.techNote;
     }
 
