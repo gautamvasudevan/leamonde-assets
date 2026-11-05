@@ -96,6 +96,10 @@
         animation: studioReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, studioBreath 14s ease-in-out 0.8s infinite alternate;
         transform-origin: center center;
       }
+      .studio-step-camera {
+        transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform-origin 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, transform-origin;
+      }
       @keyframes studioReveal {
         0% { opacity: 1; transform: scale(1.04) translateY(3px); }
         100% { opacity: 1; transform: scale(1.01) translateY(0); }
@@ -1133,7 +1137,6 @@
             <div class="grid grid-cols-1 sm:grid-cols-12 items-stretch">
               <div class="sm:col-span-5 relative h-32 sm:h-auto overflow-hidden bg-[#141A24]">
                 <img data-scene="${found.id}" alt="${found.name} at work" class="w-full h-full object-cover studio-art-motion" />
-                <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#141A24] text-[#F8F5EE] border border-[#C5A059] text-[10px] font-bold uppercase tracking-wider">● Live in Studio</span>
               </div>
               <div class="sm:col-span-7 p-3 flex flex-col justify-between gap-2">
                 <div>
@@ -1848,7 +1851,7 @@
       renderMap();
     }
 
-    // 6. Chapter 02: Full-Width Specialist Studio Stage + Live 60fps Domain Animation Engine
+    // 6. Chapter 02: Full-Width Specialist Studio Stage + Step-Driven Camera & Diegetic Object Animation (Zero Floating Text Overlays)
     const AGENTS = {
       aida: {
         deskNum: '01',
@@ -1859,9 +1862,24 @@
         studioCaption: 'Pavilion Rotunda Office · Morning Briefing & Family Schedule',
         summary: 'Coordinates family calendars, voices the 7 AM audio briefing, books tennis courts, watches email inboxes, and runs private-desk workflows like medical superbills.',
         reelSteps: [
-          { title: '07:00 Voice Briefing', detail: 'Reads iCloud calendars and overnight watches in a fresh session and posts a 60-second audio note.' },
-          { title: 'Court 4 Reservation', detail: 'Checks partner availability and locks in an open afternoon court at the local tennis club.' },
-          { title: 'Cross-Desk Handoff', detail: 'Answers the calendar part of a question, then calls handoff("Cookie") or handoff("Scout") in the same thread.' }
+          {
+            shortTab: '1. Voice Briefing',
+            title: '07:00 Voice Briefing',
+            detail: 'Reads iCloud calendars and overnight watches in a fresh session and posts a 60-second audio note.',
+            focusX: 0.22, focusY: 0.62, scale: 1.13
+          },
+          {
+            shortTab: '2. Court 4 Slot',
+            title: 'Court 4 Reservation',
+            detail: 'Checks partner availability and locks in an open afternoon court at the local tennis club.',
+            focusX: 0.86, focusY: 0.36, scale: 1.15
+          },
+          {
+            shortTab: '3. Desk Handoff',
+            title: 'Cross-Desk Handoff',
+            detail: 'Answers the calendar part of a question, then calls handoff("Cookie") or handoff("Scout") in the same thread.',
+            focusX: 0.48, focusY: 0.82, scale: 1.13
+          }
         ],
         allowed: ['iCloud Calendar', 'Tennis Club', 'Routines & Watches', 'Google (Private Desks)', 'Insurance Claims Skill'],
         blocked: ['Kitchen DB & Instacart', 'Monarch Money', 'Fellow Aiden Brewer']
@@ -1875,9 +1893,24 @@
         studioCaption: 'Household Kitchen · NYT Cooking & 6-Store Instacart Pricing',
         summary: 'Plans Sunday batch cooking, tracks what is in the fridge and pantry, rotates the kid\'s school lunchboxes, and compares live prices across six local grocery stores.',
         reelSteps: [
-          { title: 'Menu & Recipe Box', detail: 'Pulls saved NYT Cooking recipes and checks kitchen.sqlite so pantry staples are not bought twice.' },
-          { title: '6-Store Price Race', detail: 'Queries Sprouts, Safeway, Draeger\'s, Costco, Target, and Mollie Stone\'s in parallel for each ingredient.' },
-          { title: 'Shared Family Cart', detail: 'Loads the winning items into the shared Instacart Family Cart while leaving checkout to a human.' }
+          {
+            shortTab: '1. Recipe Box',
+            title: 'Menu & Recipe Box',
+            detail: 'Pulls saved NYT Cooking recipes and checks kitchen.sqlite so pantry staples are not bought twice.',
+            focusX: 0.25, focusY: 0.62, scale: 1.14
+          },
+          {
+            shortTab: '2. 6-Store Price',
+            title: '6-Store Price Race',
+            detail: 'Queries Sprouts, Safeway, Draeger\'s, Costco, Target, and Mollie Stone\'s in parallel for each ingredient.',
+            focusX: 0.66, focusY: 0.52, scale: 1.13
+          },
+          {
+            shortTab: '3. Family Cart',
+            title: 'Shared Family Cart',
+            detail: 'Loads the winning items into the shared Instacart Family Cart while leaving checkout to a human.',
+            focusX: 0.82, focusY: 0.72, scale: 1.14
+          }
         ],
         allowed: ['Kitchen SQLite DB', 'NYT Cooking', 'Instacart (6 Stores & Family Cart)', 'Shared Calendar Read'],
         blocked: ['Personal Gmail', 'Monarch Money', 'Fellow Aiden Brewer']
@@ -1891,9 +1924,24 @@
         studioCaption: 'Design & Logistics Bench · Parallel Retail Sub-Agents',
         summary: 'Compares products across retailers using parallel web sub-agents, builds one-tap Amazon cart links from verified product IDs, and tracks incoming deliveries.',
         reelSteps: [
-          { title: 'Parallel Flash Sub-Agents', detail: 'Spawns up to 4 throwaway Gemini Flash sessions to scrape specs and studio photos via Browserless.' },
-          { title: 'ASIN & Link Verification', detail: 'Backstage QC confirms every URL and Amazon ASIN came from a real tool output before posting.' },
-          { title: 'Live Parcel Tracking', detail: 'Watches carrier updates and alerts #shopping when packages are out for delivery or delayed.' }
+          {
+            shortTab: '1. Web Sub-Agents',
+            title: 'Parallel Flash Sub-Agents',
+            detail: 'Spawns up to 4 throwaway Gemini Flash sessions to scrape specs and studio photos via Browserless.',
+            focusX: 0.22, focusY: 0.72, scale: 1.14
+          },
+          {
+            shortTab: '2. Verify ASIN',
+            title: 'ASIN & Link Verification',
+            detail: 'Backstage QC confirms every URL and Amazon ASIN came from a real tool output before posting.',
+            focusX: 0.52, focusY: 0.68, scale: 1.14
+          },
+          {
+            shortTab: '3. Parcel Track',
+            title: 'Live Parcel Tracking',
+            detail: 'Watches carrier updates and alerts #shopping when packages are out for delivery or delayed.',
+            focusX: 0.78, focusY: 0.62, scale: 1.12
+          }
         ],
         allowed: ['Browserless Sub-Agents', 'MaxWorth Portals', 'Order Tracker', 'Grocery List Add'],
         blocked: ['Monarch Transactions', 'NYT Cooking', 'Personal Google Drive']
@@ -1907,9 +1955,24 @@
         studioCaption: 'Financial & Travel Study · Perks Ledger & Award Routes',
         summary: 'Tracks statement credits before they reset, audits recurring subscriptions against card perks, and spots high-value airline and hotel transfer sweet spots.',
         reelSteps: [
-          { title: 'Statement Credit Ledger', detail: 'Syncs card charges from Monarch Money into perks.sqlite to mark monthly and annual credits used.' },
-          { title: 'Subscription Audit', detail: 'Flags recurring bills that could be comped by an existing Amex, Chase, or Capital One card benefit.' },
-          { title: 'Award Sweet Spots', detail: 'Checks CardStack transfer bonuses and MaxWorth merchant offers before big household purchases or trips.' }
+          {
+            shortTab: '1. Credit Ledger',
+            title: 'Statement Credit Ledger',
+            detail: 'Syncs card charges from Monarch Money into perks.sqlite to mark monthly and annual credits used.',
+            focusX: 0.48, focusY: 0.76, scale: 1.14
+          },
+          {
+            shortTab: '2. Bill Audit',
+            title: 'Subscription Audit',
+            detail: 'Flags recurring bills that could be comped by an existing Amex, Chase, or Capital One card benefit.',
+            focusX: 0.85, focusY: 0.74, scale: 1.15
+          },
+          {
+            shortTab: '3. Award Flights',
+            title: 'Award Sweet Spots',
+            detail: 'Checks CardStack transfer bonuses and MaxWorth merchant offers before big household purchases or trips.',
+            focusX: 0.50, focusY: 0.26, scale: 1.12
+          }
         ],
         allowed: ['Perks SQLite DB', 'Monarch (Cards & Bills Only)', 'CardStack', 'MaxWorth Offers'],
         blocked: ['Kitchen & Instacart', 'Personal Gmail', 'Fellow Aiden Brewer']
@@ -1923,9 +1986,24 @@
         studioCaption: 'Architectural Atelier · Floor Plans, Swatches & Trade Sourcing',
         summary: 'Finds furniture, rugs, and lighting with studio packshots, exact dimensions, and material weave details, working from room photos and floor plans in dedicated threads.',
         reelSteps: [
-          { title: 'Room & Scale Check', detail: 'Reads room dimensions and photos from the House Binder so every recommendation fits the floor plan.' },
-          { title: 'Material & Weave Audit', detail: 'Extracts pile height, knot density, wood species, and studio packshots while filtering out review clutter.' },
-          { title: '10-Minute Spec Cache', detail: 'Caches parsed product pages on disk so follow-up questions about care or dimensions answer in milliseconds.' }
+          {
+            shortTab: '1. Room Scale',
+            title: 'Room & Scale Check',
+            detail: 'Reads room dimensions and photos from the House Binder so every recommendation fits the floor plan.',
+            focusX: 0.53, focusY: 0.82, scale: 1.15
+          },
+          {
+            shortTab: '2. Weave Audit',
+            title: 'Material & Weave Audit',
+            detail: 'Extracts pile height, knot density, wood species, and studio packshots while filtering out review clutter.',
+            focusX: 0.76, focusY: 0.84, scale: 1.13
+          },
+          {
+            shortTab: '3. 10m Cache',
+            title: '10-Minute Spec Cache',
+            detail: 'Caches parsed product pages on disk so follow-up questions about care or dimensions answer in milliseconds.',
+            focusX: 0.82, focusY: 0.54, scale: 1.14
+          }
         ],
         allowed: ['Browserless Sub-Agents', 'Room Photo Analysis', 'House Binder (Room Specs)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Personal Gmail']
@@ -1939,9 +2017,24 @@
         studioCaption: 'Specialty Coffee Bar · Bean Intake & Fellow Aiden Profiles',
         summary: 'Reads photos of new coffee bags, dials in grind and water temperature for espresso or pour-over, logs tasting notes, and pushes brew profiles straight to the Fellow Aiden.',
         reelSteps: [
-          { title: 'Coffee Bag Intake', detail: 'Reads origin, varietal, process, and roast level from a phone photo and looks up roaster notes.' },
-          { title: 'Grind & Temp Dial-In', detail: 'Calculates dose, grind setting, bloom ratio, and 3-stage water temperatures for the specific bean.' },
-          { title: 'Push to Fellow Aiden', detail: 'Sends the custom brew profile directly to the kitchen brewer so the next pot is ready to run.' }
+          {
+            shortTab: '1. Bag Intake',
+            title: 'Coffee Bag Intake',
+            detail: 'Reads origin, varietal, process, and roast level from a phone photo and looks up roaster notes.',
+            focusX: 0.83, focusY: 0.78, scale: 1.15
+          },
+          {
+            shortTab: '2. Pour Dial-In',
+            title: 'Grind & Temp Dial-In',
+            detail: 'Calculates dose, grind setting, bloom ratio, and 3-stage water temperatures for the specific bean.',
+            focusX: 0.50, focusY: 0.68, scale: 1.14
+          },
+          {
+            shortTab: '3. Fellow Aiden',
+            title: 'Push to Fellow Aiden',
+            detail: 'Sends the custom brew profile directly to the kitchen brewer so the next pot is ready to run.',
+            focusX: 0.22, focusY: 0.72, scale: 1.15
+          }
         ],
         allowed: ['Fellow Aiden Brewer', 'Roaster Web Lookup', 'House Binder (Bean Log)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Calendars & Email']
@@ -1956,9 +2049,24 @@
         studioCaption: 'Lea Monde Agency Drafting Table · Declarative YAML + Git Push',
         summary: 'The agency is not a fixed list of six bots. Whenever a new recurring domain comes up (wine cellar, garden, home maintenance, travel, kids\' activities), we add a folder in Git and a new specialist desk comes online in 60 seconds.',
         reelSteps: [
-          { title: '1. Define AGENT.md', detail: 'Write the persona handbook, model spec, custom QC rules, and strict MCP tool allowlist in YAML.' },
-          { title: '2. Generate Editorial Portrait', detail: 'Create a matching New Yorker / Monocle line-art portrait and push it to the asset CDN.' },
-          { title: '3. 60-Second Hot Reload', detail: 'On git push, the Proxmox daemon spawns the new Agent, binds its Discord webhook, and updates #lobby.' }
+          {
+            shortTab: '1. AGENT.md',
+            title: '1. Define AGENT.md',
+            detail: 'Write the persona handbook, model spec, custom QC rules, and strict MCP tool allowlist in YAML.',
+            focusX: 0.22, focusY: 0.52, scale: 1.13
+          },
+          {
+            shortTab: '2. Portrait',
+            title: '2. Generate Editorial Portrait',
+            detail: 'Create a matching New Yorker / Monocle line-art portrait and push it to the asset CDN.',
+            focusX: 0.55, focusY: 0.63, scale: 1.15
+          },
+          {
+            shortTab: '3. Git Push',
+            title: '3. 60-Second Hot Reload',
+            detail: 'On git push, the Proxmox daemon spawns the new Agent, binds its Discord webhook, and updates #lobby.',
+            focusX: 0.52, focusY: 0.58, scale: 1.06
+          }
         ],
         allowed: ['agents/<name>/AGENT.md', 'Scoped MCP Tool Allowlist', 'Custom QC Rules', 'Dedicated Discord Webhook', 'Handoffs to & from Aida'],
         blocked: ['Any MCP tool not explicitly listed in AGENT.md']
@@ -1972,18 +2080,53 @@
     let studioStartTime = 0;
 
     function selectAgentReelStep(idx) {
-      currentReelIdx = idx;
+      const a = AGENTS[currentAgentKey];
+      if (!a) return;
+      currentReelIdx = ((idx % a.reelSteps.length) + a.reelSteps.length) % a.reelSteps.length;
+      if (reelTimer) {
+        clearInterval(reelTimer);
+        if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+          reelTimer = setInterval(() => {
+            currentReelIdx = (currentReelIdx + 1) % a.reelSteps.length;
+            updateReelHighlight();
+          }, 3800);
+        }
+      }
       updateReelHighlight();
+    }
+
+    function nextAgentReelStep() {
+      const a = AGENTS[currentAgentKey];
+      if (!a) return;
+      selectAgentReelStep((currentReelIdx + 1) % a.reelSteps.length);
     }
 
     function updateReelHighlight() {
       const a = AGENTS[currentAgentKey];
       if (!a) return;
+      const activeStep = a.reelSteps[currentReelIdx] || a.reelSteps[0];
+
+      // 1. Pan & zoom the 16:9 studio illustration toward the active physical tool/prop
+      const sceneImg = document.getElementById('studio-scene-img');
+      if (sceneImg && activeStep) {
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        sceneImg.style.transformOrigin = `${Math.round(activeStep.focusX * 100)}% ${Math.round(activeStep.focusY * 100)}%`;
+        sceneImg.style.transform = reduceMotion ? 'scale(1)' : `scale(${activeStep.scale || 1.12})`;
+      }
+
+      // 2. Update the 3 interactive step tabs directly beneath the 16:9 image (mobile & desktop)
       a.reelSteps.forEach((_, i) => {
+        const active = (i === currentReelIdx);
+        const tabBtn = document.getElementById('studio-tab-' + i);
+        if (tabBtn) {
+          tabBtn.className = 'py-2 px-2 text-[11px] sm:text-xs font-bold text-center transition min-h-[40px] flex items-center justify-center ' +
+            (active
+              ? 'bg-[#C5A059] text-[#141A24]'
+              : 'bg-[#141A24] text-[#E8E2D5] hover:bg-[#1E2738]');
+        }
         const card = document.getElementById('reel-step-' + i);
         const badge = document.getElementById('reel-badge-' + i);
         if (!card || !badge) return;
-        const active = (i === currentReelIdx);
         card.className = 'w-full text-left p-3 rounded-xl border transition ' +
           (active
             ? 'bg-[var(--card)] border-[var(--primary)] ring-2 ring-[var(--primary)]/25 shadow-sm'
@@ -1993,18 +2136,17 @@
             ? 'bg-[#C5A059] text-[#141A24]'
             : 'bg-[var(--secondary)] text-[var(--muted-foreground)]');
       });
+
+      // 3. Update the active step caption bar right below the tabs inside the dark studio frame
+      const stepTitleEl = document.getElementById('studio-active-step-title');
+      const stepDetailEl = document.getElementById('studio-active-step-detail');
+      if (stepTitleEl && activeStep) stepTitleEl.textContent = activeStep.title;
+      if (stepDetailEl && activeStep) stepDetailEl.textContent = activeStep.detail;
     }
 
     function replayStudioScene() {
-      const img = document.querySelector('#agent-dossier img[data-scene]');
-      if (img) {
-        img.classList.remove('studio-art-motion');
-        void img.offsetWidth;
-        img.classList.add('studio-art-motion');
-      }
       studioStartTime = performance.now();
-      currentReelIdx = 0;
-      updateReelHighlight();
+      selectAgentReelStep(0);
     }
 
     function startStudioSceneAnimation(key) {
@@ -2016,24 +2158,41 @@
 
       const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      function drawTag(ctx, x, y, text, isAccent) {
+      // Purely visual editorial corner brackets around the active physical prop (zero text on canvas)
+      function drawFocusBrackets(ctx, cx, cy, bw, bh, pulse) {
         ctx.save();
-        ctx.font = '700 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
-        const padX = 9;
-        const tw = ctx.measureText(text).width;
-        const bw = tw + padX * 2;
-        const bh = 23;
-        ctx.fillStyle = isAccent ? '#141A24' : '#F8F5EE';
-        ctx.strokeStyle = isAccent ? '#C5A059' : '#182338';
-        ctx.lineWidth = 1.6;
+        const x0 = cx - bw / 2, y0 = cy - bh / 2;
+        const x1 = cx + bw / 2, y1 = cy + bh / 2;
+        const len = Math.min(bw, bh) * 0.26;
+        ctx.strokeStyle = '#C5A059';
+        ctx.lineWidth = 2.4;
+        ctx.shadowColor = 'rgba(20, 26, 36, 0.65)';
+        ctx.shadowBlur = 6;
+        ctx.globalAlpha = 0.85 + pulse * 0.15;
+
         ctx.beginPath();
-        ctx.roundRect(x - bw / 2, y - bh / 2, bw, bh, 6);
-        ctx.fill();
+        // Top-left
+        ctx.moveTo(x0, y0 + len); ctx.lineTo(x0, y0); ctx.lineTo(x0 + len, y0);
+        // Top-right
+        ctx.moveTo(x1 - len, y0); ctx.lineTo(x1, y0); ctx.lineTo(x1, y0 + len);
+        // Bottom-right
+        ctx.moveTo(x1, y1 - len); ctx.lineTo(x1, y1); ctx.lineTo(x1 - len, y1);
+        // Bottom-left
+        ctx.moveTo(x0 + len, y1); ctx.lineTo(x0, y1); ctx.lineTo(x0, y1 - len);
         ctx.stroke();
-        ctx.fillStyle = isAccent ? '#FFFFFF' : '#141A24';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, x, y + 0.5);
+        ctx.restore();
+      }
+
+      // Soft spotlight vignette that gently illuminates the active prop without obscuring artwork
+      function drawPropSpotlight(ctx, w, h, fx, fy) {
+        ctx.save();
+        const r = Math.max(w, h) * 0.42;
+        const grad = ctx.createRadialGradient(fx, fy, r * 0.22, fx, fy, r * 1.35);
+        grad.addColorStop(0, 'rgba(248, 245, 238, 0.08)');
+        grad.addColorStop(0.55, 'rgba(20, 26, 36, 0.0)');
+        grad.addColorStop(1, 'rgba(20, 26, 36, 0.26)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
         ctx.restore();
       }
 
@@ -2053,173 +2212,272 @@
 
         const elapsed = (now - studioStartTime) / 1000;
         const t = reduceMotion ? 1.5 : elapsed;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 3.2);
+        const step = currentReelIdx;
+
+        const a = AGENTS[key];
+        const stepCfg = (a && a.reelSteps[step]) || { focusX: 0.5, focusY: 0.5 };
+        drawPropSpotlight(ctx, w, h, w * stepCfg.focusX, h * stepCfg.focusY);
 
         if (key === 'aida') {
-          // 1. Acoustic soundwaves radiating from Aida's vintage microphone (x: 0.275, y: 0.63)
-          const mx = w * 0.275, my = h * 0.63;
-          for (let i = 0; i < 3; i++) {
-            const prog = (t * 0.85 + i * 0.33) % 1;
-            const r = 10 + prog * 38;
+          if (step === 0) {
+            // Step 1: 07:00 Voice Briefing: acoustic soundwaves from Aida's brass microphone & warm lamp glow
+            const mx = w * 0.235, my = h * 0.65;
+            for (let i = 0; i < 3; i++) {
+              const prog = (t * 0.75 + i * 0.33) % 1;
+              const r = 10 + prog * (w * 0.085);
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2.2;
+              ctx.globalAlpha = (1 - prog) * 0.9;
+              ctx.beginPath();
+              ctx.arc(mx, my, r, -Math.PI * 0.75, Math.PI * 0.35);
+              ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+            drawFocusBrackets(ctx, mx, h * 0.72, w * 0.14, h * 0.30, pulse);
+          } else if (step === 1) {
+            // Step 2: Court 4 Reservation: glowing brass lock around COURT 4 on the wall schedule
+            const cx = w * 0.918, cy = h * 0.348;
+            drawFocusBrackets(ctx, cx, cy, w * 0.085, h * 0.16, pulse);
+            // Animated gesture arc from Aida's raised left hand (0.79, 0.52) to COURT 4 (0.918, 0.38)
             ctx.strokeStyle = '#C5A059';
-            ctx.lineWidth = 1.8;
-            ctx.globalAlpha = (1 - prog) * 0.85;
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([5, 4]);
+            ctx.lineDashOffset = -t * 24;
             ctx.beginPath();
-            ctx.arc(mx, my, r, 0, Math.PI * 2);
+            ctx.moveTo(w * 0.79, h * 0.50);
+            ctx.quadraticCurveTo(w * 0.85, h * 0.42, cx, cy + h * 0.06);
             ctx.stroke();
+            ctx.setLineDash([]);
+          } else {
+            // Step 3: Cross-Desk Handoff: fountain pen writing in House Binder + dispatch arc toward doorway
+            const px = w * 0.455, py = h * 0.855;
+            drawFocusBrackets(ctx, w * 0.49, h * 0.84, w * 0.36, h * 0.22, pulse);
+            ctx.fillStyle = '#C5A059';
+            ctx.beginPath();
+            ctx.arc(px, py, 4 + pulse * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([6, 4]);
+            ctx.lineDashOffset = -t * 28;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.quadraticCurveTo(w * 0.62, h * 0.64, w * 0.76, h * 0.52);
+            ctx.stroke();
+            ctx.setLineDash([]);
           }
-          ctx.globalAlpha = 1;
-          drawTag(ctx, mx, my - 38, '07:00 Voice Briefing · Live', true);
-
-          // 2. Brass signal arc from Aida's pen (0.47, 0.80) to the wall schedule (0.86, 0.36)
-          const px = w * 0.47, py = h * 0.80;
-          const sx = w * 0.86, sy = h * 0.38;
-          const cx = w * 0.66, cy = h * 0.32;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 1.8;
-          ctx.setLineDash([5, 4]);
-          ctx.lineDashOffset = -t * 24;
-          ctx.beginPath();
-          ctx.moveTo(px, py);
-          ctx.quadraticCurveTo(cx, cy, sx, sy);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          const bob = Math.sin(t * 2.4) * 3;
-          drawTag(ctx, w * 0.83, h * 0.26 + bob, 'Court 4 Reserved · 4:30 PM ✓', false);
-          drawTag(ctx, w * 0.78, h * 0.52 - bob, 'handoff("Cookie") → #kitchen', true);
 
         } else if (key === 'cookie') {
-          // 1. Rising kitchen steam wisps above the Dutch oven (x: 0.60, y: 0.64)
-          const ox = w * 0.60, oy = h * 0.64;
+          // Gentle steam always rising from Dutch oven, intensified on Step 2
+          const ox = w * 0.61, oy = h * 0.64;
           for (let i = 0; i < 3; i++) {
             const prog = (t * 0.45 + i * 0.33) % 1;
-            const sy = oy - prog * (h * 0.34);
-            const sx = ox + Math.sin(prog * Math.PI * 2.5 + i) * 14 + (i - 1) * 12;
-            ctx.strokeStyle = '#F8F5EE';
+            const sy = oy - prog * (h * 0.28);
+            const sx = ox + Math.sin(prog * Math.PI * 2.5 + i) * 10 + (i - 1) * 10;
+            ctx.strokeStyle = step === 1 ? '#C5A059' : '#F8F5EE';
             ctx.lineWidth = 2.2;
-            ctx.globalAlpha = Math.sin(prog * Math.PI) * 0.78;
-            ctx.beginPath();
-            ctx.moveTo(sx, sy + 18);
-            ctx.quadraticCurveTo(sx + 8, sy + 9, sx - 4, sy);
-            ctx.stroke();
-          }
-          ctx.globalAlpha = 1;
-          const bob = Math.sin(t * 2.2) * 3;
-          drawTag(ctx, w * 0.28, h * 0.56 + bob, 'NYT Recipe Box · White Bean Ragu', false);
-          drawTag(ctx, w * 0.77, h * 0.46 - bob, 'Sprouts $8.48 ✓ (vs $12.90)', true);
-          drawTag(ctx, w * 0.60, h * 0.76, 'Family Cart Updated · 6 Stores Checked', false);
-
-        } else if (key === 'scout') {
-          // 1. Studio camera reticle & caliper scan line
-          const camX = w * 0.175, camY = h * 0.49;
-          const partX = w * 0.54, partY = h * 0.58;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4, 4]);
-          ctx.lineDashOffset = -t * 20;
-          ctx.beginPath();
-          ctx.moveTo(camX, camY);
-          ctx.lineTo(partX, partY);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          // Pulsing target ring on caliper hardware
-          const pulseR = 18 + Math.sin(t * 3) * 4;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(partX, partY, pulseR, 0, Math.PI * 2);
-          ctx.stroke();
-
-          // Moving delivery beacon on route map (top-left)
-          const mapProg = (t * 0.35) % 1;
-          const mx = w * (0.20 + mapProg * 0.15);
-          const my = h * (0.28 - Math.sin(mapProg * Math.PI) * 0.08);
-          ctx.fillStyle = '#C5A059';
-          ctx.beginPath();
-          ctx.arc(mx, my, 5, 0, Math.PI * 2);
-          ctx.fill();
-
-          drawTag(ctx, w * 0.28, h * 0.38, '3 Flash Sub-Agents · Scraping Specs', false);
-          drawTag(ctx, partX, partY - 34, 'ASIN Verified · Studio Packshot ✓', true);
-          drawTag(ctx, w * 0.84, h * 0.52, 'UPS Parcel · Arriving 2:15 PM', false);
-
-        } else if (key === 'sterling') {
-          // 1. Transoceanic award flight arc across world map (SFO 0.67,0.26 -> CDG 0.91,0.21)
-          const sfoX = w * 0.675, sfoY = h * 0.265;
-          const cdgX = w * 0.915, cdgY = h * 0.215;
-          const ctrlX = w * 0.79, ctrlY = h * 0.09;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(sfoX, sfoY);
-          ctx.quadraticCurveTo(ctrlX, ctrlY, cdgX, cdgY);
-          ctx.stroke();
-
-          // Gliding flight dot along arc
-          const u = (t * 0.4) % 1;
-          const inv = 1 - u;
-          const fx = inv * inv * sfoX + 2 * inv * u * ctrlX + u * u * cdgX;
-          const fy = inv * inv * sfoY + 2 * inv * u * ctrlY + u * u * cdgY;
-          ctx.fillStyle = '#C5A059';
-          ctx.beginPath();
-          ctx.arc(fx, fy, 4.5, 0, Math.PI * 2);
-          ctx.fill();
-
-          const bob = Math.sin(t * 2.2) * 3;
-          drawTag(ctx, w * 0.22, h * 0.46 + bob, 'SFO → HND · 85k ANA Business', true);
-          drawTag(ctx, w * 0.53, h * 0.76 - bob, '+$200 Amex Credit Marked Used ✓', false);
-          drawTag(ctx, w * 0.82, h * 0.40, 'Monarch Sync · Net Worth Stripped', false);
-
-        } else if (key === 'sloan') {
-          // 1. Rotating brass compass arc over living-room floor plan (0.52, 0.80)
-          const bx = w * 0.52, by = h * 0.81;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(bx, by, 34, -Math.PI * 0.85, -Math.PI * 0.85 + ((t * 1.2) % (Math.PI * 1.4)));
-          ctx.stroke();
-
-          const bob = Math.sin(t * 2.1) * 3;
-          drawTag(ctx, w * 0.22, h * 0.34 + bob, '100% Hand-Knotted Wool · 0.45" Pile', false);
-          drawTag(ctx, w * 0.52, h * 0.65, 'Floor Plan Verified · 8\'0" × 10\'0" ✓', true);
-          drawTag(ctx, w * 0.80, h * 0.42 - bob, '3 Options Under $1,200 · Cached 10m', false);
-
-        } else if (key === 'tazza') {
-          // 1. Aromatic steam rising from gooseneck kettle & V60 (x: 0.49, y: 0.42)
-          const kx = w * 0.48, ky = h * 0.42;
-          for (let i = 0; i < 3; i++) {
-            const prog = (t * 0.5 + i * 0.33) % 1;
-            const sy = ky - prog * (h * 0.26);
-            const sx = kx + Math.sin(prog * Math.PI * 2 + i) * 10;
-            ctx.strokeStyle = '#C5A059';
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = Math.sin(prog * Math.PI) * 0.82;
+            ctx.globalAlpha = Math.sin(prog * Math.PI) * (step === 1 ? 0.85 : 0.45);
             ctx.beginPath();
             ctx.moveTo(sx, sy + 14);
-            ctx.quadraticCurveTo(sx - 7, sy + 7, sx + 5, sy);
+            ctx.quadraticCurveTo(sx + 6, sy + 7, sx - 4, sy);
             ctx.stroke();
           }
           ctx.globalAlpha = 1;
 
-          // Live ticking gram readout over scale
-          const grams = Math.min(288, Math.round(18 + ((t * 38) % 270)));
-          drawTag(ctx, w * 0.53, h * 0.60, `93.0°C · ${grams}g / 288g · 1:16 Ratio`, true);
-          drawTag(ctx, w * 0.26, h * 0.44, '3-Pulse Profile → Fellow Aiden ✓', false);
-          drawTag(ctx, w * 0.80, h * 0.38, 'Washed Ethiopia · Bergamot & Peach', false);
+          if (step === 0) {
+            // Step 1: Menu & Recipe Box: focus on open green cookbook & hanging recipe cards
+            drawFocusBrackets(ctx, w * 0.27, h * 0.72, w * 0.19, h * 0.25, pulse);
+            const scanY = h * (0.64 + ((t * 0.45) % 1) * 0.14);
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.21, scanY);
+            ctx.lineTo(w * 0.33, scanY);
+            ctx.stroke();
+          } else if (step === 1) {
+            // Step 2: 6-Store Price Race: scanner sweeping across the hanging store price tags on right rail
+            const tagXs = [0.692, 0.735, 0.768, 0.80];
+            const activeTag = Math.floor((t * 2.2) % tagXs.length);
+            tagXs.forEach((tx, idx) => {
+              ctx.strokeStyle = idx === activeTag ? '#C5A059' : 'rgba(197, 160, 89, 0.4)';
+              ctx.lineWidth = idx === activeTag ? 2.4 : 1.2;
+              ctx.strokeRect(w * tx - w * 0.014, h * 0.39, w * 0.028, h * 0.085);
+            });
+            drawFocusBrackets(ctx, w * 0.745, h * 0.43, w * 0.16, h * 0.14, pulse);
+          } else {
+            // Step 3: Shared Family Cart: focus on the wooden market crate of fresh produce
+            drawFocusBrackets(ctx, w * 0.81, h * 0.72, w * 0.22, h * 0.24, pulse);
+            [[0.76, 0.67], [0.80, 0.65], [0.85, 0.69]].forEach(([px, py], idx) => {
+              const r = 6 + ((t * 2 + idx * 0.3) % 1) * 8;
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2;
+              ctx.globalAlpha = 0.85;
+              ctx.beginPath();
+              ctx.arc(w * px, h * py, r, 0, Math.PI * 2);
+              ctx.stroke();
+            });
+            ctx.globalAlpha = 1;
+          }
+
+        } else if (key === 'scout') {
+          if (step === 0) {
+            // Step 1: Parallel Flash Sub-Agents: studio camera & 3 product spec sheets on desk
+            drawFocusBrackets(ctx, w * 0.24, h * 0.85, w * 0.32, h * 0.18, pulse);
+            [0.14, 0.24, 0.34].forEach((sx, idx) => {
+              const prog = (t * 0.8 + idx * 0.33) % 1;
+              const sy = h * (0.78 + prog * 0.13);
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(w * (sx - 0.035), sy);
+              ctx.lineTo(w * (sx + 0.035), sy);
+              ctx.stroke();
+            });
+          } else if (step === 1) {
+            // Step 2: ASIN & Link Verification: brass calipers & VERIFIED stamp
+            const cx = w * 0.535, cy = h * 0.59;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 16 + pulse * 5, 0, Math.PI * 2);
+            ctx.stroke();
+            drawFocusBrackets(ctx, w * 0.505, h * 0.825, w * 0.19, h * 0.20, pulse);
+          } else {
+            // Step 3: Live Parcel Tracking: route map courier dot & barcoded shipping boxes
+            const mapProg = (t * 0.38) % 1;
+            const mx = w * (0.10 + mapProg * 0.21);
+            const my = h * (0.23 - Math.sin(mapProg * Math.PI) * 0.06);
+            ctx.fillStyle = '#C5A059';
+            ctx.beginPath();
+            ctx.arc(mx, my, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            drawFocusBrackets(ctx, w * 0.84, h * 0.70, w * 0.26, h * 0.34, pulse);
+          }
+
+        } else if (key === 'sterling') {
+          if (step === 0) {
+            // Step 1: Statement Credit Ledger: metallic gold reserve card & checked ledger rows
+            drawFocusBrackets(ctx, w * 0.47, h * 0.615, w * 0.12, h * 0.12, pulse);
+            drawFocusBrackets(ctx, w * 0.495, h * 0.925, w * 0.32, h * 0.13, pulse);
+          } else if (step === 1) {
+            // Step 2: Subscription Audit: brass balance scale weighing bills vs card perks
+            drawFocusBrackets(ctx, w * 0.868, h * 0.74, w * 0.22, h * 0.40, pulse);
+            [[0.795, 0.825], [0.942, 0.825]].forEach(([px, py]) => {
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2.2;
+              ctx.beginPath();
+              ctx.arc(w * px, h * py, 14 + pulse * 4, 0, Math.PI * 2);
+              ctx.stroke();
+            });
+          } else {
+            // Step 3: Award Sweet Spots: SFO -> HND departure row & transoceanic flight arc
+            drawFocusBrackets(ctx, w * 0.19, h * 0.19, w * 0.27, h * 0.075, pulse);
+            const sfoX = w * 0.64, sfoY = h * 0.23;
+            const hndX = w * 0.91, hndY = h * 0.26;
+            const ctrlX = w * 0.78, ctrlY = h * 0.12;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.moveTo(sfoX, sfoY);
+            ctx.quadraticCurveTo(ctrlX, ctrlY, hndX, hndY);
+            ctx.stroke();
+            const u = (t * 0.42) % 1;
+            const inv = 1 - u;
+            const fx = inv * inv * sfoX + 2 * inv * u * ctrlX + u * u * hndX;
+            const fy = inv * inv * sfoY + 2 * inv * u * ctrlY + u * u * hndY;
+            ctx.fillStyle = '#C5A059';
+            ctx.beginPath();
+            ctx.arc(fx, fy, 5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+        } else if (key === 'sloan') {
+          if (step === 0) {
+            // Step 1: Room & Scale Check: brass dividers & architectural floor plan
+            const bx = w * 0.528, by = h * 0.83;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.4;
+            ctx.beginPath();
+            ctx.arc(bx, by, w * 0.055, -Math.PI * 0.85, -Math.PI * 0.85 + ((t * 1.3) % (Math.PI * 1.4)));
+            ctx.stroke();
+            drawFocusBrackets(ctx, w * 0.54, h * 0.86, w * 0.30, h * 0.20, pulse);
+          } else if (step === 1) {
+            // Step 2: Material & Weave Audit: wool rug swatch, walnut wood, and travertine slab
+            drawFocusBrackets(ctx, w * 0.85, h * 0.91, w * 0.20, h * 0.14, pulse);
+            drawFocusBrackets(ctx, w * 0.74, h * 0.76, w * 0.18, h * 0.12, pulse);
+          } else {
+            // Step 3: 10-Minute Spec Cache: curated sculptural vessels on pedestals
+            drawFocusBrackets(ctx, w * 0.735, h * 0.47, w * 0.12, h * 0.22, pulse);
+            drawFocusBrackets(ctx, w * 0.925, h * 0.52, w * 0.11, h * 0.16, pulse);
+          }
+
+        } else if (key === 'tazza') {
+          if (step === 0) {
+            // Step 1: Coffee Bag Intake: coffee bean bags & tasting note card on right
+            drawFocusBrackets(ctx, w * 0.85, h * 0.84, w * 0.22, h * 0.24, pulse);
+          } else if (step === 1) {
+            // Step 2: Grind & Temp Dial-In: gooseneck kettle pour, V60 steam, and digital scale
+            const kx = w * 0.50, ky = h * 0.56;
+            for (let i = 0; i < 3; i++) {
+              const prog = (t * 0.5 + i * 0.33) % 1;
+              const sy = ky - prog * (h * 0.22);
+              const sx = kx + Math.sin(prog * Math.PI * 2 + i) * 9;
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2.2;
+              ctx.globalAlpha = Math.sin(prog * Math.PI) * 0.85;
+              ctx.beginPath();
+              ctx.moveTo(sx, sy + 12);
+              ctx.quadraticCurveTo(sx - 6, sy + 6, sx + 5, sy);
+              ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+            drawFocusBrackets(ctx, w * 0.505, h * 0.76, w * 0.18, h * 0.36, pulse);
+          } else {
+            // Step 3: Push to Fellow Aiden: wireless profile arc into the Fellow Aiden dial on left
+            const dialX = w * 0.242, dialY = h * 0.658;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.4;
+            ctx.setLineDash([5, 4]);
+            ctx.lineDashOffset = -t * 24;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.45, h * 0.88);
+            ctx.quadraticCurveTo(w * 0.34, h * 0.68, dialX, dialY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.arc(dialX, dialY, 14 + pulse * 4, 0, Math.PI * 2);
+            ctx.stroke();
+            drawFocusBrackets(ctx, w * 0.21, h * 0.74, w * 0.19, h * 0.44, pulse);
+          }
 
         } else if (key === 'newhire') {
-          // 1. Brass seal ring drawing around the new portrait (0.645, 0.625)
-          const px = w * 0.645, py = h * 0.625;
-          ctx.strokeStyle = '#C5A059';
-          ctx.lineWidth = 2.4;
-          ctx.beginPath();
-          ctx.arc(px, py, 44, 0, ((t * 1.5) % (Math.PI * 2)));
-          ctx.stroke();
-
-          drawTag(ctx, w * 0.36, h * 0.44, '1. agents/<name>/AGENT.md', false);
-          drawTag(ctx, w * 0.64, h * 0.42, '2. Scoped Tools + Portrait', false);
-          drawTag(ctx, w * 0.52, h * 0.76, '3. git push → Online in 60s ✓', true);
+          if (step === 0) {
+            // Step 1: Define AGENT.md: brass nameplate & LM dossier folder
+            drawFocusBrackets(ctx, w * 0.215, h * 0.365, w * 0.19, h * 0.11, pulse);
+            drawFocusBrackets(ctx, w * 0.17, h * 0.65, w * 0.22, h * 0.38, pulse);
+          } else if (step === 1) {
+            // Step 2: Generate Editorial Portrait: golden ring drawing around circular portrait
+            const px = w * 0.55, py = h * 0.625;
+            ctx.strokeStyle = '#C5A059';
+            ctx.lineWidth = 2.8;
+            ctx.beginPath();
+            ctx.arc(px, py, h * 0.165, 0, ((t * 1.4) % (Math.PI * 2)));
+            ctx.stroke();
+          } else {
+            // Step 3: 60-Second Hot Reload: concentric deployment ripples from completed portrait
+            const px = w * 0.55, py = h * 0.625;
+            for (let i = 0; i < 3; i++) {
+              const prog = (t * 0.55 + i * 0.33) % 1;
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 2.2;
+              ctx.globalAlpha = (1 - prog) * 0.85;
+              ctx.beginPath();
+              ctx.arc(px, py, h * (0.16 + prog * 0.26), 0, Math.PI * 2);
+              ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+          }
         }
 
         ctx.restore();
@@ -2258,38 +2516,54 @@
       const avatarKey = a.avatarKey || key;
       const allowedHeading = key === 'newhire' ? 'Included in every specialist folder:' : `Tools loaded for ${a.name}:`;
       const blockedHeading = key === 'newhire' ? 'Default permission boundary:' : `Blocked from ${a.name}'s session:`;
+      const firstStep = a.reelSteps[0];
 
       const container = document.getElementById('agent-dossier');
       container.innerHTML = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
-          <!-- Left 7 Columns: Widescreen "At Work" Studio Viewport + Solid Editorial Framing Bars -->
+          <!-- Left 7 Columns: Widescreen "At Work" Studio Viewport + Interactive Step Bar (Zero Text Over Image) -->
           <div class="lg:col-span-7">
             <div class="rounded-xl overflow-hidden border-2 border-[#141A24] bg-[#141A24] shadow-sm">
-              <!-- Solid Top Studio Control Bar (No Frosted Glass, No Artwork Occlusion) -->
+              <!-- Solid Top Studio Control Bar -->
               <div class="bg-[#141A24] text-[#FFFFFF] border-b border-[#C5A059]/45 px-3.5 py-2 flex items-center justify-between gap-2">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-[#E5C583]">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#E5C583] truncate">
                   ● Desk ${a.deskNum} · ${a.rooms}
                 </span>
-                <button type="button" onclick="replayStudioScene()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE] text-[#141A24] hover:bg-white text-xs font-bold min-h-[30px] transition shadow-sm">
-                  ↻ Replay Scene
+                <button type="button" onclick="nextAgentReelStep()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE] text-[#141A24] hover:bg-white text-xs font-bold min-h-[30px] shrink-0 transition shadow-sm">
+                  Next Action ▶
                 </button>
               </div>
 
-              <!-- Unobstructed 16:9 Studio Illustration + Live 60fps Canvas -->
-              <div class="relative aspect-[16/9] overflow-hidden bg-[#141A24]">
-                <img data-scene="${key}" alt="${a.sceneAlt}" class="w-full h-full object-cover studio-art-motion" />
+              <!-- Unobstructed 16:9 Studio Illustration + Step-Driven Camera Pan & Diegetic Object Highlights -->
+              <div class="relative aspect-[16/9] overflow-hidden bg-[#141A24] cursor-pointer" onclick="nextAgentReelStep()" title="Tap to focus on the next action in the room">
+                <img id="studio-scene-img" data-scene="${key}" alt="${a.sceneAlt}" class="w-full h-full object-cover studio-step-camera" />
                 <canvas id="studio-live-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
               </div>
 
-              <!-- Solid Bottom Editorial Character Introduction Plate -->
-              <div class="bg-[#141A24] text-[#FFFFFF] border-t border-[#C5A059]/45 px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
-                  <img data-avatar="${avatarKey}" alt="" width="44" height="44" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-[#C5A059] object-cover shrink-0" />
-                  <div class="min-w-0">
-                    <div class="font-serif-display text-lg sm:text-xl leading-tight truncate text-[#FFFFFF]">
-                      ${a.name} <span class="font-sans text-xs font-bold text-[#E5C583]">· ${a.role}</span>
+              <!-- 3-Step Interactive Switcher Bar Directly Beneath Image (Never Cut Off on iPhone) -->
+              <div class="grid grid-cols-3 divide-x divide-[#C5A059]/35 border-t border-[#C5A059]/45 bg-[#141A24]">
+                ${a.reelSteps.map((st, idx) => `
+                  <button type="button" id="studio-tab-${idx}" onclick="selectAgentReelStep(${idx})" class="py-2 px-2 text-[11px] sm:text-xs font-bold text-center transition min-h-[40px] flex items-center justify-center">
+                    <span class="truncate">${st.shortTab}</span>
+                  </button>
+                `).join('')}
+              </div>
+
+              <!-- Active Action Readout + Specialist Identity Plate (Solid Opaque Dark Frame) -->
+              <div class="bg-[#141A24] text-[#FFFFFF] border-t border-[#C5A059]/35 px-3.5 py-3 sm:px-4 space-y-2.5">
+                <div class="rounded-lg bg-[#1E2738] border border-[#C5A059]/40 px-3 py-2">
+                  <div class="text-xs font-bold text-[#E5C583]" id="studio-active-step-title">${firstStep.title}</div>
+                  <div class="text-xs text-[#F8F5EE] leading-relaxed mt-0.5" id="studio-active-step-detail">${firstStep.detail}</div>
+                </div>
+                <div class="flex items-center justify-between gap-3 pt-0.5">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <img data-avatar="${avatarKey}" alt="" width="40" height="40" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#C5A059] object-cover shrink-0" />
+                    <div class="min-w-0">
+                      <div class="font-serif-display text-base sm:text-lg leading-tight truncate text-[#FFFFFF]">
+                        ${a.name} <span class="font-sans text-xs font-bold text-[#E5C583]">· ${a.role}</span>
+                      </div>
+                      <div class="text-[11px] text-[#E8E2D5] truncate">${a.studioCaption}</div>
                     </div>
-                    <div class="text-xs text-[#E8E2D5] truncate">${a.studioCaption}</div>
                   </div>
                 </div>
               </div>
@@ -2303,8 +2577,8 @@
             <!-- 3-Step Animated Action Reel -->
             <div class="space-y-2">
               <div class="flex items-center justify-between text-xs">
-                <span class="font-bold uppercase tracking-wider text-[var(--muted-foreground)]">How ${a.name} Works (Live Sequence)</span>
-                <span class="text-[11px] text-[var(--muted-foreground)]">Tap any step</span>
+                <span class="font-bold uppercase tracking-wider text-[var(--muted-foreground)]">How ${a.name} Works (Tap to Focus in Room)</span>
+                <span class="text-[11px] text-[var(--muted-foreground)]">3 live actions</span>
               </div>
               <div class="space-y-1.5">
                 ${a.reelSteps.map((st, idx) => `
@@ -2348,7 +2622,7 @@
         reelTimer = setInterval(() => {
           currentReelIdx = (currentReelIdx + 1) % a.reelSteps.length;
           updateReelHighlight();
-        }, 3400);
+        }, 3800);
       }
 
       container.classList.remove('fade-swap');
