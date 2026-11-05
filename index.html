@@ -22,6 +22,9 @@
       overflow-x: hidden;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
     }
+    .font-serif-display {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+    }
     a[href], button:not(:disabled), [role="button"] {
       cursor: pointer;
     }
@@ -61,7 +64,6 @@
         to { opacity: 1; transform: translateY(0); }
       }
     }
-    /* Hide scrollbar on horizontal pill strips while keeping swipe */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -69,110 +71,324 @@
 <body class="bg-[var(--background)] text-[var(--foreground)] antialiased selection:bg-[var(--primary)] selection:text-[var(--primary-foreground)] relative">
 
   <!-- Ambient Architectural Signal Canvas -->
-  <canvas id="bg-canvas" aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 opacity-55"></canvas>
+  <canvas id="bg-canvas" aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 opacity-50"></canvas>
 
-  <!-- Clean, Uncramped Mobile-First Top Bar -->
+  <!-- Responsive Editorial Navbar -->
   <header class="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur-md border-b border-[var(--border)]">
-    <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
-      <a href="#" class="flex items-center gap-2.5 shrink-0 min-h-[36px]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="#" class="flex items-center gap-2.5 shrink-0 min-h-[44px]">
         <img data-avatar="crest" alt="Leamonde crest" width="28" height="28" class="w-7 h-7 rounded-full border border-[var(--border)] object-cover" />
         <span class="font-bold text-sm tracking-tight">LEAMONDE AI</span>
       </a>
 
-      <nav aria-label="Page sections" class="flex items-center gap-1 overflow-x-auto no-scrollbar">
-        <a href="#sec-map" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Map</a>
-        <a href="#sec-agents" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Staff</a>
-        <a href="#sec-sim" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Walkthrough</a>
-        <a href="#sec-memory" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Storage</a>
-        <a href="#sec-tools" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Tools</a>
-        <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Toggle color theme" class="ml-1 px-2.5 py-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-medium whitespace-nowrap shrink-0 transition">
+      <!-- Desktop Nav -->
+      <nav aria-label="Primary navigation" class="hidden md:flex items-center gap-1">
+        <a href="#live-demo" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">Walkthrough</a>
+        <a href="#why" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">Why Discord</a>
+        <a href="#roster" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">The Staff</a>
+        <a href="#memory" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">Memory</a>
+        <a href="#architecture" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">Architecture</a>
+        <a href="#trust" class="px-3 py-2 rounded-lg text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] min-h-[44px] inline-flex items-center">Security</a>
+        <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Toggle color theme" class="ml-2 px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-medium min-h-[40px] transition">
           Night
         </button>
       </nav>
+
+      <!-- Mobile Controls (44px touch targets) -->
+      <div class="flex md:hidden items-center gap-2">
+        <button type="button" onclick="toggleTheme()" id="theme-toggle-btn-mobile" aria-label="Toggle color theme" class="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-medium min-h-[44px]">
+          Night
+        </button>
+        <button type="button" onclick="toggleMobileMenu()" id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-nav" class="px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold min-h-[44px]">
+          Menu
+        </button>
+      </div>
     </div>
+
+    <!-- Collapsible Mobile Menu Drawer -->
+    <nav id="mobile-nav" aria-label="Mobile navigation" class="hidden md:hidden border-t border-[var(--border)] bg-[var(--card)] px-4 py-3">
+      <div class="grid grid-cols-2 gap-2">
+        <a href="#live-demo" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">Walkthrough</a>
+        <a href="#why" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">Why Discord</a>
+        <a href="#roster" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">The Six Staff</a>
+        <a href="#memory" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">Memory &amp; Git</a>
+        <a href="#architecture" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">System Map</a>
+        <a href="#trust" onclick="closeMobileMenu()" class="px-3 py-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs font-semibold min-h-[44px] flex items-center">Security &amp; Cost</a>
+      </div>
+    </nav>
   </header>
 
-  <main class="relative z-10 max-w-4xl mx-auto px-4 pt-6 pb-20 space-y-10">
+  <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-24 space-y-20 sm:space-y-28">
 
-    <!-- HERO: SPACIOUS, PUNCHY, MOBILE-FIRST -->
-    <section class="reveal visible bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 sm:p-8 shadow-sm space-y-5 relative overflow-hidden">
-      <div class="text-xs font-semibold text-[var(--muted-foreground)]">
-        Leamonde AI · System Overview
-      </div>
+    <!-- HERO + LIVE PRODUCT SHOWCASE -->
+    <section class="reveal visible space-y-10">
+      <div class="max-w-3xl space-y-5">
+        <p class="text-xs sm:text-sm font-semibold text-[var(--muted-foreground)]">
+          Private Household AI · Self-Hosted on Proxmox VE
+        </p>
 
-      <div class="space-y-3">
-        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight leading-snug">
+        <h1 class="font-serif-display text-4xl sm:text-6xl font-normal tracking-tight leading-[1.08]">
           A family staff made of AI.
         </h1>
-        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+
+        <p class="text-base sm:text-xl text-[var(--muted-foreground)] leading-relaxed">
           A chief of staff, a personal chef, a shopper, a card strategist, an interior designer, and a coffee specialist. They share a Discord server with the two of us to plan dinners, compare groceries, source furniture, track card perks, and file medical claims, all running on a server in our house.
+        </p>
+
+        <!-- Primary CTAs (44px+ touch targets) -->
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <a href="#live-demo" class="px-5 py-3 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] text-sm font-semibold min-h-[44px] inline-flex items-center shadow-sm hover:opacity-90 transition">
+            Step through a live workflow
+          </a>
+          <a href="#roster" class="px-5 py-3 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-sm font-semibold min-h-[44px] inline-flex items-center transition">
+            Meet the six specialists
+          </a>
+        </div>
+
+        <!-- Editorial Portrait Cast Strip -->
+        <div class="pt-3 flex flex-wrap items-center gap-3 sm:gap-4">
+          <div class="flex -space-x-2">
+            <img data-avatar="aida" alt="Aida portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+            <img data-avatar="cookie" alt="Cookie portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+            <img data-avatar="scout" alt="Scout portrait" width="44" height="44" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+            <img data-avatar="sterling" alt="Sterling portrait" width="44" height="44" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+            <img data-avatar="sloan" alt="Sloan portrait" width="44" height="44" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+            <img data-avatar="tazza" alt="Tazza portrait" width="44" height="44" class="w-11 h-11 rounded-full border-2 border-[var(--background)] object-cover" />
+          </div>
+          <p class="text-xs sm:text-sm text-[var(--muted-foreground)]">
+            <strong>Aida</strong> (Chief of Staff) · <strong>Cookie</strong> (Chef) · <strong>Scout</strong> (Shopping) · <strong>Sterling</strong> (Cards) · <strong>Sloan</strong> (Interiors) · <strong>Tazza</strong> (Coffee)
+          </p>
+        </div>
+      </div>
+
+      <!-- ABOVE-THE-FOLD INTERACTIVE PRODUCT WINDOW -->
+      <div id="live-demo" class="scroll-mt-20 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border)] pb-3.5">
+          <div>
+            <span class="text-xs font-semibold text-[var(--muted-foreground)]">Interactive Product Walkthrough</span>
+            <h2 class="text-base sm:text-lg font-bold">Watch how a request moves from Discord to the home server</h2>
+          </div>
+          <span class="text-xs text-[var(--muted-foreground)]">Pick a workflow and tap <strong>Next ▶</strong></span>
+        </div>
+
+        <!-- 3 Scenario Tabs (44px height) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Workflow examples">
+          <button type="button" role="tab" aria-selected="true" onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
+            1. Dinner &amp; Groceries (Aida to Cookie)
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
+            2. Sourcing a Rug (3 Parallel Sub-Agents)
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition">
+            3. Filing a Superbill (1Password + Gate)
+          </button>
+        </div>
+
+        <!-- Stepper Bar -->
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span id="sim-step-badge" class="text-xs font-bold px-2.5 py-1.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Step 1 of 4</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="toggleAutoPlay()" id="btn-autoplay" aria-label="Auto-play steps" class="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[44px] transition">
+                ▶ Auto
+              </button>
+              <button type="button" onclick="stepSim(-1)" id="btn-prev" aria-label="Previous step" class="px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[44px] disabled:opacity-35 transition">
+                ◀ Prev
+              </button>
+              <button type="button" onclick="stepSim(1)" id="btn-next" aria-label="Next step" class="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 text-xs font-semibold min-h-[44px] disabled:opacity-35 transition">
+                Next ▶
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2" id="sim-progress-bars"></div>
+          <p id="sim-why-label" class="text-xs text-[var(--muted-foreground)]"></p>
+        </div>
+
+        <!-- Split Screen: Phone Discord vs Home Server Backstage -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" aria-live="polite">
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
+              <span class="font-bold" id="sim-channel">#lobby</span>
+              <span class="text-[var(--muted-foreground)]" id="sim-thread-badge"></span>
+            </div>
+            <div id="sim-discord-feed" class="space-y-2.5 fade-swap"></div>
+          </div>
+
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
+                <span class="font-bold" id="sim-stage-title">Home Server</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-medium" id="sim-stage-chip"></span>
+              </div>
+              <div id="sim-backstage-body" class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed fade-swap"></div>
+            </div>
+            <div id="sim-tech-note" class="text-xs font-medium text-[var(--foreground)] pt-2.5 border-t border-[var(--border)]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: ASYMMETRIC EDITORIAL NARRATIVE (NO CARD BOXES) -->
+    <section id="why" class="reveal scroll-mt-20 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+      <div class="md:col-span-5 space-y-3">
+        <p class="text-xs font-semibold text-[var(--muted-foreground)]">Why We Built It</p>
+        <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight leading-tight">
+          ChatGPT is single-player. A household isn't.
+        </h2>
+        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+          Running a home takes two people coordinating across calendars, grocery lists, deliveries, and budgets. Standard AI chat traps every conversation inside one person's private browser tab.
         </p>
       </div>
 
-      <!-- Avatar Strip -->
-      <div class="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar">
-        <img data-avatar="aida" alt="Aida portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="cookie" alt="Cookie portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="scout" alt="Scout portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="sterling" alt="Sterling portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="sloan" alt="Sloan portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="tazza" alt="Tazza portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <span class="text-xs text-[var(--muted-foreground)] pl-1">Aida · Cookie · Scout · Sterling · Sloan · Tazza</span>
-      </div>
+      <div class="md:col-span-7 divide-y divide-[var(--border)] border-t border-b border-[var(--border)]">
+        <div class="py-5 space-y-1.5">
+          <h3 class="font-bold text-base">Shared rooms plus locked 1-on-1 desks</h3>
+          <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            Both partners talk with the staff together in <code>#kitchen</code>, <code>#shopping</code>, and <code>#interiors</code>. For personal tasks, each partner has a locked private channel (<code>#partner-a-desk</code> and <code>#partner-b-desk</code>) where personal Gmail, work calendars, and medical superbills stay private to that person.
+          </p>
+        </div>
 
-      <!-- 4 Core Choices -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-[var(--border)]">
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">Why Discord?</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            Both partners can talk with the staff in shared rooms or step into locked 1-on-1 desks. The mobile app already handles voice notes, photos, threads, and approval buttons.
+        <div class="py-5 space-y-1.5">
+          <h3 class="font-bold text-base">Built on Discord instead of another mobile app</h3>
+          <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            The iOS app already handles push notifications, voice notes, photo uploads, and approval buttons. When you ask a multi-step question in a main room, a fast classifier opens a dedicated thread automatically so the main channel stays easy to scan.
           </p>
         </div>
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">Why a home Proxmox server?</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            One virtual machine on our home server runs the Python agent service, three SQLite databases, and local browser containers. Conversations and household records stay on our own disk.
-          </p>
-        </div>
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">Why two Gemini models?</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            Gemini Argon handles live conversation where judgment matters. Gemini Flash handles heavy web reading in parallel sub-agents, checks draft replies before they post, and scripts voice briefings.
-          </p>
-        </div>
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">Why MCPJungle and 1Password?</div>
-          <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            All local and cloud tools connect through one local gateway. API keys and logins are fetched from 1Password on demand, so no static passwords sit in config files.
+
+        <div class="py-5 space-y-1.5">
+          <h3 class="font-bold text-base">Pinned messages instead of a separate web dashboard</h3>
+          <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            Nobody wants another web portal to check. Instead, the staff keep pinned messages in Discord updated in place: this week's dinner menu in <code>#kitchen</code>, expiring credit card credits in <code>#shopping</code>, and monthly cloud spend in <code>#ops</code>.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- 01: INTERACTIVE ARCHITECTURE MAP -->
-    <section id="sec-map" class="reveal space-y-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <span class="text-xs font-semibold text-[var(--muted-foreground)]">01 · System Map</span>
-          <h2 class="text-xl font-bold">How the Pieces Connect</h2>
-          <p class="text-sm text-[var(--muted-foreground)] mt-0.5">Tap any component to expand its role.</p>
+    <!-- SECTION 2: THE 6 SPECIALISTS (INTERACTIVE PORTRAIT SWITCHBOARD) -->
+    <section id="roster" class="reveal scroll-mt-20 space-y-6">
+      <div class="max-w-2xl space-y-2">
+        <p class="text-xs font-semibold text-[var(--muted-foreground)]">The Staff</p>
+        <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight">
+          Six specialists. Six separate minds.
+        </h2>
+        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+          Each staff member is a separate <code>Agent</code> instance with its own instructions, memory, and tool list. Cookie can edit the grocery cart, but she cannot read your email. Discord webhooks let all six post under their own name and portrait through one bot connection.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <!-- 2x3 Touch Selector -->
+        <div class="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5" role="tablist" aria-label="Household specialists">
+          <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="aida" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Aida</div>
+              <div class="text-xs opacity-80">Chief of Staff</div>
+            </div>
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="cookie" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Cookie</div>
+              <div class="text-xs opacity-80">Personal Chef</div>
+            </div>
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="scout" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Scout</div>
+              <div class="text-xs opacity-80">Product Scout</div>
+            </div>
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="sterling" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Sterling</div>
+              <div class="text-xs opacity-80">Cards &amp; Perks</div>
+            </div>
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="sloan" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Sloan</div>
+              <div class="text-xs opacity-80">Interiors</div>
+            </div>
+          </button>
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition">
+            <img data-avatar="tazza" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div>
+              <div class="font-bold text-sm leading-tight">Tazza</div>
+              <div class="text-xs opacity-80">Coffee</div>
+            </div>
+          </button>
         </div>
+
+        <!-- Specialist Dossier Panel -->
+        <div id="agent-dossier" role="tabpanel" aria-live="polite" class="lg:col-span-7 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 sm:p-6 space-y-4 fade-swap">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: HIGH-CONTRAST EDITORIAL BAND (RHYTHM BREAK) -->
+    <section id="memory" class="reveal scroll-mt-20 rounded-2xl bg-[var(--band-bg)] text-[var(--band-fg)] p-6 sm:p-10 space-y-8">
+      <div class="max-w-2xl space-y-2">
+        <p class="text-xs font-semibold text-[var(--band-muted)]">Memory &amp; Continuous Delivery</p>
+        <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight">
+          A house that remembers and updates itself.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 border-t border-[var(--band-border)] pt-6">
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-[var(--band-muted)]">01 · Self-Writing Git Handbook</div>
+          <h3 class="font-bold text-base">60-second hot reload</h3>
+          <p class="text-xs sm:text-sm text-[var(--band-muted)] leading-relaxed">
+            Agent instructions, schedules, tool permissions, and the shared House Binder live in Git and reload every 60 seconds. When an agent records a new family preference or you tap "Always allow" on a tool in Discord, the server commits and pushes that change back to Git.
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-[var(--band-muted)]">02 · Three Local SQLite Databases</div>
+          <h3 class="font-bold text-base">Structured state on disk</h3>
+          <p class="text-xs sm:text-sm text-[var(--band-muted)] leading-relaxed">
+            Household records live in three SQLite files on the home server: Kitchen DB (meal plans, pantry, grocery list, lunchbox history), Perks DB (card credits, reset dates, subscription checks), and Usage DB (token counts and monthly dollar spend).
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-[var(--band-muted)]">03 · Throwaway Briefings &amp; Auto-Rollback</div>
+          <h3 class="font-bold text-base">Clean chat, safe deploys</h3>
+          <p class="text-xs sm:text-sm text-[var(--band-muted)] leading-relaxed">
+            Morning briefings and inbox watches run in fresh throwaway sessions so status posts never clutter your chat logs. Every 5 minutes, the server checks Git, waits until no conversation is active, runs 8 live health checks, and rolls back automatically if a check fails.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: INTERACTIVE 3-TIER ARCHITECTURE MAP -->
+    <section id="architecture" class="reveal scroll-mt-20 space-y-5">
+      <div class="max-w-2xl space-y-2">
+        <p class="text-xs font-semibold text-[var(--muted-foreground)]">System Architecture</p>
+        <h2 class="font-serif-display text-3xl sm:text-4xl font-normal tracking-tight">
+          Cloud intelligence. Closet hardware.
+        </h2>
+        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+          Google's Gemini models handle reasoning, while a Proxmox VE virtual machine in our house runs the Python orchestrator, databases, and local browser containers. Tap any component to expand its role.
+        </p>
       </div>
 
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-3">
-
         <!-- Layer 1: Discord -->
         <div class="space-y-2">
           <div class="flex items-center justify-between text-xs font-bold text-[var(--muted-foreground)] px-1">
             <span>Tier 1 · Discord Multi-User Interface</span>
             <span>iOS &amp; Desktop</span>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-1-grid">
-            <!-- Rendered by JS with inline mobile expansion -->
-          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-1-grid"></div>
         </div>
 
-        <!-- Animated Signal Arrow -->
         <div class="flex items-center justify-center py-0.5 text-xs text-[var(--muted-foreground)] gap-2">
           <svg aria-hidden="true" class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
           <span>Bot connection and room webhooks</span>
@@ -184,12 +400,9 @@
             <span>Tier 2 · Home Server (Proxmox VE)</span>
             <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">On-Premises</span>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="tier-2-grid">
-            <!-- Rendered by JS -->
-          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="tier-2-grid"></div>
         </div>
 
-        <!-- Animated Signal Arrow -->
         <div class="flex items-center justify-center py-0.5 text-xs text-[var(--muted-foreground)] gap-2">
           <svg aria-hidden="true" class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
           <span>Outbound HTTPS with secret scrubbing</span>
@@ -201,304 +414,135 @@
             <span>Tier 3 · External AI, Vault &amp; Financial Feeds</span>
             <span>Cloud APIs</span>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-3-grid">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- 02: THE 6 INDEPENDENT AGENTS -->
-    <section id="sec-agents" class="reveal space-y-3">
-      <div>
-        <span class="text-xs font-semibold text-[var(--muted-foreground)]">02 · The Staff</span>
-        <h2 class="text-xl font-bold">Six Separate Agents, Scoped Tools</h2>
-        <p class="text-sm text-[var(--muted-foreground)] mt-0.5">
-          Each specialist is a separate <code>Agent</code> instance with its own instructions, memory, and tool list. Cookie cannot read your email, and Aida cannot touch the grocery cart. Discord webhooks let all six post under their own name and portrait through one bot connection.
-        </p>
-      </div>
-
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-        <!-- 2x3 Touch Selector -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" role="tablist" aria-label="Household specialists">
-          <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="aida" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Aida</div>
-              <div class="text-xs opacity-80">Chief of Staff</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="cookie" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Cookie</div>
-              <div class="text-xs opacity-80">Personal Chef</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="scout" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Scout</div>
-              <div class="text-xs opacity-80">Product Scout</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="sterling" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Sterling</div>
-              <div class="text-xs opacity-80">Cards &amp; Perks</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="sloan" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Sloan</div>
-              <div class="text-xs opacity-80">Interiors</div>
-            </div>
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="tazza" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
-            <div>
-              <div class="font-bold text-sm leading-tight">Tazza</div>
-              <div class="text-xs opacity-80">Coffee</div>
-            </div>
-          </button>
-        </div>
-
-        <!-- Clean Single-Card Dossier -->
-        <div id="agent-dossier" role="tabpanel" aria-live="polite" class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3 fade-swap">
-          <!-- Populated by JS -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-3-grid"></div>
         </div>
       </div>
     </section>
 
-    <!-- 03: INTERACTIVE TURN SIMULATOR -->
-    <section id="sec-sim" class="reveal space-y-3">
-      <div>
-        <span class="text-xs font-semibold text-[var(--muted-foreground)]">03 · In Practice</span>
-        <h2 class="text-xl font-bold">Three Real Workflows, Step by Step</h2>
-        <p class="text-sm text-[var(--muted-foreground)] mt-0.5">Pick an example and tap <strong>Next ▶</strong> to compare what you see in Discord with what happens on the home server.</p>
+    <!-- SECTION 5: SECURITY & COST DISCIPLINE (TWO-COLUMN EDITORIAL LEDGER) -->
+    <section id="trust" class="reveal scroll-mt-20 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
+      <div class="space-y-4">
+        <div class="space-y-1.5">
+          <p class="text-xs font-semibold text-[var(--muted-foreground)]">Hard Boundaries</p>
+          <h2 class="font-serif-display text-2xl sm:text-3xl font-normal tracking-tight">
+            Four rules that can't be prompt-injected away.
+          </h2>
+        </div>
+
+        <div class="divide-y divide-[var(--border)] border-t border-b border-[var(--border)]">
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">No static passwords on disk</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              1Password resolves API keys and logins in memory on demand. Every secret is registered with an output filter that replaces raw values with <code>[redacted]</code> before anything reaches Discord or a log file.
+            </p>
+          </div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Never guess credentials</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Agents are forbidden from guessing usernames, emails, passwords, or 1Password item names. Browserless blocks plain-text typing into password fields and pauses all logins for 15 minutes if any login fails.
+            </p>
+          </div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Human-only grocery checkout</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Cookie can compare prices across six grocery stores and load the shared Instacart Family Cart, but the place-order code is stripped from the server. A human always checks out in the app.
+            </p>
+          </div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Filtered financial sync</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Monarch Money syncs credit card charges and recurring bills so Sterling can flag unused card perks, while bank balances, paychecks, investments, and net worth are filtered out in code.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-        <!-- 3 Scenario Buttons -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Workflow examples">
-          <button type="button" role="tab" aria-selected="true" onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            1. Agent Handoff (Aida to Cookie)
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            2. Parallel Web Search &amp; Fact Check
-          </button>
-          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            3. Private Desk &amp; 1Password Login
-          </button>
+      <div class="space-y-4">
+        <div class="space-y-1.5">
+          <p class="text-xs font-semibold text-[var(--muted-foreground)]">Quality &amp; Cost Control</p>
+          <h2 class="font-serif-display text-2xl sm:text-3xl font-normal tracking-tight">
+            Fast replies without runaway cloud bills.
+          </h2>
         </div>
 
-        <!-- Why This Example + Thumb-Friendly Stepper Controls -->
-        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-3">
-          <div class="flex items-center justify-between gap-2">
-            <span id="sim-step-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Step 1 of 4</span>
-            <div class="flex items-center gap-1.5">
-              <button type="button" onclick="toggleAutoPlay()" id="btn-autoplay" aria-label="Auto-play steps" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold transition">
-                ▶ Auto
-              </button>
-              <button type="button" onclick="stepSim(-1)" id="btn-prev" aria-label="Previous step" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold disabled:opacity-35 transition">
-                ◀ Prev
-              </button>
-              <button type="button" onclick="stepSim(1)" id="btn-next" aria-label="Next step" class="px-3.5 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 text-xs font-semibold disabled:opacity-35 transition">
-                Next ▶
-              </button>
-            </div>
+        <div class="divide-y divide-[var(--border)] border-t border-b border-[var(--border)]">
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Argon for judgment, Flash for reading</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Gemini Argon runs live chat turns. When an agent needs to read retail pages, it spawns up to four read-only Gemini Flash sub-agents in throwaway sessions so raw HTML stays out of the main conversation.
+            </p>
           </div>
-
-          <!-- Progress Bar -->
-          <div class="grid grid-cols-4 gap-1.5" id="sim-progress-bars"></div>
-
-          <p id="sim-why-label" class="text-xs text-[var(--muted-foreground)]"></p>
-        </div>
-
-        <!-- Compact Discord View + Backstage X-Ray -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" aria-live="polite">
-          <!-- Discord View -->
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-2.5">
-            <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
-              <span class="font-bold" id="sim-channel">#lobby</span>
-              <span class="text-[var(--muted-foreground)]" id="sim-thread-badge"></span>
-            </div>
-            <div id="sim-discord-feed" class="space-y-2 fade-swap"></div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Two-step reply check</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Before any reply posts to Discord, a fast rule check blocks invented links, fake Amazon IDs, and uncalled tools. Then a Gemini Flash reviewer checks the draft against that specialist's handbook and tool outputs.
+            </p>
           </div>
-
-          <!-- Backstage View -->
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
-                <span class="font-bold" id="sim-stage-title">Home Server</span>
-                <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-medium" id="sim-stage-chip"></span>
-              </div>
-              <div id="sim-backstage-body" class="text-xs text-[var(--muted-foreground)] leading-relaxed fade-swap"></div>
-            </div>
-            <div id="sim-tech-note" class="text-xs font-medium text-[var(--foreground)] pt-2 border-t border-[var(--border)]"></div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">Routine graduation</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Scheduled routines load only the three to five tools they actually need. New routines start on Argon while Flash quietly replays the same tool outputs; three matching runs unlock a one-tap switch to Flash in <code>#ops</code>.
+            </p>
+          </div>
+          <div class="py-3.5 space-y-1">
+            <h3 class="font-bold text-sm">10-minute Browserless page cache</h3>
+            <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Parsed product specs, studio photos, and recipes stay cached on disk for 10 minutes so follow-up questions about dimensions or ingredients answer in milliseconds.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 04: MEMORY TIERS & SAFETY LOCKS -->
-    <section id="sec-memory" class="reveal grid grid-cols-1 md:grid-cols-2 gap-4">
-
-      <!-- Memory Tiers -->
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
-        <div>
-          <span class="text-xs font-semibold text-[var(--muted-foreground)]">04A · Storage</span>
-          <h2 class="text-lg font-bold">Three Backing Stores</h2>
-        </div>
-
-        <div class="divide-y divide-[var(--border)] text-sm">
-          <div class="py-3 first:pt-0 space-y-1">
-            <div class="flex items-center justify-between">
-              <span class="font-bold">1. Git Handbook &amp; House Binder</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">60s reload</span>
-            </div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Agent instructions, schedules, permissions, and shared household notes live in a Git repo that reloads every 60 seconds. When an agent saves a new family note or you approve a permanent tool rule in Discord, the server commits and pushes that change back to Git.
-            </p>
-          </div>
-
-          <div class="py-3 space-y-1">
-            <div class="flex items-center justify-between">
-              <span class="font-bold">2. Three Local SQLite Databases</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Pinned boards</span>
-            </div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Structured records stay in three local SQLite files: Kitchen DB (meal plans, pantry, grocery list, lunchbox history), Perks DB (card benefits, reset dates, subscription checks), and Usage DB (token counts and monthly cloud spend).
-            </p>
-          </div>
-
-          <div class="py-3 last:pb-0 space-y-1">
-            <div class="flex items-center justify-between">
-              <span class="font-bold">3. Thread Logs &amp; Throwaway Routines</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Lean context</span>
-            </div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Each Discord channel and thread keeps its own conversation log on disk. Scheduled morning briefings and inbox watches run in fresh throwaway sessions so daily status posts do not pile up in your chat history.
-            </p>
-          </div>
-        </div>
+    <!-- SECTION 6: CONNECTED TOOLS DIRECTORY (CLEAN TYPOGRAPHIC SPEC LIST) -->
+    <section id="integrations" class="reveal scroll-mt-20 space-y-5">
+      <div class="space-y-1.5">
+        <p class="text-xs font-semibold text-[var(--muted-foreground)]">Local MCPJungle Gateway</p>
+        <h2 class="font-serif-display text-2xl sm:text-3xl font-normal tracking-tight">
+          Nine integrations wired into the house.
+        </h2>
       </div>
 
-      <!-- Privacy & Safety Locks -->
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
-        <div>
-          <span class="text-xs font-semibold text-[var(--muted-foreground)]">04B · Boundaries</span>
-          <h2 class="text-lg font-bold">How Secrets and Data Stay Safe</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-10 divide-y divide-[var(--border)] border-t border-b border-[var(--border)] text-xs sm:text-sm">
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">Browserless (Stealth Playwright)</span>
+          <span class="text-[var(--muted-foreground)]">Product &amp; recipe extraction, studio photos, 10m disk cache, supervised 1Password sign-in</span>
         </div>
-
-        <div class="divide-y divide-[var(--border)] text-sm">
-          <div class="py-3 first:pt-0 space-y-1">
-            <div class="font-bold">No static passwords on disk</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              API keys, bot tokens, and website logins are fetched from 1Password in memory when needed. Every secret is registered with an output filter that replaces raw values with <code>[redacted]</code> before anything reaches Discord or a log file.
-            </p>
-          </div>
-
-          <div class="py-3 space-y-1">
-            <div class="font-bold">Never guess credentials</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Agents are forbidden from guessing usernames, emails, passwords, or 1Password item names. Browserless blocks plain-text typing into password fields and pauses all logins across the server for 15 minutes if any login fails.
-            </p>
-          </div>
-
-          <div class="py-3 last:pb-0 space-y-1">
-            <div class="font-bold">Hard channel and tool boundaries</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Personal Gmail and calendar tools are only attached inside that partner's private desk. Instacart has no checkout or place-order code at all, and the Monarch Money integration strips out bank balances, paychecks, investments, and net worth.
-            </p>
-          </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">Instacart (6 Local Stores)</span>
+          <span class="text-[var(--muted-foreground)]">Parallel price comparison across 6 stores, past family receipts, shared Family Cart edits</span>
         </div>
-      </div>
-
-    </section>
-
-    <!-- 05: QUALITY/COST LEVERS & CONNECTED TOOLS -->
-    <section id="sec-tools" class="reveal space-y-4">
-
-      <!-- 4 Quality & Cost Levers -->
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
-        <div>
-          <span class="text-xs font-semibold text-[var(--muted-foreground)]">05 · Day-to-Day Operation</span>
-          <h2 class="text-lg font-bold">Keeping Replies Accurate and Cloud Bills Low</h2>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">NYT Cooking</span>
+          <span class="text-[var(--muted-foreground)]">Searches the household Recipe Box and pulls full ingredients and steps for Cookie</span>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Parallel Flash sub-agents</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              When an agent needs to read retail pages or documentation, it spawns up to four read-only Gemini Flash sub-agents. They read the full pages and return a short summary, keeping raw HTML out of the main Argon conversation.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Two-step reply check</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Before any reply posts to Discord, a fast rule check blocks invented links, fake Amazon IDs, and uncalled tools. Then a Gemini Flash reviewer checks the draft against that specialist's rules and the tool outputs from that turn.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Routine graduation</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Scheduled routines load only the three to five tools they actually need. New routines start on Gemini Argon while Flash quietly replays the same tool outputs in the background; after three matching runs, an <code>#ops</code> button lets you switch that routine to Flash.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Pull deploys with auto-rollback</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Every five minutes the server checks Git for updates. When nobody is mid-conversation, it pulls the new code, runs eight live checks against 1Password, MCPJungle, and Gemini, and rolls back automatically if any check fails.
-            </p>
-          </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">iCloud Family Calendar</span>
+          <span class="text-[var(--muted-foreground)]">Shared family scheduling plus free/busy privacy masks on personal work calendars</span>
+        </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">Google Workspace</span>
+          <span class="text-[var(--muted-foreground)]">Private-desk Gmail, Calendar, and Drive with phone-friendly OAuth inside Discord</span>
+        </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">Monarch Money</span>
+          <span class="text-[var(--muted-foreground)]">Read-only credit cards, recurring bills, and category spend (net worth and paychecks stripped)</span>
+        </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">CardStack &amp; MaxWorth</span>
+          <span class="text-[var(--muted-foreground)]">Credit card benefit catalogs, reset rules, shopping portal rates, and card-linked offers</span>
+        </div>
+        <div class="py-3.5 flex flex-col gap-0.5">
+          <span class="font-bold text-[var(--foreground)]">Fellow Aiden &amp; Local Tennis Club</span>
+          <span class="text-[var(--muted-foreground)]">Pushes custom brew profiles to the coffee maker and books courts at the local tennis club</span>
         </div>
       </div>
-
-      <!-- Connected Tools via MCPJungle -->
-      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
-        <div>
-          <span class="text-xs font-semibold text-[var(--muted-foreground)]">Local Gateway · MCPJungle</span>
-          <h2 class="text-lg font-bold">Tools Wired Into the House</h2>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Browserless (Stealth Playwright)</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Extracts product specs, studio photos, and recipes with a 10-minute local disk cache for follow-up questions, plus supervised browser sessions with 1Password sign-in.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Instacart &amp; NYT Cooking</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Searches the household NYT Cooking Recipe Box, compares live prices across six local grocery stores, reads past family order receipts, and edits the shared Instacart Family Cart.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">iCloud Calendar, Tennis Club &amp; Fellow Aiden</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Reads and books shared family calendars (with free/busy privacy masks on personal work calendars), reserves courts at the local tennis club, and pushes custom brew profiles to the Fellow Aiden coffee maker.
-            </p>
-          </div>
-          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">Google Workspace, Monarch &amp; Card Catalogs</div>
-            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Connects personal Gmail, Calendar, and Drive inside private desks, syncs credit card charges and recurring bills from Monarch Money, and checks CardStack and MaxWorth for card offers and portal rates.
-            </p>
-          </div>
-        </div>
-      </div>
-
     </section>
 
     <!-- FOOTER -->
-    <footer class="border-t border-[var(--border)] pt-6 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--muted-foreground)]">
-      <div class="flex items-center gap-2">
-        <img data-avatar="crest" alt="" width="20" height="20" class="w-5 h-5 rounded-full border border-[var(--border)]" />
+    <footer class="border-t border-[var(--border)] pt-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--muted-foreground)]">
+      <div class="flex items-center gap-2.5">
+        <img data-avatar="crest" alt="" width="22" height="22" class="w-5 h-5 rounded-full border border-[var(--border)]" />
         <span><strong>Leamonde AI</strong> · A Family Staff Made of AI</span>
       </div>
       <div>Proxmox VE · Antigravity SDK · Gemini · MCPJungle · 1Password</div>
@@ -523,7 +567,11 @@
         '--primary-foreground': '#11161f',
         '--secondary': '#232d3f',
         '--secondary-foreground': '#e5e0d5',
-        '--accent': '#2a364b'
+        '--accent': '#2a364b',
+        '--band-bg': '#232d3f',
+        '--band-fg': '#f3f1ec',
+        '--band-muted': '#b8c2d1',
+        '--band-border': '#36445c'
       } : {
         '--background': '#f8f5ee',
         '--content': '#f2ede2',
@@ -536,22 +584,56 @@
         '--primary-foreground': '#f8f5ee',
         '--secondary': '#ebe4d6',
         '--secondary-foreground': '#1b2a4a',
-        '--accent': '#c5a059'
+        '--accent': '#c5a059',
+        '--band-bg': '#1b2a4a',
+        '--band-fg': '#f8f5ee',
+        '--band-muted': '#d6cfc2',
+        '--band-border': '#31446b'
       };
       for (const [k, v] of Object.entries(vars)) {
         document.documentElement.style.setProperty(k, v);
       }
+      const label = mode === 'dark' ? 'Ivory' : 'Night';
       const btn = document.getElementById('theme-toggle-btn');
-      if (btn) btn.textContent = mode === 'dark' ? 'Ivory' : 'Night';
+      const btnMob = document.getElementById('theme-toggle-btn-mobile');
+      if (btn) btn.textContent = label;
+      if (btnMob) btnMob.textContent = label;
     }
 
     function toggleTheme() {
       applyEditorialTheme(currentThemeMode === 'dark' ? 'light' : 'dark');
     }
 
+    function toggleMobileMenu() {
+      const nav = document.getElementById('mobile-nav');
+      const btn = document.getElementById('mobile-menu-btn');
+      if (!nav || !btn) return;
+      const isHidden = nav.classList.contains('hidden');
+      if (isHidden) {
+        nav.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+        btn.textContent = 'Close';
+      } else {
+        closeMobileMenu();
+      }
+    }
+
+    function closeMobileMenu() {
+      const nav = document.getElementById('mobile-nav');
+      const btn = document.getElementById('mobile-menu-btn');
+      if (!nav || !btn) return;
+      nav.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.textContent = 'Menu';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
+
     (function ensureStandaloneTheme() {
       const rootStyle = getComputedStyle(document.documentElement);
-      if (!rootStyle.getPropertyValue('--background').trim()) {
+      if (!rootStyle.getPropertyValue('--background').trim() || !rootStyle.getPropertyValue('--band-bg').trim()) {
         const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         applyEditorialTheme(dark ? 'dark' : 'light');
       }
@@ -803,31 +885,31 @@
       if (!a) return;
       document.querySelectorAll('.ag-btn').forEach(btn => {
         btn.setAttribute('aria-selected', 'false');
-        btn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
+        btn.className = 'ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition bg-[var(--card)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const activeBtn = document.getElementById('ag-btn-' + key);
       if (activeBtn) {
         activeBtn.setAttribute('aria-selected', 'true');
-        activeBtn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+        activeBtn.className = 'ag-btn flex items-center gap-2.5 p-3 rounded-xl border text-left min-h-[56px] transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
       }
 
       const container = document.getElementById('agent-dossier');
       container.innerHTML = `
-        <div class="flex items-center gap-3">
-          <img data-avatar="${key}" alt="" width="48" height="48" class="w-12 h-12 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <div class="flex items-center gap-3.5">
+          <img data-avatar="${key}" alt="" width="56" height="56" class="w-14 h-14 rounded-full border border-[var(--border)] object-cover shrink-0" />
           <div>
-            <div class="font-bold text-base">${a.name} · <span class="font-normal text-xs text-[var(--muted-foreground)]">${a.role}</span></div>
-            <div class="text-xs text-[var(--muted-foreground)]">Rooms: <strong>${a.rooms}</strong></div>
+            <div class="font-serif-display text-2xl leading-tight">${a.name} <span class="font-sans text-xs font-medium text-[var(--muted-foreground)]">· ${a.role}</span></div>
+            <div class="text-xs text-[var(--muted-foreground)] mt-0.5">Active in <strong>${a.rooms}</strong></div>
           </div>
         </div>
-        <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">${a.summary}</p>
+        <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">${a.summary}</p>
         <div class="space-y-2 pt-1">
           <div class="text-xs font-bold">Tools available to ${a.name}:</div>
           <div class="flex flex-wrap gap-1.5">
-            ${a.allowed.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--card)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
+            ${a.allowed.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--background)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
           </div>
         </div>
-        <div class="space-y-1.5 pt-2 border-t border-[var(--border)]">
+        <div class="space-y-1.5 pt-3 border-t border-[var(--border)]">
           <div class="text-xs font-bold text-[var(--muted-foreground)]">Not loaded in ${a.name}'s session:</div>
           <div class="flex flex-wrap gap-1.5">
             ${a.blocked.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--secondary)]/50 text-[var(--muted-foreground)] line-through">${t}</span>`).join('')}
@@ -1016,12 +1098,12 @@
       currentStep = 0;
       document.querySelectorAll('.scen-btn').forEach(btn => {
         btn.setAttribute('aria-selected', 'false');
-        btn.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
+        btn.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const active = document.getElementById('scen-' + key);
       if (active) {
         active.setAttribute('aria-selected', 'true');
-        active.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+        active.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold min-h-[44px] transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
       }
       renderSim();
     }
