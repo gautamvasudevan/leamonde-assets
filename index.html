@@ -11,7 +11,23 @@
   <meta property="og:url" content="https://gautamvasudevan.github.io/leamonde-assets/" />
   <meta property="og:image" content="https://gautamvasudevan.github.io/leamonde-assets/avatars/server_icon.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/jpeg" href="./avatars/server_icon.jpg" />
+  <script>
+    // Overwrite any stale browser disk cache for the bare URL and keep the address bar clean
+    (function() {
+      try {
+        if (location.protocol.startsWith('http')) {
+          fetch(location.pathname, { cache: 'reload', credentials: 'same-origin' }).catch(function() {});
+          if (location.search) {
+            history.replaceState(null, '', location.pathname + location.hash);
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     html {
