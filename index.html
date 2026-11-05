@@ -196,35 +196,54 @@
           </div>
         </div>
 
-        <!-- Right Column: Interactive 3D Lea Monde Atelier Pavilion & Orbiting Specialists -->
+        <!-- Right Column: Interactive 3D Lea Monde Dispatch Pavilion & Live Mission Narrative -->
         <div class="lg:col-span-6">
           <div class="lm-frame lm-halftone bg-[var(--card)] rounded-2xl p-3.5 sm:p-4 shadow-sm space-y-3">
             <div class="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
               <div class="flex items-center gap-2">
                 <img data-avatar="pavilion" alt="Lea Monde Pavilion crest" width="24" height="24" class="w-6 h-6 rounded-full border border-[var(--border)] object-cover" />
                 <div>
-                  <div class="text-xs font-bold leading-tight">The Lea Monde Pavilion (Interactive 3D)</div>
-                  <div class="text-[11px] text-[var(--muted-foreground)]">Drag to rotate · Tap a specialist desk to trace its signal</div>
+                  <div class="text-xs font-bold leading-tight">Live 3D Agency Dispatch Pavilion</div>
+                  <div class="text-[11px] text-[var(--muted-foreground)]">Drag to rotate · Watch live dispatches route from Discord to tools</div>
                 </div>
               </div>
-              <button type="button" onclick="togglePavilion3D()" id="pavilion-pause-btn" aria-label="Pause or play 3D pavilion rotation" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[44px] shrink-0 transition">
-                Pause 3D
-              </button>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="nextPavilionMission()" aria-label="Trigger next 3D agency dispatch" class="px-2.5 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 text-xs font-semibold min-h-[40px] transition">
+                  Next Dispatch ▶
+                </button>
+                <button type="button" onclick="togglePavilion3D()" id="pavilion-pause-btn" aria-label="Pause or play 3D pavilion animation" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--secondary)] text-xs font-semibold min-h-[40px] transition">
+                  Pause
+                </button>
+              </div>
             </div>
 
-            <!-- 3D Canvas Viewport -->
-            <div class="relative rounded-xl overflow-hidden bg-[var(--background)] border border-[var(--border)]">
-              <canvas id="pavilion-3d-canvas" class="w-full h-[320px] sm:h-[360px] block touch-none select-none" aria-label="Interactive 3D architectural model of the Lea Monde Pavilion with orbiting AI specialists"></canvas>
-              <div id="pavilion-caption" class="px-3 py-2 border-t border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-sm flex items-center justify-between gap-2 text-xs">
-                <span class="font-semibold text-[var(--foreground)]" id="pavilion-focus-title">Active specialist desks orbiting the home server</span>
-                <span class="text-[var(--muted-foreground)] shrink-0" id="pavilion-focus-room">Proxmox VE · Discord</span>
+            <!-- 3D Canvas Viewport + Solid Opaque Narrative HUD -->
+            <div class="rounded-xl overflow-hidden bg-[var(--background)] border border-[var(--border)]">
+              <!-- Solid Top Mission Banner (No Frosted Glass) -->
+              <div class="px-3.5 py-2 bg-[#141A24] text-[#F8F5EE] border-b border-[#C5A059]/45 flex items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="inline-block w-2 h-2 rounded-full bg-[#C5A059] shrink-0"></span>
+                  <span class="font-bold text-[#E5C583] shrink-0" id="pavilion-focus-room">#lobby</span>
+                  <span class="truncate text-[#F8F5EE] font-medium" id="pavilion-focus-title">Aida · Syncing family calendar &amp; 7 AM briefing</span>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-[#22304A] text-[#E5C583] border border-[#C5A059]/40 text-[10px] font-bold uppercase tracking-wider shrink-0" id="pavilion-phase-badge">1 · Discord</span>
+              </div>
+
+              <canvas id="pavilion-3d-canvas" class="w-full h-[300px] sm:h-[330px] block touch-none select-none" aria-label="Interactive 3D architectural model of the Lea Monde Pavilion routing live household dispatches"></canvas>
+
+              <!-- Solid Bottom 4-Stage Live Dispatch Progress Bar -->
+              <div class="grid grid-cols-4 border-t border-[var(--border)] bg-[var(--card)] text-[11px] font-semibold text-center divide-x divide-[var(--border)]" id="pavilion-stage-bar">
+                <div id="pav-stage-0" class="py-2 px-1 transition">1. Discord</div>
+                <div id="pav-stage-1" class="py-2 px-1 transition">2. Specialist</div>
+                <div id="pav-stage-2" class="py-2 px-1 transition">3. Tool MCP</div>
+                <div id="pav-stage-3" class="py-2 px-1 transition">4. QC Pass ✓</div>
               </div>
             </div>
 
             <!-- Specialist 3D Orbit Spotlight Pills (44px touch targets) -->
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5" role="group" aria-label="Spotlight a specialist in 3D">
               <button type="button" onclick="focusPavilionAgent('all')" id="pav-btn-all" class="pav-pill px-3 py-2 rounded-lg border text-xs font-semibold min-h-[44px] shrink-0 transition">
-                All Desks
+                Auto Cycle
               </button>
               <button type="button" onclick="focusPavilionAgent('aida')" id="pav-btn-aida" class="pav-pill px-2.5 py-2 rounded-lg border text-xs font-semibold min-h-[44px] shrink-0 inline-flex items-center gap-1.5 transition">
                 <img data-avatar="aida" alt="" width="20" height="20" class="w-5 h-5 rounded-full object-cover" />
@@ -258,7 +277,7 @@
         </div>
       </div>
 
-      <!-- ABOVE-THE-FOLD VISUAL STORYBOARD WALKTHROUGH (3-ACT PICTURE-FIRST NARRATIVE) -->
+      <!-- ABOVE-THE-FOLD VISUAL STORYBOARD WALKTHROUGH (CRISP OPAQUE BARS, ZERO FROSTED GLASS) -->
       <div id="live-demo" class="scroll-mt-20 lm-frame bg-[var(--card)] rounded-2xl p-4 sm:p-7 shadow-sm space-y-5">
         <!-- Header Row + 3 Compact Story Pills -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
@@ -281,28 +300,32 @@
           </div>
         </div>
 
-        <!-- Widescreen 16:9 Editorial Storyboard Stage (Click artwork or filmstrip to advance) -->
-        <div class="relative rounded-xl overflow-hidden border border-[var(--border)] bg-[#141A24] aspect-[16/10] sm:aspect-[16/9] cursor-pointer group select-none" onclick="nextSimAct()" role="button" tabindex="0" aria-label="Advance to next act in the storyboard" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nextSimAct();}">
-          <img id="sim-stage-img" src="./walkthrough/handoff-1.jpg?v=9" alt="" class="w-full h-full object-cover studio-ken-burns transition-opacity duration-300" />
-
-          <!-- Subtle Top & Bottom Editorial Scrims for Pill Legibility -->
-          <div class="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#0E1522]/80 via-[#0E1522]/35 to-transparent"></div>
-          <div class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0E1522]/92 via-[#0E1522]/55 to-transparent"></div>
-
-          <!-- Top-Left Floating Discord Message Pill (Single compact overlay) -->
-          <div class="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-auto sm:max-w-xl flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#141A24]/90 backdrop-blur-md border border-[#C5A059]/55 text-[#F8F5EE] shadow-md">
-            <img id="sim-chat-avatar" data-avatar="aida" alt="" width="28" height="28" class="w-7 h-7 rounded-full border border-[#C5A059] object-cover shrink-0 hidden" />
-            <span id="sim-chat-user-badge" class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#C5A059] text-[#141A24] text-xs font-bold shrink-0">A</span>
-            <div class="min-w-0 text-xs sm:text-sm leading-snug">
-              <span class="font-bold text-[#E5C583]" id="sim-chat-speaker">Partner A in #lobby:</span>
-              <span class="text-[#F8F5EE] ml-1" id="sim-chat-quote"></span>
+        <!-- Unified Storyboard Theater Frame: Solid Top Discord Bar + Unobstructed 16:9 Artwork + Solid Bottom Pipeline Bar -->
+        <div class="rounded-xl overflow-hidden border-2 border-[#182338] bg-[#141A24] shadow-sm">
+          <!-- Solid Opaque Top Discord Message Bar (15:1 High Contrast, Zero Blur) -->
+          <div class="px-4 py-3 bg-[#141A24] text-[#F8F5EE] border-b border-[#C5A059]/45 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <img id="sim-chat-avatar" data-avatar="aida" alt="" width="32" height="32" class="w-8 h-8 rounded-full border-2 border-[#C5A059] object-cover shrink-0 hidden" />
+              <span id="sim-chat-user-badge" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#C5A059] text-[#141A24] text-xs font-bold shrink-0">A</span>
+              <div class="min-w-0 text-sm sm:text-base leading-snug">
+                <span class="font-bold text-[#E5C583]" id="sim-chat-speaker">Partner A in #lobby:</span>
+                <span class="text-[#FFFFFF] font-medium ml-1.5" id="sim-chat-quote"></span>
+              </div>
             </div>
+            <span class="hidden sm:inline-block px-2.5 py-1 rounded bg-[#22304A] text-[#E5C583] border border-[#C5A059]/40 text-[11px] font-bold uppercase tracking-wider shrink-0">
+              Tap artwork for next act ▶
+            </span>
           </div>
 
-          <!-- Bottom-Edge Technical Pipeline Strip (Clarifies the exact server primitives) -->
-          <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-xl bg-[#141A24]/92 backdrop-blur-md border border-white/15 text-[#F8F5EE]">
-            <div class="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-xs font-mono" id="sim-pipeline-strip"></div>
-            <span class="px-2.5 py-0.5 rounded bg-[#C5A059] text-[#141A24] text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shrink-0" id="sim-guardrail-pill"></span>
+          <!-- 100% Unobstructed Widescreen 16:9 Storyboard Illustration -->
+          <div class="relative aspect-[16/10] sm:aspect-[16/9] bg-[#141A24] cursor-pointer overflow-hidden select-none" onclick="nextSimAct()" role="button" tabindex="0" aria-label="Advance to next act in the storyboard" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nextSimAct();}">
+            <img id="sim-stage-img" src="./walkthrough/handoff-1.jpg?v=9" alt="" class="w-full h-full object-cover studio-ken-burns transition-opacity duration-300" />
+          </div>
+
+          <!-- Solid Opaque Bottom Technical Pipeline Bar (Zero Frosted Glass) -->
+          <div class="px-4 py-3 bg-[#141A24] text-[#F8F5EE] border-t border-[#C5A059]/45 flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-mono" id="sim-pipeline-strip"></div>
+            <span class="px-3 py-1 rounded-md bg-[#C5A059] text-[#141A24] text-xs font-bold uppercase tracking-wider shrink-0" id="sim-guardrail-pill"></span>
           </div>
         </div>
 
@@ -889,34 +912,107 @@
     bindAvatars();
     bindScenes();
 
-    // 4B. Interactive 3D Lea Monde Atelier Pavilion & Orbiting Specialist Constellation
+    // 4B. Interactive 3D Lea Monde Dispatch Pavilion & 4-Phase Live Mission Narrative Engine
     let pavilionPaused = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || false;
     let activePavilionAgent = 'all';
     let pavilionTargetRotY = null;
+    let missionAgentIdx = 0;
+    let missionStartTime = performance.now();
+    const MISSION_DURATION_MS = 6400; // 4 phases x 1.6s each
+
     const PAVILION_AGENTS = [
-      { id: 'aida', name: 'Aida', role: 'Chief of Staff · Calendar, Gmail, Superbills', room: '#lobby · #foothills', liveNote: 'Syncing family calendar & 7 AM briefing', angle: 0, tilt: 0.22 },
-      { id: 'cookie', name: 'Cookie', role: 'Personal Chef · NYT Cooking & 6 Instacart Stores', room: '#kitchen', liveNote: 'Comparing 6 grocery stores & planning dinner', angle: Math.PI / 3, tilt: -0.20 },
-      { id: 'scout', name: 'Scout', role: 'Product Scout · Retail Research & Package Tracking', room: '#shopping', liveNote: 'Running 3 parallel retail sub-agents', angle: (2 * Math.PI) / 3, tilt: 0.24 },
-      { id: 'sterling', name: 'Sterling', role: 'Card Strategist · Perks DB, Monarch, Points', room: '#shopping', liveNote: 'Auditing statement credits & award flights', angle: Math.PI, tilt: -0.22 },
-      { id: 'sloan', name: 'Sloan', role: 'Interior Designer · Trade Sourcing & Dimensions', room: '#interiors', liveNote: 'Checking 8x10 rug dimensions & wool pile', angle: (4 * Math.PI) / 3, tilt: 0.20 },
-      { id: 'tazza', name: 'Tazza', role: 'Head Barista · Dial-In & Fellow Aiden Profiles', room: '#coffee', liveNote: 'Dialing in 93°C bloom profile for Fellow Aiden', angle: (5 * Math.PI) / 3, tilt: -0.24 }
+      {
+        id: 'aida',
+        name: 'Aida',
+        role: 'Chief of Staff · Calendar, Gmail, Superbills',
+        room: '#lobby · #foothills',
+        shortRoom: '#lobby',
+        liveNote: 'Syncing family calendar, 7 AM voice briefing & Court 4 booking',
+        discordBubble: '#lobby · "Book Court 4 & check Wednesday"',
+        toolSatellite: 'iCloud + Court 4',
+        qcStamp: 'QC · Calendar Verified ✓',
+        angle: 0,
+        tilt: 0.20
+      },
+      {
+        id: 'cookie',
+        name: 'Cookie',
+        role: 'Personal Chef · NYT Cooking & 6 Instacart Stores',
+        room: '#kitchen',
+        shortRoom: '#kitchen',
+        liveNote: 'Comparing 6 grocery stores ($8.48) & updating Menu Board',
+        discordBubble: '#kitchen · "Plan White Bean Ragu & load cart"',
+        toolSatellite: '6-Store Cart ($8.48)',
+        qcStamp: 'QC · Menu Board Updated ✓',
+        angle: Math.PI / 3,
+        tilt: -0.18
+      },
+      {
+        id: 'scout',
+        name: 'Scout',
+        role: 'Product Scout · Retail Research & Package Tracking',
+        room: '#shopping',
+        shortRoom: '#shopping',
+        liveNote: 'Running 3 parallel Flash sub-agents & tracking parcels',
+        discordBubble: '#shopping · "Compare 3 espresso tampers"',
+        toolSatellite: '3x Flash Sub-Agents',
+        qcStamp: 'QC · ASINs Grounded ✓',
+        angle: (2 * Math.PI) / 3,
+        tilt: 0.22
+      },
+      {
+        id: 'sterling',
+        name: 'Sterling',
+        role: 'Card Strategist · Perks DB, Monarch, Points',
+        room: '#shopping',
+        shortRoom: '#shopping',
+        liveNote: 'Auditing statement credits in perks.sqlite & SFO->HND awards',
+        discordBubble: '#shopping · "Check unused credits & Tokyo flights"',
+        toolSatellite: 'Monarch + Perks DB',
+        qcStamp: 'QC · Ledger Synced ✓',
+        angle: Math.PI,
+        tilt: -0.20
+      },
+      {
+        id: 'sloan',
+        name: 'Sloan',
+        role: 'Interior Designer · Trade Sourcing & Dimensions',
+        room: '#interiors',
+        shortRoom: '#interiors',
+        liveNote: 'Sourcing 3 warm-ivory 8x10 wool rugs with 10m disk cache',
+        discordBubble: '#interiors · "3 warm-ivory 8x10 wool rugs"',
+        toolSatellite: 'Browserless 10m Cache',
+        qcStamp: 'QC · 3 Links Verified ✓',
+        angle: (4 * Math.PI) / 3,
+        tilt: 0.18
+      },
+      {
+        id: 'tazza',
+        name: 'Tazza',
+        role: 'Head Barista · Dial-In & Fellow Aiden Profiles',
+        room: '#coffee',
+        shortRoom: '#coffee',
+        liveNote: 'Pushing 93°C Ethiopian pour-over profile to Fellow Aiden',
+        discordBubble: '#coffee · "Dial in new Ethiopian washed bag"',
+        toolSatellite: 'Fellow Aiden Brewer',
+        qcStamp: 'QC · Brew Profile Sent ✓',
+        angle: (5 * Math.PI) / 3,
+        tilt: -0.22
+      }
     ];
+
     const pavilionImages = {};
     PAVILION_AGENTS.forEach(ag => {
       const im = new Image();
       if (AVATARS[ag.id]) im.src = AVATARS[ag.id];
       pavilionImages[ag.id] = im;
     });
-    let pavilionPulses = [];
     let lastSelectedScreenNodes = [];
+    let lastHudSignature = '';
 
-    function spawnPavilionPulses(targetId) {
-      PAVILION_AGENTS.forEach((ag, idx) => {
-        if (targetId === 'all' || targetId === ag.id) {
-          pavilionPulses.push({ agentIdx: idx, t: 0, speed: 0.018 + (idx % 3) * 0.004, dir: 1 });
-          pavilionPulses.push({ agentIdx: idx, t: 0.45, speed: 0.018 + (idx % 2) * 0.004, dir: -1 });
-        }
-      });
+    function getTargetRotYForAgent(ag) {
+      // Positions the active specialist at the front-right foreground (theta = +0.35 rad in front of camera)
+      return (Math.PI * 0.58 - ag.angle) / 1.85;
     }
 
     function updatePavilionPills() {
@@ -930,47 +1026,66 @@
             ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm'
             : 'bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]');
       });
-      const titleEl = document.getElementById('pavilion-focus-title');
-      const roomEl = document.getElementById('pavilion-focus-room');
       const drawer = document.getElementById('pavilion-studio-drawer');
       if (activePavilionAgent === 'all') {
-        if (titleEl) titleEl.textContent = 'Active specialist desks orbiting the home server';
-        if (roomEl) roomEl.textContent = 'Proxmox VE · Discord';
         if (drawer) {
           drawer.classList.add('hidden');
           drawer.innerHTML = '';
         }
       } else {
         const found = PAVILION_AGENTS.find(a => a.id === activePavilionAgent);
-        if (found) {
-          if (titleEl) titleEl.textContent = found.name + ' · ' + found.role;
-          if (roomEl) roomEl.textContent = found.room;
-          if (drawer) {
-            drawer.classList.remove('hidden');
-            drawer.innerHTML = `
-              <div class="grid grid-cols-1 sm:grid-cols-12 items-stretch">
-                <div class="sm:col-span-5 relative h-32 sm:h-auto overflow-hidden bg-[#141A24]">
-                  <img data-scene="${found.id}" alt="${found.name} at work" class="w-full h-full object-cover studio-art-motion" />
-                  <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#141A24]/85 text-[#F8F5EE] border border-[#C5A059]/60 text-[10px] font-bold uppercase tracking-wider">● Live in Studio</span>
+        if (found && drawer) {
+          drawer.classList.remove('hidden');
+          drawer.innerHTML = `
+            <div class="grid grid-cols-1 sm:grid-cols-12 items-stretch">
+              <div class="sm:col-span-5 relative h-32 sm:h-auto overflow-hidden bg-[#141A24]">
+                <img data-scene="${found.id}" alt="${found.name} at work" class="w-full h-full object-cover studio-art-motion" />
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#141A24] text-[#F8F5EE] border border-[#C5A059] text-[10px] font-bold uppercase tracking-wider">● Live in Studio</span>
+              </div>
+              <div class="sm:col-span-7 p-3 flex flex-col justify-between gap-2">
+                <div>
+                  <div class="text-xs font-bold text-[var(--foreground)]">${found.name} at Work · <span class="text-[var(--muted-foreground)] font-medium">${found.room}</span></div>
+                  <p class="text-xs text-[var(--muted-foreground)] mt-0.5 leading-snug">${found.liveNote}</p>
                 </div>
-                <div class="sm:col-span-7 p-3 flex flex-col justify-between gap-2">
-                  <div>
-                    <div class="text-xs font-bold text-[var(--foreground)]">${found.name} at Work · <span class="text-[var(--muted-foreground)] font-medium">${found.room}</span></div>
-                    <p class="text-xs text-[var(--muted-foreground)] mt-0.5 leading-snug">${found.liveNote}</p>
-                  </div>
-                  <div class="flex items-center justify-between gap-2 pt-1">
-                    <button type="button" onclick="jumpToAgentStudio('${found.id}')" class="px-3 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold min-h-[36px] hover:opacity-90 transition">
-                      Open Full Studio Stage ↓
-                    </button>
-                    <button type="button" onclick="focusPavilionAgent('all')" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium min-h-[36px] hover:bg-[var(--secondary)] transition">
-                      All Desks
-                    </button>
-                  </div>
+                <div class="flex items-center justify-between gap-2 pt-1">
+                  <button type="button" onclick="jumpToAgentStudio('${found.id}')" class="px-3 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold min-h-[36px] hover:opacity-90 transition">
+                    Open Full Studio Stage ↓
+                  </button>
+                  <button type="button" onclick="focusPavilionAgent('all')" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium min-h-[36px] hover:bg-[var(--secondary)] transition">
+                    Auto Cycle
+                  </button>
                 </div>
               </div>
-            `;
-            bindScenes(drawer);
-          }
+            </div>
+          `;
+          bindScenes(drawer);
+        }
+      }
+    }
+
+    function updatePavilionNarrativeHUD(ag, phaseIdx) {
+      const sig = ag.id + ':' + phaseIdx;
+      if (sig === lastHudSignature) return;
+      lastHudSignature = sig;
+
+      const roomEl = document.getElementById('pavilion-focus-room');
+      const titleEl = document.getElementById('pavilion-focus-title');
+      const badgeEl = document.getElementById('pavilion-phase-badge');
+      if (roomEl) roomEl.textContent = ag.shortRoom;
+      if (titleEl) titleEl.textContent = ag.name + ' · ' + ag.liveNote;
+
+      const phaseLabels = ['1 · Discord', '2 · Specialist', '3 · Tool MCP', '4 · QC Pass ✓'];
+      if (badgeEl) badgeEl.textContent = phaseLabels[phaseIdx] || '1 · Discord';
+
+      for (let i = 0; i < 4; i++) {
+        const cell = document.getElementById('pav-stage-' + i);
+        if (!cell) continue;
+        if (i === phaseIdx) {
+          cell.className = 'py-2 px-1 transition bg-[#141A24] text-[#E5C583] font-bold';
+        } else if (i < phaseIdx) {
+          cell.className = 'py-2 px-1 transition bg-[var(--secondary)] text-[var(--foreground)] font-semibold';
+        } else {
+          cell.className = 'py-2 px-1 transition bg-[var(--card)] text-[var(--muted-foreground)]';
         }
       }
     }
@@ -983,25 +1098,37 @@
 
     function focusPavilionAgent(id) {
       activePavilionAgent = id;
+      missionStartTime = performance.now();
       if (id !== 'all') {
-        const found = PAVILION_AGENTS.find(a => a.id === id);
-        if (found) {
-          pavilionTargetRotY = (-Math.PI / 2 - found.angle) / 1.85;
+        const idx = PAVILION_AGENTS.findIndex(a => a.id === id);
+        if (idx >= 0) {
+          missionAgentIdx = idx;
+          pavilionTargetRotY = getTargetRotYForAgent(PAVILION_AGENTS[idx]);
         }
       } else {
-        pavilionTargetRotY = null;
+        pavilionTargetRotY = getTargetRotYForAgent(PAVILION_AGENTS[missionAgentIdx]);
       }
       updatePavilionPills();
-      spawnPavilionPulses(id);
       if (id !== 'all' && typeof selectAgent === 'function') {
         selectAgent(id);
       }
     }
 
+    function nextPavilionMission() {
+      missionAgentIdx = (missionAgentIdx + 1) % PAVILION_AGENTS.length;
+      missionStartTime = performance.now();
+      if (activePavilionAgent !== 'all') {
+        activePavilionAgent = PAVILION_AGENTS[missionAgentIdx].id;
+        updatePavilionPills();
+      }
+      pavilionTargetRotY = getTargetRotYForAgent(PAVILION_AGENTS[missionAgentIdx]);
+    }
+
     function togglePavilion3D() {
       pavilionPaused = !pavilionPaused;
+      if (!pavilionPaused) missionStartTime = performance.now();
       const btn = document.getElementById('pavilion-pause-btn');
-      if (btn) btn.textContent = pavilionPaused ? 'Play 3D' : 'Pause 3D';
+      if (btn) btn.textContent = pavilionPaused ? 'Play' : 'Pause';
     }
 
     (function initPavilion3D() {
@@ -1009,26 +1136,25 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const btn = document.getElementById('pavilion-pause-btn');
-      if (btn) btn.textContent = pavilionPaused ? 'Play 3D' : 'Pause 3D';
+      if (btn) btn.textContent = pavilionPaused ? 'Play' : 'Pause';
       updatePavilionPills();
-      spawnPavilionPulses('all');
 
       let cw = 0, ch = 0, dpr = 1;
       function resize3D() {
         const rect = canvas.getBoundingClientRect();
         dpr = Math.min(window.devicePixelRatio || 1, 2);
         cw = rect.width || 440;
-        ch = rect.height || 340;
+        ch = rect.height || 315;
         canvas.width = cw * dpr;
         canvas.height = ch * dpr;
       }
       window.addEventListener('resize', resize3D);
       resize3D();
 
-      let rotY = 0.42;
+      let rotY = getTargetRotYForAgent(PAVILION_AGENTS[0]);
       let rotX = 0.24;
-      let velY = 0.0045;
       let dragging = false;
+      let userHasDraggedRecently = 0;
       let dragStartX = 0, dragStartY = 0, pointerMoved = false;
 
       canvas.addEventListener('pointerdown', (e) => {
@@ -1042,11 +1168,14 @@
         if (!dragging) return;
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) pointerMoved = true;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          pointerMoved = true;
+          userHasDraggedRecently = performance.now();
+        }
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         rotY += dx * 0.0085;
-        rotX = Math.max(-0.35, Math.min(0.62, rotX + dy * 0.0065));
+        rotX = Math.max(-0.32, Math.min(0.58, rotX + dy * 0.0065));
       });
       canvas.addEventListener('pointerup', (e) => {
         if (!dragging) return;
@@ -1057,7 +1186,7 @@
           const my = e.clientY - rect.top;
           for (const node of lastSelectedScreenNodes) {
             const dist = Math.hypot(mx - node.sx, my - node.sy);
-            if (dist <= node.r + 10) {
+            if (dist <= node.r + 12) {
               focusPavilionAgent(activePavilionAgent === node.id ? 'all' : node.id);
               return;
             }
@@ -1080,7 +1209,7 @@
         const s = (fov / Math.max(120, fov + pt.z)) * scaleMul;
         return {
           x: cw * 0.5 + pt.x * s,
-          y: ch * 0.52 + pt.y * s,
+          y: ch * 0.54 + pt.y * s,
           z: pt.z,
           s
         };
@@ -1093,7 +1222,7 @@
         ctx.globalAlpha = alpha;
         if (dashed) ctx.setLineDash([4, 4]);
         ctx.beginPath();
-        const scaleMul = Math.min(cw, ch) / 335;
+        const scaleMul = Math.min(cw, ch) / 330;
         for (let i = 0; i <= segments; i++) {
           const a = (i / segments) * Math.PI * 2;
           let rx = Math.cos(a) * radius;
@@ -1107,7 +1236,27 @@
         ctx.restore();
       }
 
-      function renderPavilionFrame() {
+      function drawOpaquePill(x, y, text, bgFill, borderStroke, textColor, fontPx) {
+        ctx.save();
+        ctx.font = '700 ' + fontPx + 'px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+        const tw = ctx.measureText(text).width;
+        const pw = tw + 14;
+        const ph = fontPx + 9;
+        ctx.fillStyle = bgFill;
+        ctx.strokeStyle = borderStroke;
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.roundRect(x - pw * 0.5, y - ph * 0.5, pw, ph, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y + 0.5);
+        ctx.restore();
+      }
+
+      function renderPavilionFrame(now) {
         ctx.save();
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, cw, ch);
@@ -1117,51 +1266,61 @@
         const brass = styles.getPropertyValue('--brass').trim() || '#b58d46';
         const cardBg = styles.getPropertyValue('--card').trim() || '#faf7f0';
         const pageBg = styles.getPropertyValue('--background').trim() || '#f5f1e6';
-        const scaleMul = Math.min(cw, ch) / 335;
+        const scaleMul = Math.min(cw, ch) / 330;
 
+        // Determine active narrative mission & 4-phase progress (0..3)
+        let elapsed = pavilionPaused ? 2200 : (now - missionStartTime);
+        if (!pavilionPaused && elapsed >= MISSION_DURATION_MS) {
+          missionStartTime = now;
+          elapsed = 0;
+          if (activePavilionAgent === 'all') {
+            missionAgentIdx = (missionAgentIdx + 1) % PAVILION_AGENTS.length;
+            if (now - userHasDraggedRecently > 4000) {
+              pavilionTargetRotY = getTargetRotYForAgent(PAVILION_AGENTS[missionAgentIdx]);
+            }
+          }
+        }
+        const activeMissionAgent = activePavilionAgent === 'all'
+          ? PAVILION_AGENTS[missionAgentIdx]
+          : (PAVILION_AGENTS.find(a => a.id === activePavilionAgent) || PAVILION_AGENTS[0]);
+        const activeIdx = PAVILION_AGENTS.indexOf(activeMissionAgent);
+
+        const missionNorm = Math.min(0.999, Math.max(0, elapsed / MISSION_DURATION_MS));
+        const phaseIdx = Math.floor(missionNorm * 4); // 0: Discord, 1: Specialist, 2: Tool MCP, 3: QC Pass
+        const phaseProg = (missionNorm * 4) % 1;
+
+        updatePavilionNarrativeHUD(activeMissionAgent, phaseIdx);
+
+        // Purposeful camera rotation: smoothly glide toward active mission specialist + gentle breathing orbit
         if (dragging) {
           pavilionTargetRotY = null;
         } else if (pavilionTargetRotY !== null) {
           const diff = pavilionTargetRotY - rotY;
-          rotY += diff * 0.08;
-          if (Math.abs(diff) < 0.005) pavilionTargetRotY = null;
+          rotY += diff * 0.065;
+          if (Math.abs(diff) < 0.004) pavilionTargetRotY = null;
         } else if (!pavilionPaused) {
-          rotY += velY;
+          rotY += 0.0014;
         }
 
-        // Outer framing compass ring (echoing server_icon.jpg double border)
-        const outerR = Math.min(cw, ch) * 0.45;
-        ctx.save();
-        ctx.strokeStyle = fg;
-        ctx.globalAlpha = 0.14;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(cw * 0.5, ch * 0.52, outerR, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.strokeStyle = brass;
-        ctx.globalAlpha = 0.28;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(cw * 0.5, ch * 0.52, outerR - 5, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
+        // 1. 3D Stepped Rotunda Base Plinth (SQLite · Git · 1Password) & Backstage QC Gate Ring
+        draw3DRing(86, 66, 0, 0, 48, fg, 1.5, 0.35, false);
+        draw3DRing(72, 60, 0, 0, 48, brass, 1.3, 0.55, false);
+        // Backstage QC Gate Ring at mid-height (glows bright brass during Phase 3: QC Pass)
+        const qcRingAlpha = phaseIdx === 3 ? 0.92 : 0.38;
+        const qcRingWidth = phaseIdx === 3 ? 2.4 : 1.2;
+        draw3DRing(68, 18, 0.08 * Math.sin(now * 0.002), 0.08 * Math.cos(now * 0.002), 48, brass, qcRingWidth, qcRingAlpha, phaseIdx !== 3);
+        // Outer specialist orbital track
+        draw3DRing(132, 8, 0.20, 0.06, 64, brass, 1.2, 0.36, true);
+        draw3DRing(132, 8, -0.20, -0.06, 64, fg, 1.0, 0.16, false);
 
-        // 1. 3D Stepped Rotunda Base Plinth & Gyroscopic Astrolabe Rings
-        draw3DRing(86, 68, 0, 0, 48, fg, 1.6, 0.38, false);
-        draw3DRing(74, 62, 0, 0, 48, brass, 1.3, 0.55, false);
-        draw3DRing(60, 62, 0, 0, 36, fg, 1.0, 0.22, true);
-        // Gyroscopic orbital rings
-        draw3DRing(136, 4, 0.22, 0.08, 64, brass, 1.25, 0.42, true);
-        draw3DRing(136, 4, -0.22, -0.08, 64, fg, 1.0, 0.18, false);
-
-        // Build 3D Pavilion Architectural Elements + Orbiting Specialists for Z-sorting
+        // Build 3D Pavilion Architectural Elements + Orbiting Specialists + Tool Satellites
         const renderQueue = [];
         const colCount = 6;
-        const colR = 58;
-        const baseY = 62;
-        const archSpringY = 4;
-        const eaveY = -16;
-        const roofPeakY = -62;
+        const colR = 54;
+        const baseY = 60;
+        const archSpringY = 6;
+        const eaveY = -14;
+        const roofPeakY = -58;
         const cupolaTopY = -88;
 
         const colBasePts = [];
@@ -1178,53 +1337,49 @@
         }
         const roofApexPt = project3D(rotate3D(0, roofPeakY, 0), scaleMul);
         const cupolaApexPt = project3D(rotate3D(0, cupolaTopY, 0), scaleMul);
+        const discordBeaconPt = project3D(rotate3D(0, cupolaTopY - 20, 0), scaleMul);
         const corePt = project3D(rotate3D(0, 18, 0), scaleMul);
 
         // Queue 6 Classical Columns & Vaulted Arches
         for (let i = 0; i < colCount; i++) {
           const next = (i + 1) % colCount;
           const b1 = colBasePts[i], c1 = colCapPts[i], e1 = colEavePts[i];
-          const b2 = colBasePts[next], c2 = colCapPts[next], e2 = colEavePts[next];
+          const c2 = colCapPts[next], e2 = colEavePts[next];
 
-          // Column shaft + capital
           renderQueue.push({
             z: b1.z,
             draw: () => {
-              const depthAlpha = b1.z < 0 ? 0.78 : 0.35;
+              const depthAlpha = b1.z < 0 ? 0.78 : 0.32;
               ctx.save();
               ctx.strokeStyle = fg;
               ctx.globalAlpha = depthAlpha;
-              ctx.lineWidth = Math.max(1.5, 2.8 * b1.s);
+              ctx.lineWidth = Math.max(1.4, 2.6 * b1.s);
               ctx.beginPath();
               ctx.moveTo(b1.x, b1.y);
               ctx.lineTo(e1.x, e1.y);
               ctx.stroke();
 
-              // Brass capital & base plinth
               ctx.fillStyle = brass;
               ctx.globalAlpha = depthAlpha + 0.15;
               ctx.beginPath();
-              ctx.arc(c1.x, c1.y, 2.6 * c1.s, 0, Math.PI * 2);
-              ctx.arc(b1.x, b1.y, 2.6 * b1.s, 0, Math.PI * 2);
+              ctx.arc(c1.x, c1.y, 2.5 * c1.s, 0, Math.PI * 2);
+              ctx.arc(b1.x, b1.y, 2.5 * b1.s, 0, Math.PI * 2);
               ctx.fill();
               ctx.restore();
             }
           });
 
-          // Vaulted Arch + Pitched Roof Truss Facet between Column i and next
           const aMid = ((i + 0.5) / colCount) * Math.PI * 2;
-          const archCrown3D = rotate3D(Math.cos(aMid) * colR, eaveY - 4, Math.sin(aMid) * colR);
-          const archCrownPt = project3D(archCrown3D, scaleMul);
+          const archCrownPt = project3D(rotate3D(Math.cos(aMid) * colR, eaveY - 4, Math.sin(aMid) * colR), scaleMul);
           const facetZ = (e1.z + e2.z) * 0.5;
 
           renderQueue.push({
             z: facetZ,
             draw: () => {
-              const frontFactor = facetZ < 0 ? 1 : 0.45;
+              const frontFactor = facetZ < 0 ? 1 : 0.42;
               ctx.save();
-              // Pitched geometric roof facet fill (subtle brass/navy tint)
               ctx.fillStyle = i % 2 === 0 ? brass : fg;
-              ctx.globalAlpha = 0.065 * frontFactor;
+              ctx.globalAlpha = 0.06 * frontFactor;
               ctx.beginPath();
               ctx.moveTo(e1.x, e1.y);
               ctx.lineTo(e2.x, e2.y);
@@ -1232,10 +1387,9 @@
               ctx.closePath();
               ctx.fill();
 
-              // Pitched roof truss rafters
               ctx.strokeStyle = fg;
-              ctx.globalAlpha = 0.55 * frontFactor;
-              ctx.lineWidth = 1.35;
+              ctx.globalAlpha = 0.52 * frontFactor;
+              ctx.lineWidth = 1.3;
               ctx.beginPath();
               ctx.moveTo(e1.x, e1.y);
               ctx.lineTo(e2.x, e2.y);
@@ -1243,24 +1397,59 @@
               ctx.closePath();
               ctx.stroke();
 
-              // Classical arch spanning between columns (like server_icon.jpg)
               ctx.strokeStyle = brass;
               ctx.globalAlpha = 0.75 * frontFactor;
-              ctx.lineWidth = 1.6;
+              ctx.lineWidth = 1.5;
               ctx.beginPath();
               ctx.moveTo(c1.x, c1.y);
-              ctx.quadraticCurveTo(archCrownPt.x, archCrownPt.y - 8 * archCrownPt.s, c2.x, c2.y);
+              ctx.quadraticCurveTo(archCrownPt.x, archCrownPt.y - 7 * archCrownPt.s, c2.x, c2.y);
               ctx.stroke();
               ctx.restore();
             }
           });
         }
 
-        // Crowning 3D Cupola Lantern & Interwoven LM Core Emblem
+        // Crowning 3D Discord Cupola Receiver, Vertical Dispatch Spire & Central LM Proxmox Core
         renderQueue.push({
           z: corePt.z,
           draw: () => {
             ctx.save();
+            // Vertical 3D Dispatch Spire connecting Discord Cupola to Proxmox Core
+            ctx.strokeStyle = phaseIdx === 0 || phaseIdx === 3 ? '#C5A059' : fg;
+            ctx.globalAlpha = phaseIdx === 0 || phaseIdx === 3 ? 0.9 : 0.35;
+            ctx.lineWidth = phaseIdx === 0 || phaseIdx === 3 ? 2.2 : 1.2;
+            ctx.beginPath();
+            ctx.moveTo(discordBeaconPt.x, discordBeaconPt.y);
+            ctx.lineTo(corePt.x, corePt.y);
+            ctx.stroke();
+
+            // Phase 0: Descending 3D Discord Prompt Packet along the vertical spire
+            if (phaseIdx === 0) {
+              const py = discordBeaconPt.y + (corePt.y - discordBeaconPt.y) * phaseProg;
+              const px = discordBeaconPt.x + (corePt.x - discordBeaconPt.x) * phaseProg;
+              ctx.fillStyle = '#C5A059';
+              ctx.beginPath();
+              ctx.arc(px, py, 5 * corePt.s, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = '#C5A059';
+              ctx.lineWidth = 1.5;
+              ctx.globalAlpha = 1 - phaseProg;
+              ctx.beginPath();
+              ctx.arc(px, py, (6 + phaseProg * 16) * corePt.s, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+
+            // Phase 3: Ascending QC-Verified Reply Packet back up to Discord
+            if (phaseIdx === 3) {
+              const py = corePt.y + (discordBeaconPt.y - corePt.y) * phaseProg;
+              const px = corePt.x + (discordBeaconPt.x - corePt.x) * phaseProg;
+              ctx.fillStyle = '#C5A059';
+              ctx.beginPath();
+              ctx.arc(px, py, 5 * corePt.s, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
             // Cupola lantern above roof peak
             ctx.strokeStyle = brass;
             ctx.globalAlpha = 0.85;
@@ -1268,28 +1457,37 @@
             ctx.beginPath();
             ctx.moveTo(roofApexPt.x - 10 * roofApexPt.s, roofApexPt.y);
             ctx.quadraticCurveTo(cupolaApexPt.x, cupolaApexPt.y - 10 * cupolaApexPt.s, roofApexPt.x + 10 * roofApexPt.s, roofApexPt.y);
-            ctx.moveTo(cupolaApexPt.x, cupolaApexPt.y - 4 * cupolaApexPt.s);
-            ctx.lineTo(cupolaApexPt.x, cupolaApexPt.y - 16 * cupolaApexPt.s);
             ctx.stroke();
 
-            // Central glowing LM Monogram Medallion inside the Pavilion
-            const rCore = 18 * corePt.s;
-            ctx.fillStyle = cardBg;
-            ctx.globalAlpha = 0.96;
+            // Top 3D Discord Room Beacon Pill (Solid High Contrast)
+            drawOpaquePill(
+              discordBeaconPt.x,
+              discordBeaconPt.y - 8 * discordBeaconPt.s,
+              phaseIdx === 3 ? activeMissionAgent.qcStamp : activeMissionAgent.discordBubble,
+              '#141A24',
+              '#C5A059',
+              phaseIdx === 3 ? '#E5C583' : '#F8F5EE',
+              Math.max(10, Math.round(10.5 * discordBeaconPt.s))
+            );
+
+            // Central glowing LM Proxmox Core Medallion inside the Pavilion
+            const rCore = (phaseIdx === 1 || phaseIdx === 3 ? 20 : 17) * corePt.s;
+            ctx.fillStyle = phaseIdx === 1 ? '#141A24' : cardBg;
+            ctx.globalAlpha = 0.98;
             ctx.beginPath();
             ctx.arc(corePt.x, corePt.y, rCore, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.lineWidth = 2;
-            ctx.strokeStyle = fg;
+            ctx.strokeStyle = phaseIdx === 1 ? '#C5A059' : fg;
             ctx.stroke();
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = 1.3;
             ctx.strokeStyle = brass;
             ctx.beginPath();
-            ctx.arc(corePt.x, corePt.y, rCore + 3.5, 0, Math.PI * 2);
+            ctx.arc(corePt.x, corePt.y, rCore + 4, 0, Math.PI * 2);
             ctx.stroke();
 
-            ctx.fillStyle = fg;
+            ctx.fillStyle = phaseIdx === 1 ? '#E5C583' : fg;
             ctx.font = '700 ' + Math.round(12 * corePt.s) + 'px Georgia, serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -1298,28 +1496,29 @@
           }
         });
 
-        // Advance signal pulses
-        if (!pavilionPaused) {
-          for (const p of pavilionPulses) {
-            p.t += p.speed;
-            if (p.t > 1) p.t -= 1;
-          }
-        }
-
-        // Queue the 6 Orbiting Specialist 3D Medallions & Signal Arcs
-        const orbitR = 136;
+        // Queue the 6 Orbiting Specialist 3D Medallions + Their 3D Tool Satellites & Live Narrative Beams
+        const orbitR = 132;
         const screenNodes = [];
         PAVILION_AGENTS.forEach((ag, idx) => {
           const theta = ag.angle + rotY * 0.85;
           const ox = Math.cos(theta) * orbitR;
-          const oy = 4 + Math.sin(theta) * orbitR * Math.sin(ag.tilt);
+          const oy = 8 + Math.sin(theta) * orbitR * Math.sin(ag.tilt);
           const oz = Math.sin(theta) * orbitR * Math.cos(ag.tilt);
 
           const wPt = rotate3D(ox, oy, oz);
           const sPt = project3D(wPt, scaleMul);
-          const isFocused = activePavilionAgent === 'all' || activePavilionAgent === ag.id;
-          const isSingleSpotlight = activePavilionAgent === ag.id;
-          const nodeR = (isSingleSpotlight ? 24 : 20) * sPt.s;
+          const isMissionActive = idx === activeIdx;
+          const nodeR = (isMissionActive ? 24 : 18.5) * sPt.s;
+
+          // 3D Tool Satellite Node positioned in 3D space just outside/above the active specialist
+          const satTheta = theta + 0.24;
+          const satR = orbitR + 28;
+          const satW = rotate3D(
+            Math.cos(satTheta) * satR,
+            oy - 26,
+            Math.sin(satTheta) * satR * Math.cos(ag.tilt)
+          );
+          const satPt = project3D(satW, scaleMul);
 
           screenNodes.push({ id: ag.id, sx: sPt.x, sy: sPt.y, r: nodeR });
 
@@ -1327,42 +1526,91 @@
             z: sPt.z,
             draw: () => {
               ctx.save();
-              const alphaMul = isFocused ? (sPt.z < 0 ? 1 : 0.78) : 0.25;
+              const alphaMul = isMissionActive ? 1 : (sPt.z < 0 ? 0.68 : 0.36);
 
-              // 3D Tether Arc to Pavilion Core
+              // 1. 3D Tether Arc between Proxmox Core (LM) and Specialist Desk
               const ctrlX = (corePt.x + sPt.x) * 0.5;
-              const ctrlY = (corePt.y + sPt.y) * 0.5 - 18 * sPt.s;
-              ctx.strokeStyle = isSingleSpotlight ? brass : fg;
-              ctx.globalAlpha = isSingleSpotlight ? 0.65 : 0.18 * alphaMul;
-              ctx.lineWidth = isSingleSpotlight ? 1.8 : 1.1;
+              const ctrlY = (corePt.y + sPt.y) * 0.5 - 22 * sPt.s;
+              ctx.strokeStyle = isMissionActive ? '#C5A059' : fg;
+              ctx.globalAlpha = isMissionActive ? 0.88 : 0.16 * alphaMul;
+              ctx.lineWidth = isMissionActive ? 2.2 : 1.0;
               ctx.beginPath();
               ctx.moveTo(corePt.x, corePt.y);
               ctx.quadraticCurveTo(ctrlX, ctrlY, sPt.x, sPt.y);
               ctx.stroke();
 
-              // Animated Brass Signal Pulses along the 3D Tether
-              for (const pulse of pavilionPulses) {
-                if (pulse.agentIdx !== idx || !isFocused) continue;
-                const u = pulse.dir === 1 ? pulse.t : 1 - pulse.t;
+              // Phase 1 (Specialist Dispatch) & Phase 3 (Return to QC): 3D Signal Packet on Tether
+              if (isMissionActive && (phaseIdx === 1 || phaseIdx === 3)) {
+                const u = phaseIdx === 1 ? phaseProg : (1 - phaseProg);
                 const inv = 1 - u;
                 const px = inv * inv * corePt.x + 2 * inv * u * ctrlX + u * u * sPt.x;
                 const py = inv * inv * corePt.y + 2 * inv * u * ctrlY + u * u * sPt.y;
-                ctx.fillStyle = brass;
-                ctx.globalAlpha = 0.9;
+                ctx.fillStyle = '#C5A059';
+                ctx.globalAlpha = 1;
                 ctx.beginPath();
-                ctx.arc(px, py, 3.2 * sPt.s, 0, Math.PI * 2);
+                ctx.arc(px, py, 4.8 * sPt.s, 0, Math.PI * 2);
                 ctx.fill();
               }
 
-              // Medallion Backing & Double Navy/Brass Ring Frame
+              // 2. 3D Tool Satellite Node & Orbital Tool Link (Prominently active for current mission specialist)
+              if (isMissionActive) {
+                ctx.strokeStyle = '#C5A059';
+                ctx.lineWidth = phaseIdx === 2 ? 2.2 : 1.3;
+                ctx.globalAlpha = phaseIdx === 2 ? 0.95 : 0.55;
+                ctx.setLineDash(phaseIdx === 2 ? [] : [3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(sPt.x, sPt.y);
+                ctx.lineTo(satPt.x, satPt.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Rapid bidirectional tool packets during Phase 2 (Tool MCP)
+                if (phaseIdx === 2) {
+                  for (let k = 0; k < 2; k++) {
+                    const tu = (phaseProg * 2 + k * 0.5) % 1;
+                    const dirU = k === 0 ? tu : 1 - tu;
+                    const tx = sPt.x + (satPt.x - sPt.x) * dirU;
+                    const ty = sPt.y + (satPt.y - sPt.y) * dirU;
+                    ctx.fillStyle = '#C5A059';
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                    ctx.arc(tx, ty, 3.8 * sPt.s, 0, Math.PI * 2);
+                    ctx.fill();
+                  }
+                }
+
+                // Solid Opaque 3D Tool Satellite Badge
+                drawOpaquePill(
+                  satPt.x,
+                  satPt.y,
+                  ag.toolSatellite,
+                  phaseIdx === 2 ? '#C5A059' : '#141A24',
+                  '#C5A059',
+                  phaseIdx === 2 ? '#141A24' : '#E5C583',
+                  Math.max(9.5, Math.round(10 * satPt.s))
+                );
+              }
+
+              // 3. Specialist Medallion Backing & Double Navy/Brass Ring Frame
               ctx.globalAlpha = alphaMul;
+              if (isMissionActive) {
+                // Active mission pulse halo
+                ctx.strokeStyle = '#C5A059';
+                ctx.lineWidth = 1.6;
+                ctx.globalAlpha = 0.55;
+                ctx.beginPath();
+                ctx.arc(sPt.x, sPt.y, nodeR + 7.5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+              }
+
               ctx.fillStyle = cardBg;
               ctx.beginPath();
               ctx.arc(sPt.x, sPt.y, nodeR + 3, 0, Math.PI * 2);
               ctx.fill();
 
-              ctx.lineWidth = isSingleSpotlight ? 2.4 : 1.5;
-              ctx.strokeStyle = isSingleSpotlight ? brass : fg;
+              ctx.lineWidth = isMissionActive ? 2.6 : 1.4;
+              ctx.strokeStyle = isMissionActive ? '#C5A059' : fg;
               ctx.stroke();
 
               // Circular Clipped Portrait
@@ -1376,25 +1624,17 @@
                 ctx.restore();
               }
 
-              // Editorial Nameplate Pill beneath Portrait
+              // Solid Opaque Editorial Nameplate Pill beneath Portrait
               const labelY = sPt.y + nodeR + 11 * sPt.s;
-              ctx.font = '600 ' + Math.max(10, Math.round(11 * sPt.s)) + 'px -apple-system, BlinkMacSystemFont, sans-serif';
-              const textW = ctx.measureText(ag.name).width;
-              const pillW = textW + 12;
-              const pillH = 16 * sPt.s;
-
-              ctx.fillStyle = isSingleSpotlight ? fg : pageBg;
-              ctx.strokeStyle = isSingleSpotlight ? brass : fg;
-              ctx.lineWidth = 1;
-              ctx.beginPath();
-              ctx.roundRect(sPt.x - pillW * 0.5, labelY - pillH * 0.5, pillW, pillH, 6);
-              ctx.fill();
-              ctx.stroke();
-
-              ctx.fillStyle = isSingleSpotlight ? cardBg : fg;
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(ag.name, sPt.x, labelY + 0.5);
+              drawOpaquePill(
+                sPt.x,
+                labelY,
+                ag.name,
+                isMissionActive ? '#141A24' : pageBg,
+                isMissionActive ? '#C5A059' : fg,
+                isMissionActive ? '#F8F5EE' : fg,
+                Math.max(10, Math.round(10.5 * sPt.s))
+              );
               ctx.restore();
             }
           });
@@ -1685,19 +1925,19 @@
 
       function drawTag(ctx, x, y, text, isAccent) {
         ctx.save();
-        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
-        const padX = 8;
+        ctx.font = '700 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+        const padX = 9;
         const tw = ctx.measureText(text).width;
         const bw = tw + padX * 2;
-        const bh = 22;
-        ctx.fillStyle = isAccent ? 'rgba(20, 26, 36, 0.92)' : 'rgba(248, 245, 238, 0.94)';
+        const bh = 23;
+        ctx.fillStyle = isAccent ? '#141A24' : '#F8F5EE';
         ctx.strokeStyle = isAccent ? '#C5A059' : '#182338';
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
         ctx.roundRect(x - bw / 2, y - bh / 2, bw, bh, 6);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = isAccent ? '#F8F5EE' : '#182338';
+        ctx.fillStyle = isAccent ? '#FFFFFF' : '#141A24';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(text, x, y + 0.5);
@@ -1720,13 +1960,6 @@
 
         const elapsed = (now - studioStartTime) / 1000;
         const t = reduceMotion ? 1.5 : elapsed;
-
-        // Subtle warm vignette around the studio frame
-        const grad = ctx.createLinearGradient(0, h * 0.65, 0, h);
-        grad.addColorStop(0, 'rgba(20, 26, 36, 0)');
-        grad.addColorStop(1, 'rgba(20, 26, 36, 0.72)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, h * 0.65, w, h * 0.35);
 
         if (key === 'aida') {
           // 1. Acoustic soundwaves radiating from Aida's vintage microphone (x: 0.275, y: 0.63)
@@ -1936,31 +2169,34 @@
       const container = document.getElementById('agent-dossier');
       container.innerHTML = `
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
-          <!-- Left 7 Columns: Widescreen "At Work" Studio Viewport + Live 60fps Canvas -->
-          <div class="lg:col-span-7 space-y-2.5">
-            <div class="relative aspect-[16/9] rounded-xl overflow-hidden border border-[var(--border)] bg-[#141A24] shadow-sm">
-              <img data-scene="${key}" alt="${a.sceneAlt}" class="w-full h-full object-cover studio-art-motion" />
-              <canvas id="studio-live-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-
-              <!-- Top Studio Control Bar -->
-              <div class="absolute top-3 inset-x-3 flex items-center justify-between gap-2">
-                <span class="px-2.5 py-1 rounded-md bg-[#141A24]/88 text-[#F8F5EE] border border-[#C5A059]/60 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
+          <!-- Left 7 Columns: Widescreen "At Work" Studio Viewport + Solid Editorial Framing Bars -->
+          <div class="lg:col-span-7">
+            <div class="rounded-xl overflow-hidden border-2 border-[#141A24] bg-[#141A24] shadow-sm">
+              <!-- Solid Top Studio Control Bar (No Frosted Glass, No Artwork Occlusion) -->
+              <div class="bg-[#141A24] text-[#FFFFFF] border-b border-[#C5A059]/45 px-3.5 py-2 flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#E5C583]">
                   ● Desk ${a.deskNum} · ${a.rooms}
                 </span>
-                <button type="button" onclick="replayStudioScene()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE]/92 text-[#141A24] hover:bg-white border border-[#141A24]/30 text-xs font-semibold min-h-[32px] transition shadow-sm">
+                <button type="button" onclick="replayStudioScene()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE] text-[#141A24] hover:bg-white text-xs font-bold min-h-[30px] transition shadow-sm">
                   ↻ Replay Scene
                 </button>
               </div>
 
-              <!-- Bottom Editorial Character Introduction Plate -->
-              <div class="absolute bottom-0 inset-x-0 bg-[#141A24]/92 backdrop-blur-md text-[#F8F5EE] border-t border-[#C5A059]/50 px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3">
+              <!-- Unobstructed 16:9 Studio Illustration + Live 60fps Canvas -->
+              <div class="relative aspect-[16/9] overflow-hidden bg-[#141A24]">
+                <img data-scene="${key}" alt="${a.sceneAlt}" class="w-full h-full object-cover studio-art-motion" />
+                <canvas id="studio-live-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+              </div>
+
+              <!-- Solid Bottom Editorial Character Introduction Plate -->
+              <div class="bg-[#141A24] text-[#FFFFFF] border-t border-[#C5A059]/45 px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
                   <img data-avatar="${avatarKey}" alt="" width="44" height="44" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-[#C5A059] object-cover shrink-0" />
                   <div class="min-w-0">
-                    <div class="font-serif-display text-lg sm:text-xl leading-tight truncate">
-                      ${a.name} <span class="font-sans text-xs font-semibold text-[#D4B26F]">· ${a.role}</span>
+                    <div class="font-serif-display text-lg sm:text-xl leading-tight truncate text-[#FFFFFF]">
+                      ${a.name} <span class="font-sans text-xs font-bold text-[#E5C583]">· ${a.role}</span>
                     </div>
-                    <div class="text-[11px] text-[#D5CFC2] truncate">${a.studioCaption}</div>
+                    <div class="text-xs text-[#E8E2D5] truncate">${a.studioCaption}</div>
                   </div>
                 </div>
               </div>
@@ -2236,9 +2472,9 @@
       document.getElementById('sim-chat-speaker').textContent = act.speaker;
       document.getElementById('sim-chat-quote').textContent = act.quote;
 
-      // 3. Update Bottom Technical Pipeline Strip
+      // 3. Update Bottom Technical Pipeline Strip (Solid High-Contrast Pills)
       document.getElementById('sim-pipeline-strip').innerHTML = act.pipeline.map((op, i) => `
-        <span class="px-2 py-0.5 rounded bg-white/10 text-[#F8F5EE] border border-white/15">${op}</span>
+        <span class="px-2 py-0.5 rounded bg-[#22304A] text-[#FFFFFF] border border-[#C5A059]/55 font-semibold">${op}</span>
         ${i < act.pipeline.length - 1 ? `<span class="text-[#C5A059] font-bold" aria-hidden="true">→</span>` : ''}
       `).join('');
       document.getElementById('sim-guardrail-pill').textContent = act.guardrail;
