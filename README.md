@@ -1,6 +1,6 @@
 # Leamonde Assets
 
-Public assets, icons, and avatars for **Lea Monde AI** staff on Discord.
+Public assets, icons, avatars, and the interactive **[Architecture Overview (`index.html`)](https://gautamvasudevan.github.io/leamonde-assets/)** for **Lea Monde AI**.
 
 ---
 

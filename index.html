@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leamonde AI — Architecture Overview</title>
+  <meta name="description" content="Executive architecture overview of Leamonde AI: a private, self-hosted multi-agent household platform running on Proxmox VE, Google Antigravity SDK, Gemini, and Discord." />
+  <meta property="og:title" content="Leamonde AI — Household Staff Architecture" />
+  <meta property="og:description" content="Six independent AI specialists for the household—collaborating in shared rooms while keeping personal data and secrets at home." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://gautamvasudevan.github.io/leamonde-assets/" />
+  <meta property="og:image" content="https://gautamvasudevan.github.io/leamonde-assets/avatars/server_icon.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/jpeg" href="./avatars/crest.jpg" />
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif; }
+
+    /* Subtle editorial grid + animated signal aesthetics */
+    .blueprint-card {
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .blueprint-card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Scroll reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animated SVG signal lines */
+    @keyframes signalFlow {
+      to { stroke-dashoffset: -48; }
+    }
+    .signal-line {
+      stroke-dasharray: 6 6;
+      animation: signalFlow 1.6s linear infinite;
+    }
+    .signal-line-slow {
+      stroke-dasharray: 4 8;
+      animation: signalFlow 3s linear infinite;
+    }
+
+    /* Pulse ring for active nodes */
+    @keyframes softPulse {
+      0%, 100% { transform: scale(1); opacity: 0.75; }
+      50% { transform: scale(1.18); opacity: 0.2; }
+    }
+    .pulse-ring {
+      animation: softPulse 2.4s ease-in-out infinite;
+    }
+
+    .fade-swap {
+      animation: fadeSwap 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeSwap {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .map-node {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .map-node:hover {
+      transform: translateY(-2px);
+    }
+    .map-node.is-active {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .map-node.is-dimmed {
+      opacity: 0.42;
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased selection:bg-[var(--primary)] selection:text-[var(--primary-foreground)] relative">
+
+  <!-- Full-Viewport Ambient Architectural & Signal Canvas -->
+  <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
+
+  <!-- Floating Minimal Top Bar -->
+  <header class="sticky top-0 z-30 bg-[var(--background)]/85 backdrop-blur-md border-b border-[var(--border)]">
+    <div class="max-w-6xl mx-auto px-5 py-2.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <img data-avatar="crest" alt="Crest" class="w-8 h-8 rounded-full border border-[var(--border)] object-cover" />
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-sm tracking-tight">LEAMONDE AI</span>
+          <span class="text-xs text-[var(--muted-foreground)] hidden sm:inline">· Household Staff Architecture</span>
+        </div>
+      </div>
+      <nav class="flex items-center gap-1 text-xs overflow-x-auto py-0.5">
+        <a href="#ch-map" class="px-2.5 py-1 rounded-full hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">01 · System Map</a>
+        <a href="#ch-staff" class="px-2.5 py-1 rounded-full hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">02 · The 6 Agents</a>
+        <a href="#ch-theatre" class="px-2.5 py-1 rounded-full hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">03 · Live Turn Theatre</a>
+        <a href="#ch-memory" class="px-2.5 py-1 rounded-full hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">04 · Memory &amp; Vault</a>
+        <a href="#ch-engine" class="px-2.5 py-1 rounded-full hover:bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">05 · Speed, QC &amp; Tools</a>
+        <button onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Light / Dark Theme" class="ml-1 px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--secondary)] transition whitespace-nowrap font-medium">
+          ◐ Theme
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-6xl mx-auto px-5 pt-8 pb-16">
+
+    <!-- HERO: EDITORIAL ATELIER INTRO -->
+    <section class="reveal visible relative bg-[var(--card)]/90 border border-[var(--border)] rounded-3xl p-6 md:p-10 shadow-sm overflow-hidden">
+      <!-- Decorative Animated SVG Architectural Arch / Signal Lines in Hero Background -->
+      <svg class="absolute right-0 top-0 h-full w-1/2 pointer-events-none opacity-20 hidden lg:block" viewBox="0 0 400 320" fill="none">
+        <path d="M 60 320 L 60 140 A 120 120 0 0 1 300 140 L 300 320" stroke="currentColor" stroke-width="1.2" />
+        <path d="M 100 320 L 100 150 A 80 80 0 0 1 260 150 L 260 320" stroke="currentColor" stroke-width="1" class="signal-line" />
+        <line x1="0" y1="80" x2="400" y2="80" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 6" />
+        <line x1="180" y1="0" x2="180" y2="320" stroke="currentColor" stroke-width="0.75" class="signal-line-slow" />
+        <circle cx="180" cy="80" r="5" fill="currentColor" />
+        <circle cx="60" cy="140" r="4" fill="currentColor" />
+        <circle cx="300" cy="140" r="4" fill="currentColor" />
+      </svg>
+
+      <div class="relative z-10 max-w-3xl space-y-5">
+        <div class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-[var(--secondary)] text-[var(--secondary-foreground)]">
+          <span class="w-2 h-2 rounded-full bg-[var(--primary)] pulse-ring"></span>
+          <span>Private Household AI Agency · Self-Hosted on Proxmox VE</span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight leading-tight">
+          An intelligent home staff that lives in multi-player chat, remembers how the house runs, and keeps every secret at home.
+        </h1>
+
+        <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+          Standard AI apps are single-player: two partners can't sit in one chat room to plan dinner, compare rugs, or coordinate calendars together while keeping their personal emails separate. <strong>Leamonde AI</strong> runs six independent specialists on a home server and puts them inside a private family Discord.
+        </p>
+
+        <!-- 3 Crisp Thesis Strips (No Wordy Boxes) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-[var(--border)]">
+          <div class="space-y-1">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">01 · Multi-User Front End</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <strong>Discord</strong> gives both partners shared specialist rooms plus locked 1-on-1 desks—with voice notes, photos, threads, and approval buttons on every phone.
+            </p>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">02 · Home Server + Cloud Brain</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              A <strong>Proxmox VE</strong> home server runs the <strong>Antigravity SDK</strong> harness, local databases, and tool containers; <strong>Google Gemini</strong> handles reasoning and voice.
+            </p>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">03 · Six Separate Minds</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Each specialist is an isolated agent with its own prompt, memory, and tool allowlist—backed by <strong>MCPJungle</strong> for tools and <strong>1Password</strong> for secrets.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONNECTOR SPINE -->
+    <div class="flex flex-col items-center py-4">
+      <div class="w-px h-10 bg-[var(--border)] relative overflow-hidden">
+        <div class="w-full h-3 bg-[var(--primary)] animate-bounce"></div>
+      </div>
+      <span class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]">
+        01 · The Architecture at a Glance
+      </span>
+    </div>
+
+    <!-- CHAPTER 01: SIDE-BY-SIDE ANIMATED SYSTEM BLUEPRINT -->
+    <section id="ch-map" class="reveal space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <h2 class="text-xl font-bold">The House &amp; Agency Blueprint</h2>
+          <p class="text-sm text-[var(--muted-foreground)]">Click any room or engine component on the left—signal paths light up and the brief updates on the right.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <!-- Left 7 Cols: Visual 3-Layer Schematic with Animated SVG Connectors -->
+        <div class="lg:col-span-7 bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 flex flex-col justify-between space-y-2 shadow-sm relative">
+
+          <!-- Layer 1: Discord Rooms -->
+          <div class="bg-[var(--background)]/90 border border-[var(--border)] rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Front Door · Discord Multi-User Rooms</span>
+              <span class="text-[var(--muted-foreground)]">iOS · Android · Mac</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div onclick="selectNode('discord-shared')" id="node-discord-shared" class="map-node is-active bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🏠 Shared Rooms</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">#lobby, #kitchen, #shopping…</div>
+              </div>
+              <div onclick="selectNode('discord-desks')" id="node-discord-desks" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🔒 Private Desks</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Partner A &amp; B 1-on-1 rooms</div>
+              </div>
+              <div onclick="selectNode('discord-ops')" id="node-discord-ops" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">📌 Live Boards</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Menu, Perks &amp; #ops Spend</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Animated Signal Conduit 1 -> 2 -->
+          <div class="flex items-center justify-around px-8 py-0.5">
+            <svg class="w-full h-6 text-[var(--muted-foreground)]" viewBox="0 0 400 24" fill="none">
+              <line x1="65" y1="0" x2="140" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+              <line x1="200" y1="0" x2="200" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+              <line x1="335" y1="0" x2="260" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+            </svg>
+          </div>
+
+          <!-- Layer 2: Home Server (Proxmox VE) -->
+          <div class="bg-[var(--background)]/90 border-2 border-[var(--primary)]/40 rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold uppercase tracking-wider">Home Server · Proxmox VE Docker Host</span>
+              <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold">Runs Locally at Home</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div onclick="selectNode('harness')" id="node-harness" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">⚡ Staff Harness (Antigravity SDK)</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">6 isolated agents · Sub-agents · QC Gate</div>
+              </div>
+              <div onclick="selectNode('storage')" id="node-storage" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🗂️ 3-Tier Local Memory (/data)</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Git Handbook · 3 SQLite DBs · Sessions</div>
+              </div>
+              <div onclick="selectNode('mcpjungle')" id="node-mcpjungle" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🔌 MCPJungle Tool Gateway</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Browserless, Instacart, NYT, Calendars</div>
+              </div>
+              <div onclick="selectNode('deployer')" id="node-deployer" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🚚 Self-Healing Pull Deployer</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">5m Git poll → 8 checks → swap/rollback</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Animated Signal Conduit 2 -> 3 -->
+          <div class="flex items-center justify-around px-8 py-0.5">
+            <svg class="w-full h-6 text-[var(--muted-foreground)]" viewBox="0 0 400 24" fill="none">
+              <line x1="140" y1="0" x2="65" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+              <line x1="200" y1="0" x2="200" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+              <line x1="260" y1="0" x2="335" y2="24" stroke="currentColor" stroke-width="1.4" class="signal-line" />
+            </svg>
+          </div>
+
+          <!-- Layer 3: External Cloud -->
+          <div class="bg-[var(--background)]/90 border border-[var(--border)] rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Cloud Brain, Vault &amp; Financial Feeds</span>
+              <span class="text-[var(--muted-foreground)]">Outbound HTTPS Only</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div onclick="selectNode('gemini')" id="node-gemini" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">✨ Gemini API</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Argon · Flash · TTS</div>
+              </div>
+              <div onclick="selectNode('onepassword')" id="node-onepassword" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">🔑 1Password</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">On-demand vault</div>
+              </div>
+              <div onclick="selectNode('external-mcps')" id="node-external-mcps" class="map-node bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+                <div class="font-bold text-xs">💳 Monarch &amp; Cards</div>
+                <div class="text-xs text-[var(--muted-foreground)] truncate">Filtered card/bill sync</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right 5 Cols: Crisp Inspector Card (Always Visible Next to Map) -->
+        <div id="node-inspector" class="lg:col-span-5 bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-4 fade-swap">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span id="insp-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]">Front Door · Discord</span>
+              <span id="insp-tag" class="text-xs text-[var(--muted-foreground)]">Multi-player rooms</span>
+            </div>
+
+            <h3 id="insp-title" class="font-bold text-lg">Shared Rooms (#lobby, #kitchen, #shopping…)</h3>
+            <p id="insp-desc" class="text-sm text-[var(--muted-foreground)] leading-relaxed"></p>
+
+            <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+              <div class="text-xs font-bold uppercase tracking-wider">Key Design Choice</div>
+              <p id="insp-why" class="text-xs text-[var(--muted-foreground)] leading-relaxed"></p>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-[var(--border)]">
+            <div class="text-xs font-semibold text-[var(--muted-foreground)]">Connected Signal Paths (click to trace):</div>
+            <div id="insp-links" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONNECTOR SPINE -->
+    <div class="flex flex-col items-center py-6">
+      <div class="w-px h-10 bg-[var(--border)]"></div>
+      <span class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]">
+        02 · The Agency Roster
+      </span>
+    </div>
+
+    <!-- CHAPTER 02: INTERACTIVE STAFF SWITCHBOARD (6 INDEPENDENT AGENTS) -->
+    <section id="ch-staff" class="reveal space-y-4">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-2">
+        <div>
+          <h2 class="text-xl font-bold">Six Independent AI Agents — Not One Shared Prompt</h2>
+          <p class="text-sm text-[var(--muted-foreground)]">
+            Each specialist runs in its own isolated Antigravity SDK session with its own instructions and strictly scoped tools. Select a specialist below to inspect their boundary.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm space-y-5">
+        <!-- Portrait Switchboard Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          <button onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]">
+            <img data-avatar="aida" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Aida</div>
+              <div class="text-xs opacity-80 truncate">Chief of Staff</div>
+            </div>
+          </button>
+
+          <button onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+            <img data-avatar="cookie" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Cookie</div>
+              <div class="text-xs text-[var(--muted-foreground)] truncate">Personal Chef</div>
+            </div>
+          </button>
+
+          <button onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+            <img data-avatar="scout" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Scout</div>
+              <div class="text-xs text-[var(--muted-foreground)] truncate">Product Scout</div>
+            </div>
+          </button>
+
+          <button onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+            <img data-avatar="sterling" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Sterling</div>
+              <div class="text-xs text-[var(--muted-foreground)] truncate">Card &amp; Perks</div>
+            </div>
+          </button>
+
+          <button onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+            <img data-avatar="sloan" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Sloan</div>
+              <div class="text-xs text-[var(--muted-foreground)] truncate">Interiors</div>
+            </div>
+          </button>
+
+          <button onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+            <img data-avatar="tazza" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+            <div class="min-w-0">
+              <div class="font-bold text-xs truncate">Tazza</div>
+              <div class="text-xs text-[var(--muted-foreground)] truncate">Coffee &amp; Brew</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Active Agent Dossier + Why Separate Agents Diagram -->
+        <div id="agent-dossier" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch fade-swap">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CONNECTOR SPINE -->
+    <div class="flex flex-col items-center py-6">
+      <div class="w-px h-10 bg-[var(--border)]"></div>
+      <span class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]">
+        03 · Live Turn Theatre
+      </span>
+    </div>
+
+    <!-- CHAPTER 03: LIVE TURN THEATRE (ANIMATED PIPELINE + DISCORD VS BACKSTAGE) -->
+    <section id="ch-theatre" class="reveal space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <h2 class="text-xl font-bold">Watch a Request Move Through the House</h2>
+          <p class="text-sm text-[var(--muted-foreground)]">Three real examples—each chosen to show a core design choice: multi-agent handoffs, clean-context web research, and private desk approvals.</p>
+        </div>
+      </div>
+
+      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm space-y-5">
+        <!-- 3 Scenario Pills + Auto-Play Button -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2">
+            <button onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2 rounded-xl border text-xs font-bold transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]">
+              1. Multi-Agent Handoff (Aida → Cookie)
+            </button>
+            <button onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2 rounded-xl border text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+              2. Parallel Sub-Agents &amp; QC (Sloan)
+            </button>
+            <button onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2 rounded-xl border text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]">
+              3. Private Desk &amp; 1Password Gate (Aida)
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="toggleAutoPlay()" id="btn-autoplay" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] text-xs font-semibold hover:bg-[var(--secondary)] transition">
+              ▶ Auto-Play
+            </button>
+            <button onclick="stepSim(-1)" id="btn-prev" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] text-xs font-semibold hover:bg-[var(--secondary)] disabled:opacity-40 transition">
+              ◀
+            </button>
+            <button onclick="stepSim(1)" id="btn-next" class="px-3 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold hover:opacity-90 disabled:opacity-40 transition">
+              Next Step ▶
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated 4-Stage Pipeline Bar -->
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3">
+          <div class="text-xs text-[var(--muted-foreground)] mb-2 font-medium" id="sim-why-label"></div>
+          <div id="pipeline-track" class="grid grid-cols-4 gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Split Screen: Discord Chat (Left) vs Backstage X-Ray (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <div class="lg:col-span-6 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]" id="sim-channel"></span>
+                  <span class="text-xs text-[var(--muted-foreground)]" id="sim-thread-badge"></span>
+                </div>
+                <span class="text-xs text-[var(--muted-foreground)]">What the Family Sees</span>
+              </div>
+              <div id="sim-discord-feed" class="space-y-2.5 fade-swap"></div>
+            </div>
+            <div id="sim-ux-note" class="text-xs text-[var(--muted-foreground)] pt-2 border-t border-[var(--border)]"></div>
+          </div>
+
+          <div class="lg:col-span-6 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                <span class="text-xs font-bold uppercase tracking-wider" id="sim-stage-title"></span>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-medium" id="sim-stage-chip"></span>
+              </div>
+              <div id="sim-backstage-body" class="space-y-2.5 fade-swap"></div>
+            </div>
+            <div id="sim-tech-note" class="text-xs text-[var(--muted-foreground)] pt-2 border-t border-[var(--border)]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONNECTOR SPINE -->
+    <div class="flex flex-col items-center py-6">
+      <div class="w-px h-10 bg-[var(--border)]"></div>
+      <span class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]">
+        04 · Memory &amp; The Vault
+      </span>
+    </div>
+
+    <!-- CHAPTER 04: MEMORY TIERS & HARD SAFETY LOCKS (SIDE BY SIDE VISUAL STRATA) -->
+    <section id="ch-memory" class="reveal grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+      <!-- Left 6 Cols: The 3 Memory Strata -->
+      <div class="lg:col-span-6 bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">How the House Remembers</div>
+          <h2 class="text-lg font-bold mt-0.5">Three Purpose-Built Storage Tiers</h2>
+        </div>
+
+        <div class="space-y-3">
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">1. Git Handbook &amp; House Binder (YAML + Markdown)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">60s Hot-Reload</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Holds agent instructions, channel layout, tool rules, and the <strong>House Binder</strong> (shared facts in <code>knowledge/*.md</code> + private notes). <strong>Bidirectional:</strong> when staff learn a lasting fact or you tap <em>"Always allow"</em>, they commit and push directly back to Git.
+            </p>
+          </div>
+
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">2. Three Local SQLite Databases</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Live Pinned Boards</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <strong>Kitchen DB</strong> (meals, pantry, groceries, recipes, kid's lunchbox rotation), <strong>Card Perks DB</strong> (cards, credit resets, subscription audits), and <strong>Usage DB</strong> (token &amp; dollar spend)—powering self-updating pinned boards in Discord.
+            </p>
+          </div>
+
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">3. On-Disk Conversation &amp; Throwaway Sessions</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Crash-Resilient</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Chat histories persist on disk per <code>(agent, channel/thread)</code>. Daily briefings and email watches run in <strong>fresh throwaway sessions</strong> so they never bloat chat history, leaving a short carry-over note for follow-up questions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right 6 Cols: The 4 Hard Safety Locks -->
+      <div class="lg:col-span-6 bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">How the House Stays Safe</div>
+          <h2 class="text-lg font-bold mt-0.5">Four Hard Privacy &amp; Credential Locks</h2>
+        </div>
+
+        <div class="space-y-3">
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">🔐 1Password On-Demand + Live Output Redactor</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">0 Passwords on Disk</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Only a read-only vault token sits on disk. All keys and logins resolve from 1Password on demand and register in an in-memory <strong>Redactor</strong> that scrubs secret strings (<code>[redacted]</code>) from every tool output, log, and reply.
+            </p>
+          </div>
+
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">🚫 3-Layer "Never Guess Credentials" Rule</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">15m Lockout</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Agents never invent or vary logins or vault item names. Enforced in prompts and hard-coded in the browser—which blocks plain-text password fills, checks an <code>op://</code> allowlist, and locks all logins for 15 minutes on any failure.
+            </p>
+          </div>
+
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs">🚪 Physical Private Desks &amp; Human Checkout</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Scope Gated</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Personal Google tools and claims skills don't exist outside that partner's private desk. Instacart order placement is stripped from code (humans always check out in the app), and Monarch Money excludes bank balances, paychecks, and net worth.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CONNECTOR SPINE -->
+    <div class="flex flex-col items-center py-6">
+      <div class="w-px h-10 bg-[var(--border)]"></div>
+      <span class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]">
+        05 · Speed, Cost &amp; Connected Tools
+      </span>
+    </div>
+
+    <!-- CHAPTER 05: COST/QUALITY LEVERS + CONNECTED TOOL FLEET -->
+    <section id="ch-engine" class="reveal space-y-6">
+      <!-- 4 Levers Strip -->
+      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Model &amp; Operations Strategy</div>
+            <h2 class="text-lg font-bold mt-0.5">High Reasoning Quality Without Runaway Cloud Bills</h2>
+          </div>
+          <span class="text-xs text-[var(--muted-foreground)]">Argon for chat · Flash for sub-agents, QC &amp; graduated routines</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">1. Parallel Flash Sub-Agents</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Up to 4 read-only Flash sub-agents read noisy web pages in throwaway sessions and return clean briefs—keeping the parent Argon chat history small.
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">2. Two-Stage Backstage QC</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <code>&lt;1ms</code> rule checks catch broken tables, fake tool claims, and unverified links, followed by a Flash critic checking house rules before any reply posts.
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">3. Evidence-Based Graduation</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Routines load only 3–5 tools and start on Argon while Flash shadow-replays the same tool outputs. 3 matches unlock a 1-click switch to Flash in <code>#ops</code>.
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">4. Self-Healing Pull Deploys</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Home server polls Git every 5m, waits for idle, runs 8 live pre-flight checks (<code>staff selftest</code>), swaps in, and auto-rolls back if health fails.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connected Tool Fleet (MCPJungle) -->
+      <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Single &lt;0.1s Local Bridge · MCPJungle</div>
+            <h2 class="text-lg font-bold mt-0.5">Connected Home &amp; Cloud Tool Fleet</h2>
+          </div>
+          <span class="text-xs text-[var(--muted-foreground)]">Phone-friendly OAuth sign-in right inside Discord</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">🌐 Browserless (Stealth Web)</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              DuckDuckGo search, structured product/recipe extraction with a 10m disk cache, and stateful browser sessions with 1Password login &amp; submit locks.
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">🛒 Instacart &amp; NYT Cooking</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Saved Recipe Box, parallel price checks across 6 local grocery stores, past receipt lookup, and shared Family Cart edits (probed every 6h).
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">📅 iCloud, Tennis Club &amp; Aiden</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Shared &amp; private calendars with free/busy masks, court reservations at the local club, and custom Fellow Aiden coffee brew profiles.
+            </p>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
+            <div class="font-bold text-xs">💳 Google, Monarch &amp; Cards</div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Per-partner Gmail/Calendar/Drive in private desks, plus read-only Monarch Money card/bill sync paired with CardStack &amp; MaxWorth offers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-[var(--border)] mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--muted-foreground)]">
+      <div class="flex items-center gap-2">
+        <img data-avatar="crest" alt="Crest" class="w-5 h-5 rounded-full border border-[var(--border)]" />
+        <span><strong>Leamonde AI</strong> — Household Agency Architecture</span>
+      </div>
+      <div>Proxmox VE · Google Antigravity SDK · Gemini · MCPJungle · 1Password</div>
+    </footer>
+
+  </main>
+
+  <script>
+    // 1. Standalone browser theme & interactive Light/Dark toggle
+    let currentThemeMode = 'light';
+    function applyEditorialTheme(mode) {
+      currentThemeMode = mode;
+      const vars = mode === 'dark' ? {
+        '--background': '#0f141c',
+        '--content': '#151c27',
+        '--card': '#18202d',
+        '--sidebar': '#121822',
+        '--border': '#283244',
+        '--foreground': '#f3f1ec',
+        '--muted-foreground': '#9ba6b8',
+        '--primary': '#c5a059',
+        '--primary-foreground': '#11161f',
+        '--secondary': '#232d3f',
+        '--secondary-foreground': '#e5e0d5',
+        '--accent': '#2a364b'
+      } : {
+        '--background': '#f8f5ee',
+        '--content': '#f2ede2',
+        '--card': '#ffffff',
+        '--sidebar': '#f2ede2',
+        '--border': '#e2dacb',
+        '--foreground': '#1b2a4a',
+        '--muted-foreground': '#536179',
+        '--primary': '#1b2a4a',
+        '--primary-foreground': '#f8f5ee',
+        '--secondary': '#ebe4d6',
+        '--secondary-foreground': '#1b2a4a',
+        '--accent': '#c5a059'
+      };
+      for (const [k, v] of Object.entries(vars)) {
+        document.documentElement.style.setProperty(k, v);
+      }
+      const btn = document.getElementById('theme-toggle-btn');
+      if (btn) btn.textContent = mode === 'dark' ? '☀ Ivory' : '☾ Night';
+    }
+
+    function toggleTheme() {
+      applyEditorialTheme(currentThemeMode === 'dark' ? 'light' : 'dark');
+    }
+
+    (function ensureStandaloneTheme() {
+      const rootStyle = getComputedStyle(document.documentElement);
+      if (!rootStyle.getPropertyValue('--background').trim()) {
+        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyEditorialTheme(dark ? 'dark' : 'light');
+      }
+    })();
+
+    // 2. Ambient Architectural & Signal Flow Background Canvas
+    (function initCanvas() {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = 0, h = 0;
+      const pulses = [];
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      const gridSize = 96;
+      for (let i = 0; i < 18; i++) {
+        pulses.push({
+          x: Math.floor(Math.random() * 16) * gridSize,
+          y: Math.floor(Math.random() * 12) * gridSize,
+          vx: Math.random() > 0.5 ? (Math.random() > 0.5 ? 1.2 : -1.2) : 0,
+          vy: 0,
+          len: 36 + Math.random() * 44,
+          alpha: 0.18 + Math.random() * 0.25
+        });
+        if (pulses[i].vx === 0) pulses[i].vy = Math.random() > 0.5 ? 1.2 : -1.2;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        const fg = getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim() || '#888';
+
+        // Faint architectural grid lines
+        ctx.strokeStyle = fg;
+        ctx.globalAlpha = 0.045;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = 0; x < w; x += gridSize) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+        }
+        for (let y = 0; y < h; y += gridSize) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // Moving signal pulses along architectural tracks
+        for (const p of pulses) {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Turn at grid intersections occasionally
+          if (Math.abs(p.x % gridSize) < 1.3 && Math.abs(p.y % gridSize) < 1.3 && Math.random() < 0.08) {
+            p.x = Math.round(p.x / gridSize) * gridSize;
+            p.y = Math.round(p.y / gridSize) * gridSize;
+            if (p.vx !== 0) {
+              p.vx = 0;
+              p.vy = Math.random() > 0.5 ? 1.2 : -1.2;
+            } else {
+              p.vy = 0;
+              p.vx = Math.random() > 0.5 ? 1.2 : -1.2;
+            }
+          }
+
+          if (p.x < -80) p.x = w + 40;
+          if (p.x > w + 80) p.x = -40;
+          if (p.y < -80) p.y = h + 40;
+          if (p.y > h + 80) p.y = -40;
+
+          ctx.globalAlpha = p.alpha;
+          ctx.strokeStyle = fg;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - (p.vx * p.len), p.y - (p.vy * p.len));
+          ctx.stroke();
+
+          ctx.fillStyle = fg;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+    })();
+
+    // 3. Scroll Reveal Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 4. Bind Base64 Avatars
+    const AVATARS = {"crest": "data:image/jpeg;base64,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", "aida": "data:image/jpeg;base64,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", "tazza": "data:image/jpeg;base64,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", "scout": "data:image/jpeg;base64,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", "sterling": "data:image/jpeg;base64,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", "sloan": "data:image/jpeg;base64,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", "cookie": "data:image/jpeg;base64,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"};
+    function bindAvatars(root = document) {
+      root.querySelectorAll('img[data-avatar]').forEach(img => {
+        const key = img.getAttribute('data-avatar');
+        if (AVATARS[key]) img.src = AVATARS[key];
+      });
+    }
+    bindAvatars();
+
+    // 5. Chapter 01: Interactive System Map Data
+    const NODES = {
+      'discord-shared': {
+        badge: 'Front Door · Discord UI',
+        title: 'Shared Rooms (#lobby, #kitchen, #shopping…)',
+        tag: 'Multi-player family channels',
+        desc: 'Dedicated rooms where both partners and the AI specialists talk together. When Partner A asks Cookie about Sunday dinner in #kitchen, Partner B sees the options live and can jump into the same thread.',
+        why: 'Chosen because standard AI apps are single-player. Domain channels also let the server route messages automatically without needing @mentions.',
+        links: ['harness', 'discord-ops']
+      },
+      'discord-desks': {
+        badge: 'Front Door · Privacy Boundary',
+        title: 'Private Personal Desks & DMs',
+        tag: 'Locked per-partner scope',
+        desc: 'Each partner has a private room (#partner-a-desk, #partner-b-desk). Only inside that room can an agent access that partner\'s Gmail, personal calendar, private notes, or insurance claim workflows.',
+        why: 'Personal tools are physically excluded from agent sessions in shared channels—so private emails or medical superbills can never leak into household rooms.',
+        links: ['harness', 'onepassword']
+      },
+      'discord-ops': {
+        badge: 'Front Door · Live Dashboards',
+        title: 'Pinned Channel Boards & #ops',
+        tag: 'Self-updating embeds',
+        desc: 'Pinned messages act as live dashboards: #kitchen pins the weekly Menu & Grocery List, #shopping pins active Credit Card Perks, and #ops pins the monthly Token & Dollar Spend Board.',
+        why: 'Zero separate web dashboards to maintain—household state is always one tap away inside Discord.',
+        links: ['storage', 'deployer', 'harness']
+      },
+      'harness': {
+        badge: 'Home Server · Core Engine',
+        title: 'Staff Runtime Harness (Antigravity SDK)',
+        tag: 'Python daemon on Proxmox VE',
+        desc: 'Routes Discord messages to the right independent agent instance, spawns parallel read-only sub-agents for web research, posts approval cards, and runs every reply through Backstage Quality Control.',
+        why: 'Keeps session state, privacy gates, and tool orchestration on private hardware at home while delegating raw LLM inference to the cloud.',
+        links: ['discord-shared', 'discord-desks', 'storage', 'mcpjungle', 'gemini']
+      },
+      'storage': {
+        badge: 'Home Server · Memory',
+        title: 'Three-Tier Local Storage (/data)',
+        tag: 'Git + 3 SQLite DBs + SDK Sessions',
+        desc: 'Combines a 60s hot-reloaded, self-writing Git repo (instructions, rules, House Binder) with three SQLite databases (Kitchen, Card Perks, Usage) and crash-resilient conversation stores.',
+        why: 'Matches each data type to the right store: Git for human-readable rules and facts, SQLite for structured lists, and SDK stores for chat continuity.',
+        links: ['harness', 'discord-ops']
+      },
+      'mcpjungle': {
+        badge: 'Home Server · Tool Choke Point',
+        title: 'MCPJungle Local Tool Gateway',
+        tag: '<0.1s persistent HTTP stream',
+        desc: 'Single local gateway bridging Browserless, Instacart, NYT Cooking, iCloud Calendar, Tennis Club, Fellow Aiden, Google Workspace, and card data.',
+        why: 'Funnels every tool call through one bridge so allowlists, privacy filters, secret redaction, and screenshot capture happen in one place.',
+        links: ['harness', 'onepassword', 'external-mcps']
+      },
+      'deployer': {
+        badge: 'Home Server · Self-Healing CI/CD',
+        title: 'Idle-Aware Pull Deployer',
+        tag: '8-point pre-flight selftest',
+        desc: 'Polls Git every 5 minutes via a read-only SSH key, waits until no conversation is active, builds locally, runs 8 live service checks, swaps in, and auto-rolls back on failure.',
+        why: 'No external container registries, no expiring tokens, and no broken deploys interrupting an active chat.',
+        links: ['harness', 'discord-ops']
+      },
+      'gemini': {
+        badge: 'Cloud Brain · AI Models',
+        title: 'Google Gemini API (Argon · Flash · TTS)',
+        tag: 'Frontier chat + fast sub-agents',
+        desc: 'Gemini Argon runs interactive chat; Gemini Flash runs parallel web sub-agents, the Backstage QC critic, thread naming, and graduated routines; Gemini TTS voices audio briefings.',
+        why: 'Pairs frontier reasoning on live turns with fast, inexpensive models for heavy web reading and verification.',
+        links: ['harness']
+      },
+      'onepassword': {
+        badge: 'Cloud Vault · Secrets',
+        title: '1Password Vault ("LeaMonde Staff")',
+        tag: 'Zero static passwords on disk',
+        desc: 'Resolves API keys, bot tokens, and website logins on demand (cached 5m) and registers every secret with an in-memory Redactor that scrubs raw values from outputs and logs.',
+        why: 'Rotating a credential in 1Password updates the house without touching config files on disk.',
+        links: ['harness', 'mcpjungle', 'discord-desks']
+      },
+      'external-mcps': {
+        badge: 'Cloud Data · Cards & Spend',
+        title: 'Monarch Money, CardStack & MaxWorth',
+        tag: 'Filtered read-only sync',
+        desc: 'Syncs credit cards, recurring bills, and spending categories from Monarch Money (excluding bank balances, paychecks, and net worth) plus live card perks and portal rates.',
+        why: 'Lets Sterling audit subscriptions and statement credits automatically without exposing family net worth.',
+        links: ['mcpjungle', 'harness']
+      }
+    };
+
+    function selectNode(id) {
+      const data = NODES[id];
+      if (!data) return;
+      const connected = new Set(data.links || []);
+      document.querySelectorAll('.map-node').forEach(el => {
+        const nid = el.id.replace('node-', '');
+        el.classList.remove('is-active', 'is-dimmed');
+        if (nid === id) {
+          el.classList.add('is-active');
+        } else if (!connected.has(nid)) {
+          el.classList.add('is-dimmed');
+        }
+      });
+      const box = document.getElementById('node-inspector');
+      document.getElementById('insp-badge').textContent = data.badge;
+      document.getElementById('insp-title').textContent = data.title;
+      document.getElementById('insp-tag').textContent = data.tag;
+      document.getElementById('insp-desc').textContent = data.desc;
+      document.getElementById('insp-why').textContent = data.why;
+      document.getElementById('insp-links').innerHTML = (data.links || []).map(tid => {
+        const t = NODES[tid];
+        return `<button onclick="selectNode('${tid}')" class="text-xs px-2.5 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-85 transition font-medium">→ ${t ? t.title.split(' (')[0] : tid}</button>`;
+      }).join('');
+      box.classList.remove('fade-swap');
+      void box.offsetWidth;
+      box.classList.add('fade-swap');
+    }
+
+    // 6. Chapter 02: Interactive Agent Switchboard Data
+    const AGENTS = {
+      aida: {
+        name: 'Aida',
+        role: 'Chief of Staff',
+        rooms: '#lobby · #foothills · #morning-briefing · Private Desks',
+        summary: 'Coordinates family schedules, delivers 7 AM spoken morning briefings, books tennis courts, runs background email watches, and handles private-desk life admin (like staging medical superbills).',
+        allowed: ['iCloud Calendar', 'Foothills Tennis Club', 'Routines & Email Watches', 'Order Tracker', 'Google Workspace (Private Desks Only)', 'Anthem Claims Skill (Partner B Desk Only)'],
+        blocked: ['Kitchen SQLite (Meals/Pantry)', 'Instacart Cart', 'Monarch Money & Card Perks', 'Fellow Aiden Brewer'],
+        handoffExample: 'Asked about dinner in #lobby → checks which evening is free on the calendar, then calls handoff("Cookie") to plan the menu.'
+      },
+      cookie: {
+        name: 'Cookie',
+        role: 'Personal Chef',
+        rooms: '#kitchen',
+        summary: 'Runs Sunday batch-cooking plans, tracks pantry & leftovers, plans the kid\'s school lunchbox rotation, searches NYT Cooking, compares prices across 6 local grocery stores, and edits the Instacart Family Cart.',
+        allowed: ['Kitchen SQLite (Meals, Pantry, Leftovers, Lunchbox)', 'NYT Cooking & Recipe Box', 'Instacart (Search, 6-Store Price Compare, Family Cart, Past Orders)', 'Shared Calendar Read'],
+        blocked: ['Personal Gmail / Drive', 'Monarch Money & Credit Cards', 'Fellow Aiden Brewer', 'Instacart Checkout (Removed in Code)'],
+        handoffExample: 'Asked to order a new sauté pan → hands off to Scout in #shopping.'
+      },
+      scout: {
+        name: 'Scout',
+        role: 'Product & Gear Specialist',
+        rooms: '#shopping (co-habited with Sterling)',
+        summary: 'Researches gear and household goods across retailers using parallel web sub-agents, generates 1-tap Amazon cart links from verified ASINs, checks portal cashback rates, and tracks incoming deliveries.',
+        allowed: ['Parallel Browserless Sub-Agents', 'MaxWorth Cashback Portals & Card Offers', 'Household Order Tracker', 'Kitchen Grocery List Read/Add'],
+        blocked: ['Monarch Money Transactions', 'NYT Cooking', 'Fellow Aiden Brewer', 'Personal Google Drive'],
+        handoffExample: 'Asked which credit card to put a $900 stroller on → hands off to Sterling in the same thread.'
+      },
+      sterling: {
+        name: 'Sterling',
+        role: 'Card Perks, Points & Spending Strategist',
+        rooms: '#shopping (co-habited with Scout)',
+        summary: 'Tracks credit card statement credits and reset cycles, audits recurring subscriptions against comped credits, summarizes card spending via Monarch Money, and finds award travel sweet spots.',
+        allowed: ['Perks SQLite Ledger', 'Monarch Money (Cards, Recurring Bills & Spending Only)', 'CardStack (Catalogs, Transfers, Sweet Spots)', 'MaxWorth (Portals & Amex/Chase Offers)'],
+        blocked: ['Monarch Bank Balances, Paychecks & Net Worth (Filtered Out)', 'Instacart Cart', 'Fellow Aiden Brewer'],
+        handoffExample: 'Automatically routes unaddressed messages in #shopping that mention points, Amex/Chase offers, subscriptions, or travel booking.'
+      },
+      sloan: {
+        name: 'Sloan',
+        role: 'Interior Designer',
+        rooms: '#interiors',
+        summary: 'Curates furniture, rugs, lighting, and layout options with studio product photos, exact dimensions, and material specs—evaluating room photos and floor plans directly in Discord threads.',
+        allowed: ['Parallel Browserless Sub-Agents (10m Page Cache)', 'Room & Floorplan Vision Analysis', 'House Binder (Room Dimensions & Style Notes)'],
+        blocked: ['Kitchen SQLite & Instacart', 'Monarch Money', 'Personal Gmail', 'Tennis Club Booking'],
+        handoffExample: 'Handles all furniture, rug, and lighting sourcing directly via her own research sub-agents.'
+      },
+      tazza: {
+        name: 'Tazza',
+        role: 'Coffee & Espresso Specialist',
+        rooms: '#coffee',
+        summary: 'Reads photos of coffee bags, dials in espresso grind and pour-over recipes, tracks each partner\'s palate notes over time, and pushes precision temperature/pulse profiles to the Fellow Aiden brewer.',
+        allowed: ['Fellow Aiden Brewer Profiles & Schedules', 'Parallel Browserless Sub-Agents (Roaster Specs)', 'House Binder (Bean Log & Palate Preferences)'],
+        blocked: ['Kitchen SQLite & Instacart', 'Monarch Money', 'Personal Gmail', 'Calendars'],
+        handoffExample: 'Drop a photo of a new coffee bag in #coffee → Tazza looks up the roaster notes and writes a custom Aiden profile.'
+      }
+    };
+
+    function selectAgent(key) {
+      const a = AGENTS[key];
+      if (!a) return;
+      document.querySelectorAll('.ag-btn').forEach(btn => {
+        btn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]';
+      });
+      const activeBtn = document.getElementById('ag-btn-' + key);
+      if (activeBtn) {
+        activeBtn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+      }
+
+      const container = document.getElementById('agent-dossier');
+      container.innerHTML = `
+        <div class="lg:col-span-7 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
+          <div class="flex items-center gap-3.5">
+            <img data-avatar="${key}" class="w-14 h-14 rounded-full border border-[var(--border)] object-cover shrink-0" />
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="font-bold text-base">${a.name}</h3>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)] font-medium">${a.role}</span>
+              </div>
+              <div class="text-xs text-[var(--muted-foreground)] mt-0.5">Default Rooms: <strong>${a.rooms}</strong></div>
+            </div>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">${a.summary}</p>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5 text-xs text-[var(--muted-foreground)]">
+            <strong class="text-[var(--foreground)]">Routing &amp; Handoffs:</strong> ${a.handoffExample}
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="text-xs font-bold uppercase tracking-wider">✓ Scoped Tools Wired into ${a.name}'s Session</div>
+            <div class="flex flex-wrap gap-1.5">
+              ${a.allowed.map(t => `<span class="text-xs px-2 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
+            </div>
+          </div>
+          <div class="space-y-1.5 pt-2 border-t border-[var(--border)]">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">✕ Physically Absent from ${a.name}'s Context</div>
+            <div class="flex flex-wrap gap-1.5">
+              ${a.blocked.map(t => `<span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)]/50 text-[var(--muted-foreground)] line-through opacity-75">${t}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      bindAvatars(container);
+      container.classList.remove('fade-swap');
+      void container.offsetWidth;
+      container.classList.add('fade-swap');
+    }
+
+    // 7. Chapter 03: Live Turn Theatre Data
+    const SCENARIOS = {
+      handoff: {
+        why: 'Shows why staff are separate agents: Aida checks family calendars, then hands off to Cookie (who owns Kitchen SQLite + Instacart).',
+        channel: '#lobby',
+        thread: '🧵 🍲 Weeknight Dinner Plan',
+        steps: [
+          {
+            label: '1. Calendar Check',
+            stageTitle: 'Stage 1 · Channel Router → Aida',
+            stageChip: 'Aida (Agent #1)',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
+                <div class="flex justify-between text-xs"><span class="font-bold">Partner A</span><span class="text-[var(--muted-foreground)]">6:12 PM</span></div>
+                <p class="text-xs">Which night is clearest for both of us to cook this week, and can we plan a batch dinner?</p>
+              </div>
+              <div class="px-2 py-1 text-xs text-[var(--muted-foreground)] italic">-# 💭 Checking the calendar…</div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Independent Session #1 (Aida)</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Aida checks both partners' calendars via <code>household_freebusy</code> and finds Wednesday evening wide open. She has no Kitchen or Instacart tools—so she prepares a handoff.</p>
+              </div>
+            `,
+            uxNote: 'Silent breadcrumb appears after 3s—no push notification yet.',
+            techNote: 'Aida cannot read or mutate kitchen.sqlite; least-privilege scoping enforces domain boundaries.'
+          },
+          {
+            label: '2. Agent Handoff',
+            stageTitle: 'Stage 2 · Cross-Agent Handoff',
+            stageChip: 'handoff("Cookie")',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
+                <img data-avatar="aida" class="w-8 h-8 rounded-full border border-[var(--border)] object-cover shrink-0" />
+                <div class="text-xs space-y-0.5">
+                  <div class="font-bold">Aida</div>
+                  <p class="text-[var(--muted-foreground)]">Wednesday is open after 5:30 PM for both of you. Handing over to <strong>Cookie</strong> to pick a batch recipe.</p>
+                </div>
+              </div>
+              <div class="px-2 py-1 text-xs text-[var(--muted-foreground)] italic">-# ↳ Handing over to Cookie · 💭 Checking the kitchen…</div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Independent Session #2 (Cookie)</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">The harness spins up Cookie's separate <code>Agent</code> instance in the same thread. Cookie reads <code>kitchen.sqlite</code> (pantry/leftovers) and searches saved NYT Cooking favorites.</p>
+              </div>
+            `,
+            uxNote: 'Channel webhook switches display name and portrait from Aida to Cookie automatically.',
+            techNote: 'Each agent keeps its own system prompt, tool schemas, and conversation ID.'
+          },
+          {
+            label: '3. Shared Cart Edit',
+            stageTitle: 'Stage 3 · Multi-Player Reply & Cart Update',
+            stageChip: 'Kitchen DB + Instacart',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
+                <div class="flex justify-between text-xs"><span class="font-bold">Partner B</span><span class="text-[var(--muted-foreground)]">6:14 PM</span></div>
+                <p class="text-xs">Let's do the Rosemary White Bean Ragù! Put it on Wednesday and add rosemary + crusty bread to the cart.</p>
+              </div>
+              <div class="px-2 py-1 text-xs text-[var(--muted-foreground)] italic">-# 💭 Updating meal plan &amp; Sprouts Family Cart…</div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Zero-Friction Family Cart</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Partner B jumps into the same thread. Cookie writes to <code>kitchen.sqlite</code> and calls <code>instacart_add_to_cart</code>—which runs without an approval card because order checkout is stripped from code.</p>
+              </div>
+            `,
+            uxNote: 'Both partners collaborate in one thread from their phones.',
+            techNote: 'Cart additions are safe to auto-allow because only a human can place the order in the Instacart app.'
+          },
+          {
+            label: '4. QC & Live Board',
+            stageTitle: 'Stage 4 · Backstage QC & Pinned Board',
+            stageChip: 'Verified & Posted',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
+                <img data-avatar="cookie" class="w-8 h-8 rounded-full border border-[var(--border)] object-cover shrink-0" />
+                <div class="text-xs space-y-0.5">
+                  <div class="font-bold">Cookie</div>
+                  <p class="text-[var(--muted-foreground)]">Added <strong>Rosemary White Bean Ragù</strong> to Wednesday on the Menu Board, and put fresh rosemary + levain in the Sprouts Family Cart ($8.48).</p>
+                </div>
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Phantom-Tool Check + Live Board Refresh</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">The <code>&lt;1ms</code> QC gate confirms <code>kitchen_plan_meal</code> actually ran before letting Cookie say she updated the plan. The pinned Menu Board in <code>#kitchen</code> updates in place.</p>
+              </div>
+            `,
+            uxNote: 'Silent breadcrumb deletes itself; final reply triggers a single clean push notification.',
+            techNote: 'Deterministic QC guarantees agents never claim a state change without a matching tool trace.'
+          }
+        ]
+      },
+      research: {
+        why: 'Shows how staff browse heavy retail sites in parallel without bloating memory or hallucinating product links.',
+        channel: '#interiors',
+        thread: '🧵 🪑 Warm Ivory 8×10 Wool Rugs',
+        steps: [
+          {
+            label: '1. Auto-Thread',
+            stageTitle: 'Stage 1 · Pre-Turn Thread Classifier',
+            stageChip: 'Gemini Flash (<1s)',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
+                <div class="flex justify-between text-xs"><span class="font-bold">Partner A</span><span class="text-[var(--muted-foreground)]">2:05 PM</span></div>
+                <p class="text-xs">Can you find 3 low-shed 8×10 wool rugs in warm ivory under $1,200 for the living room?</p>
+              </div>
+              <div class="bg-[var(--secondary)]/60 border border-[var(--border)] rounded-lg px-3 py-1.5 text-xs">
+                🧵 Opened thread <strong>🪑 Warm Ivory 8×10 Wool Rugs</strong>
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Automatic Thread Anchoring</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">A fast classifier detects a multi-step sourcing request, anchors a new Discord thread to the message, and runs the turn inside that thread's isolated session.</p>
+              </div>
+            `,
+            uxNote: 'Keeps top-level #interiors clean while giving the rug search its own workspace.',
+            techNote: 'Follow-up questions in the main channel automatically bridge recent thread context.'
+          },
+          {
+            label: '2. Sub-Agents',
+            stageTitle: 'Stage 2 · Parallel Clean-Context Sub-Agents',
+            stageChip: '3 Parallel Flash Agents',
+            discordHtml: `
+              <div class="px-2 py-2 text-xs text-[var(--muted-foreground)] italic">
+                -# 💭 Researching (3 parallel tasks)…
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">No Raw HTML in Sloan's Context</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Sloan (on Gemini Argon) cannot call <code>browserless</code> directly. She calls <code>delegate_research</code>, spawning 3 parallel Flash sub-agents that scrape retailers, extract specs/packshots, discard the 90k tokens of noisy DOM, and return compact briefs.</p>
+              </div>
+            `,
+            uxNote: '3 retail sites are searched and parsed concurrently.',
+            techNote: 'Keeps parent conversation history tiny—cutting uncached input token cost by >80%.'
+          },
+          {
+            label: '3. Backstage QC',
+            stageTitle: 'Stage 3 · Two-Stage Backstage QC Gate',
+            stageChip: 'URL Audit + Flash Critic',
+            discordHtml: `
+              <div class="px-2 py-2 text-xs text-[var(--muted-foreground)] italic">
+                -# ↳ Researching (3 parallel tasks)<br/>
+                -# 💭 Checking details…
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Every Link &amp; Price Verified Against Tool Traces</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Sub-agents forward their raw <code>ToolTrace</code> records to the parent turn. Deterministic QC verifies every URL and image link exists in the traces; a Flash critic checks budget and House Binder rules.</p>
+              </div>
+            `,
+            uxNote: 'If a link or price is unverified, Sloan fixes her draft before posting.',
+            techNote: 'Eliminates hallucinated URLs, mismatched prices, and Markdown tables.'
+          },
+          {
+            label: '4. Verified Post',
+            stageTitle: 'Stage 4 · Grounded Shortlist Delivered',
+            stageChip: 'Complete',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
+                <img data-avatar="sloan" class="w-8 h-8 rounded-full border border-[var(--border)] object-cover shrink-0" />
+                <div class="text-xs space-y-0.5">
+                  <div class="font-bold">Sloan</div>
+                  <p class="text-[var(--muted-foreground)]">Here are 3 warm-ivory 8×10 wool rugs under $1,200 with verified pile heights, weave specs, and direct studio photos…</p>
+                </div>
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">10-Minute Disk Cache Ready</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Browserless caches rendered pages on disk for 10 minutes—so if Partner A asks "what are the care instructions on #2?", drilling into that section takes <code>&lt;5ms</code>.</p>
+              </div>
+            `,
+            uxNote: 'Studio product photos render inline in the Discord thread.',
+            techNote: 'Usage ledger records parent Argon, sub-agent Flash, and QC tokens separately.'
+          }
+        ]
+      },
+      approval: {
+        why: 'Shows how private personal desks, server-side 1Password logins, and approval cards protect sensitive actions.',
+        channel: '#partner-b-desk (Private)',
+        thread: '🔒 Owner-Only Scope',
+        steps: [
+          {
+            label: '1. Private Scope',
+            stageTitle: 'Stage 1 · Private Desk Gate',
+            stageChip: 'Partner B Scope Unlocked',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
+                <div class="flex justify-between text-xs"><span class="font-bold">Partner B</span><span class="text-[var(--muted-foreground)]">4:30 PM</span></div>
+                <p class="text-xs">Please stage that new acupuncture superbill from my email on the insurance portal.</p>
+              </div>
+              <div class="px-2 py-1 text-xs text-[var(--muted-foreground)] italic">-# 💭 Working in the browser…</div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Physical Tool &amp; Skill Gating</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Because this message is in <code>#partner-b-desk</code>, Partner B's Gmail server and the <code>anthem-claims</code> skill are bound for this turn. Aida reads the superbill PDF as ground truth.</p>
+              </div>
+            `,
+            uxNote: 'Background email watch only notifies Partner B; staging waits for her go-ahead.',
+            techNote: 'In shared channels, Partner B\'s Gmail and claims skill are not even registered on the agent.'
+          },
+          {
+            label: '2. 1Password Login',
+            stageTitle: 'Stage 2 · Server-Side Vault Injection',
+            stageChip: 'op://LeaMonde Staff/Anthem',
+            discordHtml: `
+              <div class="px-2 py-2 text-xs text-[var(--muted-foreground)] italic">
+                -# ↳ Signing into portal &amp; checking OCR fields against PDF…
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">AI Never Sees the Password</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">Aida passes an <code>op://</code> reference to Browserless, which fetches the login from 1Password server-side and fills the form. Plain-text password fills are blocked, and any login failure locks credentials for 15m.</p>
+              </div>
+            `,
+            uxNote: 'If the portal texts a 1-time code, Aida pauses and asks Partner B for the code.',
+            techNote: 'Three-layer "Never Guess Credentials" rule prevents invented logins or vault item names.'
+          },
+          {
+            label: '3. Approval Card',
+            stageTitle: 'Stage 3 · Hard Submit Lock & Discord Card',
+            stageChip: 'always_ask Gate',
+            discordHtml: `
+              <div class="bg-[var(--card)] border-2 border-[var(--primary)]/50 rounded-lg p-3 space-y-2">
+                <div class="flex justify-between text-xs"><span class="font-bold">🔒 Approval Required · Aida</span><span class="text-[var(--muted-foreground)]">15m TTL</span></div>
+                <p class="text-xs text-[var(--muted-foreground)]">Submit out-of-network claim ($165.00)? Portal fields match superbill PDF 100%. Review screenshot attached.</p>
+                <div class="flex gap-2">
+                  <span class="px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold">✓ Approve</span>
+                  <span class="px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)] text-xs font-semibold">✕ Decline</span>
+                </div>
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Browser Refuses Unapproved Submit</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed"><code>browser_session</code> blocks clicking "Submit" buttons. Aida must call <code>browser_session_commit</code>, which halts execution and posts a Discord card with the final review screenshot.</p>
+              </div>
+            `,
+            uxNote: 'Partner B verifies the screenshot on her phone and taps Approve.',
+            techNote: 'Only the desk owner\'s Discord user ID is allowed to approve the card.'
+          },
+          {
+            label: '4. Submitted',
+            stageTitle: 'Stage 4 · Commit & Gmail Label',
+            stageChip: 'Approved & Logged',
+            discordHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
+                <img data-avatar="aida" class="w-8 h-8 rounded-full border border-[var(--border)] object-cover shrink-0" />
+                <div class="text-xs space-y-0.5">
+                  <div class="font-bold">Aida</div>
+                  <p class="text-[var(--muted-foreground)]">Claim submitted! Confirmation screenshot attached, and I labeled the email <code>Anthem-Submitted</code>.</p>
+                </div>
+              </div>
+            `,
+            backstageHtml: `
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 text-xs space-y-1">
+                <div class="font-bold">Clean Audit Trail</div>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">The claim is submitted, the confirmation screenshot is posted to Discord, and the Gmail label prevents future duplicate staging.</p>
+              </div>
+            `,
+            uxNote: 'Zero manual portal typing required.',
+            techNote: 'For routine tools where a user taps "Always allow", the harness commits that rule back to approvals.yaml in Git.'
+          }
+        ]
+      }
+    };
+
+    let currentScenario = 'handoff';
+    let currentStep = 0;
+    let autoPlayTimer = null;
+
+    function selectScenario(key) {
+      stopAutoPlay();
+      currentScenario = key;
+      currentStep = 0;
+      document.querySelectorAll('.scen-btn').forEach(btn => {
+        btn.className = 'scen-btn px-3.5 py-2 rounded-xl border text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]';
+      });
+      const active = document.getElementById('scen-' + key);
+      if (active) {
+        active.className = 'scen-btn px-3.5 py-2 rounded-xl border text-xs font-bold transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
+      }
+      renderSim();
+    }
+
+    function stepSim(delta) {
+      const scen = SCENARIOS[currentScenario];
+      if (!scen) return;
+      const next = currentStep + delta;
+      if (next < 0 || next >= scen.steps.length) return;
+      currentStep = next;
+      renderSim();
+    }
+
+    function goToStep(idx) {
+      stopAutoPlay();
+      currentStep = idx;
+      renderSim();
+    }
+
+    function toggleAutoPlay() {
+      if (autoPlayTimer) {
+        stopAutoPlay();
+      } else {
+        const btn = document.getElementById('btn-autoplay');
+        btn.textContent = '⏸ Pause';
+        autoPlayTimer = setInterval(() => {
+          const scen = SCENARIOS[currentScenario];
+          currentStep = (currentStep + 1) % scen.steps.length;
+          renderSim();
+        }, 3200);
+      }
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+      const btn = document.getElementById('btn-autoplay');
+      if (btn) btn.textContent = '▶ Auto-Play';
+    }
+
+    function renderSim() {
+      const scen = SCENARIOS[currentScenario];
+      if (!scen) return;
+      const step = scen.steps[currentStep];
+
+      document.getElementById('sim-why-label').textContent = scen.why;
+      document.getElementById('sim-channel').textContent = scen.channel;
+      document.getElementById('sim-thread-badge').textContent = scen.thread;
+
+      document.getElementById('btn-prev').disabled = (currentStep === 0);
+      document.getElementById('btn-next').disabled = (currentStep === scen.steps.length - 1);
+
+      const track = document.getElementById('pipeline-track');
+      track.innerHTML = scen.steps.map((s, i) => {
+        const active = (i === currentStep);
+        const done = (i < currentStep);
+        return `
+          <button onclick="goToStep(${i})" class="text-left p-2 rounded-lg border text-xs transition flex items-center justify-between ${active ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] font-bold' : done ? 'bg-[var(--secondary)] text-[var(--secondary-foreground)] border-[var(--border)] font-medium' : 'bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] opacity-70 hover:opacity-100'}">
+            <span class="truncate">${s.label}</span>
+            <span>${active ? '●' : done ? '✓' : ''}</span>
+          </button>
+        `;
+      }).join('');
+
+      const feed = document.getElementById('sim-discord-feed');
+      feed.innerHTML = step.discordHtml;
+      bindAvatars(feed);
+      feed.classList.remove('fade-swap');
+      void feed.offsetWidth;
+      feed.classList.add('fade-swap');
+
+      document.getElementById('sim-stage-title').textContent = step.stageTitle;
+      document.getElementById('sim-stage-chip').textContent = step.stageChip;
+
+      const back = document.getElementById('sim-backstage-body');
+      back.innerHTML = step.backstageHtml;
+      back.classList.remove('fade-swap');
+      void back.offsetWidth;
+      back.classList.add('fade-swap');
+
+      document.getElementById('sim-ux-note').textContent = step.uxNote;
+      document.getElementById('sim-tech-note').textContent = step.techNote;
+    }
+
+    // Initialize defaults
+    selectNode('discord-shared');
+    selectAgent('aida');
+    selectScenario('handoff');
+  </script>
+</body>
+</html>
