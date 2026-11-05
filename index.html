@@ -576,7 +576,7 @@
             <img src="./sections/boundaries.jpg?v=11" alt="Editorial illustration of a 1Password vault feeding a redacted key, a Discord smartphone Approval Gate turnstile, a $0 Direct Spend seal stamp, and a Cards Only financial filter" class="w-full h-full object-cover" loading="lazy" />
           </div>
           <div class="px-3.5 py-2 bg-[#141A24] text-[#E5C583] border-t border-[#C5A059]/45 text-[11px] font-bold uppercase tracking-wider">
-            Enforced in Server Code · Approval Gate &amp; $0 Direct Spend
+            Approval Gate · $0 Direct Spend · Vault Redaction · Card-Only Sync
           </div>
         </div>
 
@@ -584,7 +584,7 @@
           <div class="py-3.5 space-y-1">
             <h3 class="font-bold text-sm">Discord approval for edits &amp; zero direct spend</h3>
             <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-              External edits, bookings, and portal submissions pause behind an explicit <code>Approve</code> button in Discord, and no agent can spend money directly. Checkout and payment actions do not exist in the server code: Cookie can load the shared Instacart cart, while a human always checks out.
+              External edits, bookings, and portal submissions pause behind an explicit <code>Approve</code> button in Discord, and no agent can spend money directly. Agents can stage carts, links, and forms, while a human always completes checkout.
             </p>
           </div>
           <div class="py-3.5 space-y-1">
@@ -602,7 +602,7 @@
           <div class="py-3.5 space-y-1">
             <h3 class="font-bold text-sm">Filtered financial sync</h3>
             <p class="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Monarch Money syncs credit card charges and recurring bills so Sterling can flag unused card perks, while bank balances, paychecks, investments, and net worth are filtered out in code.
+              Monarch Money syncs credit card charges and recurring bills so Sterling can flag unused card perks, without exposing bank balances, paychecks, investments, or net worth.
             </p>
           </div>
         </div>
@@ -1832,7 +1832,7 @@
           { title: 'Shared Family Cart', detail: 'Loads the winning items into the shared Instacart Family Cart while leaving checkout to a human.' }
         ],
         allowed: ['Kitchen SQLite DB', 'NYT Cooking', 'Instacart (6 Stores & Family Cart)', 'Shared Calendar Read'],
-        blocked: ['Personal Gmail', 'Monarch Money', 'Instacart Checkout (Not in Code)']
+        blocked: ['Personal Gmail', 'Monarch Money', 'Fellow Aiden Brewer']
       },
       scout: {
         deskNum: '03',
@@ -1864,7 +1864,7 @@
           { title: 'Award Sweet Spots', detail: 'Checks CardStack transfer bonuses and MaxWorth merchant offers before big household purchases or trips.' }
         ],
         allowed: ['Perks SQLite DB', 'Monarch (Cards & Bills Only)', 'CardStack', 'MaxWorth Offers'],
-        blocked: ['Bank Balances, Paychecks & Net Worth', 'Instacart Cart', 'Fellow Aiden']
+        blocked: ['Kitchen & Instacart', 'Personal Gmail', 'Fellow Aiden Brewer']
       },
       sloan: {
         deskNum: '05',
@@ -2338,7 +2338,7 @@
             headline: 'Cookie compares six grocery stores and loads the Family Cart.',
             body: 'Cookie checks pantry staples in kitchen.sqlite, pulls the saved NYT Cooking recipe, and compares live prices across six local stores before adding rosemary and levain to the Sprouts Family Cart ($8.48).',
             pipeline: ['kitchen.sqlite', 'NYT Recipe Box', 'instacart_add_to_cart ($8.48)'],
-            guardrail: 'No checkout tool in code'
+            guardrail: 'Human-only checkout'
           },
           {
             roman: 'III',
