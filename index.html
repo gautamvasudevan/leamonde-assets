@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>Leamonde AI — Architecture Overview</title>
-  <meta name="description" content="Executive architecture overview of Leamonde AI: a private, self-hosted multi-agent household platform running on Proxmox VE, Google Antigravity SDK, Gemini, and Discord." />
-  <meta property="og:title" content="Leamonde AI — Household Staff Architecture" />
-  <meta property="og:description" content="Six independent AI specialists for the household—collaborating in shared rooms while keeping personal data and secrets at home." />
+  <title>Leamonde AI: Household Staff Architecture</title>
+  <meta name="description" content="How Leamonde AI works: six independent AI specialists in Discord, running on a home Proxmox server with 1Password and local SQLite memory." />
+  <meta property="og:title" content="Leamonde AI: Household Staff Architecture" />
+  <meta property="og:description" content="Six independent AI specialists in shared family chat, running on our own home server." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://gautamvasudevan.github.io/leamonde-assets/" />
   <meta property="og:image" content="https://gautamvasudevan.github.io/leamonde-assets/avatars/server_icon.jpg" />
@@ -22,35 +22,44 @@
       overflow-x: hidden;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
     }
+    a[href], button:not(:disabled), [role="button"] {
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: not-allowed;
+    }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
     .reveal {
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .reveal.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
     }
-    @keyframes signalFlow {
-      to { stroke-dashoffset: -36; }
-    }
-    .signal-line {
-      stroke-dasharray: 5 5;
-      animation: signalFlow 1.5s linear infinite;
-    }
-    @keyframes softPulse {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.25); opacity: 0.25; }
-    }
-    .pulse-dot {
-      animation: softPulse 2.2s ease-in-out infinite;
-    }
-    .fade-swap {
-      animation: fadeSwap 0.2s ease-out;
-    }
-    @keyframes fadeSwap {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @keyframes signalFlow {
+        to { stroke-dashoffset: -36; }
+      }
+      .signal-line {
+        stroke-dasharray: 5 5;
+        animation: signalFlow 1.5s linear infinite;
+      }
+      .fade-swap {
+        animation: fadeSwap 0.2s ease-out;
+      }
+      @keyframes fadeSwap {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
     }
     /* Hide scrollbar on horizontal pill strips while keeping swipe */
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -60,26 +69,26 @@
 <body class="bg-[var(--background)] text-[var(--foreground)] antialiased selection:bg-[var(--primary)] selection:text-[var(--primary-foreground)] relative">
 
   <!-- Ambient Architectural Signal Canvas -->
-  <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-55"></canvas>
+  <canvas id="bg-canvas" aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 opacity-55"></canvas>
 
   <!-- Clean, Uncramped Mobile-First Top Bar -->
   <header class="sticky top-0 z-30 bg-[var(--background)]/90 backdrop-blur-md border-b border-[var(--border)]">
     <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
-      <a href="#" class="flex items-center gap-2.5 shrink-0">
-        <img data-avatar="crest" alt="Crest" class="w-7 h-7 rounded-full border border-[var(--border)] object-cover" />
+      <a href="#" class="flex items-center gap-2.5 shrink-0 min-h-[36px]">
+        <img data-avatar="crest" alt="Leamonde crest" width="28" height="28" class="w-7 h-7 rounded-full border border-[var(--border)] object-cover" />
         <span class="font-bold text-sm tracking-tight">LEAMONDE AI</span>
       </a>
 
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-        <a href="#sec-map" class="px-2.5 py-1 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Map</a>
-        <a href="#sec-agents" class="px-2.5 py-1 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Agents</a>
-        <a href="#sec-sim" class="px-2.5 py-1 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Demo</a>
-        <a href="#sec-memory" class="px-2.5 py-1 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Vault</a>
-        <a href="#sec-tools" class="px-2.5 py-1 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Tools</a>
-        <button onclick="toggleTheme()" id="theme-toggle-btn" class="ml-1 px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--card)] text-xs font-medium whitespace-nowrap shrink-0">
-          ☾ Night
+      <nav aria-label="Page sections" class="flex items-center gap-1 overflow-x-auto no-scrollbar">
+        <a href="#sec-map" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Map</a>
+        <a href="#sec-agents" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Staff</a>
+        <a href="#sec-sim" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Walkthrough</a>
+        <a href="#sec-memory" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Storage</a>
+        <a href="#sec-tools" class="px-2.5 py-1.5 rounded-full text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] whitespace-nowrap">Tools</a>
+        <button type="button" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Toggle color theme" class="ml-1 px-2.5 py-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-medium whitespace-nowrap shrink-0 transition">
+          Night
         </button>
-      </div>
+      </nav>
     </div>
   </header>
 
@@ -87,66 +96,66 @@
 
     <!-- HERO: SPACIOUS, PUNCHY, MOBILE-FIRST -->
     <section class="reveal visible bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 sm:p-8 shadow-sm space-y-5 relative overflow-hidden">
-      <div class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-[var(--secondary)] text-[var(--secondary-foreground)]">
-        <span class="w-2 h-2 rounded-full bg-[var(--primary)] pulse-dot"></span>
-        <span>Private Household AI Staff</span>
+      <div class="text-xs font-semibold text-[var(--muted-foreground)]">
+        Architecture Overview · Self-Hosted Household Staff
       </div>
 
       <div class="space-y-3">
         <h1 class="text-2xl sm:text-4xl font-bold tracking-tight leading-snug">
-          Six independent AI specialists for the home—in multi-player chat, hosted on our own hardware.
+          Six independent AI specialists in shared family chat, running on our own server.
         </h1>
         <p class="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
-          Standard AI apps are single-player. <strong>Leamonde AI</strong> gives Partner A and Partner B a shared team of six specialists inside Discord to plan meals, compare groceries, source furniture, optimize credit cards, and run life admin—while keeping all state and secrets on a home server.
+          Most AI chat apps assume one person working alone. Leamonde AI puts Partner A, Partner B, and six specialist agents into the same Discord server. Together they plan weeknight dinners, compare grocery prices across local stores, source rugs and furniture, track credit card perks, and prepare medical claims, while every database and password stays on a home machine.
         </p>
       </div>
 
       <!-- Avatar Strip -->
       <div class="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar">
-        <img data-avatar="aida" alt="Aida" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="cookie" alt="Cookie" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="scout" alt="Scout" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="sterling" alt="Sterling" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="sloan" alt="Sloan" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
-        <img data-avatar="tazza" alt="Tazza" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="aida" alt="Aida portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="cookie" alt="Cookie portrait" width="44" height="44" fetchpriority="high" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="scout" alt="Scout portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="sterling" alt="Sterling portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="sloan" alt="Sloan portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
+        <img data-avatar="tazza" alt="Tazza portrait" width="44" height="44" class="w-11 h-11 rounded-full border border-[var(--border)] object-cover shrink-0" />
         <span class="text-xs text-[var(--muted-foreground)] pl-1">Aida · Cookie · Scout · Sterling · Sloan · Tazza</span>
       </div>
 
-      <!-- 4 Core Choices: Clean 1-Liners -->
+      <!-- 4 Core Choices -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-[var(--border)]">
         <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">💬 Why Discord?</div>
+          <div class="font-bold text-sm">Why Discord?</div>
           <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            True <strong>multi-user chat</strong>: shared rooms for both partners plus locked 1-on-1 desks, voice notes, threads, and approval buttons on iOS.
+            Both partners can talk with the staff in shared rooms or step into locked 1-on-1 desks. The mobile app already handles voice notes, photos, threads, and approval buttons.
           </p>
         </div>
         <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">🖥️ Why Proxmox + Antigravity?</div>
+          <div class="font-bold text-sm">Why a home Proxmox server?</div>
           <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            A home server VM runs the <strong>Antigravity SDK</strong> daemon, SQLite databases, and local tool containers—owning all memory at home.
+            One virtual machine on our home server runs the Python agent service, three SQLite databases, and local browser containers. Conversations and household records stay on our own disk.
           </p>
         </div>
         <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">🧠 Why Gemini Argon + Flash?</div>
+          <div class="font-bold text-sm">Why two Gemini models?</div>
           <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            <strong>Argon</strong> handles live reasoning; <strong>Flash</strong> runs parallel web sub-agents, backstage quality checks, and spoken briefings.
+            Gemini Argon handles live conversation where judgment matters. Gemini Flash handles heavy web reading in parallel sub-agents, checks draft replies before they post, and scripts voice briefings.
           </p>
         </div>
         <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5">
-          <div class="font-bold text-sm">🔐 Why MCPJungle + 1Password?</div>
+          <div class="font-bold text-sm">Why MCPJungle and 1Password?</div>
           <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
-            One local gateway for all tools, and on-demand secret lookup from <strong>1Password</strong> so zero static passwords sit on disk.
+            All local and cloud tools connect through one local gateway. API keys and logins are fetched from 1Password on demand, so no static passwords sit in config files.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- 01: INTERACTIVE ARCHITECTURE MAP (INLINE ACCORDION ON MOBILE — NO SCROLLING UP & DOWN!) -->
+    <!-- 01: INTERACTIVE ARCHITECTURE MAP -->
     <section id="sec-map" class="reveal space-y-3">
       <div class="flex items-center justify-between">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">01 · System Topology</span>
-          <h2 class="text-xl font-bold">Tap Any Layer to Inspect</h2>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">01 · System Map</span>
+          <h2 class="text-xl font-bold">How the Pieces Connect</h2>
+          <p class="text-sm text-[var(--muted-foreground)] mt-0.5">Tap any component to expand its role.</p>
         </div>
       </div>
 
@@ -154,9 +163,9 @@
 
         <!-- Layer 1: Discord -->
         <div class="space-y-2">
-          <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-1">
-            <span>Tier 1 · Discord Multi-User UI</span>
-            <span>Phone &amp; Desktop</span>
+          <div class="flex items-center justify-between text-xs font-bold text-[var(--muted-foreground)] px-1">
+            <span>Tier 1 · Discord Multi-User Interface</span>
+            <span>iOS &amp; Desktop</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-1-grid">
             <!-- Rendered by JS with inline mobile expansion -->
@@ -165,15 +174,15 @@
 
         <!-- Animated Signal Arrow -->
         <div class="flex items-center justify-center py-0.5 text-xs text-[var(--muted-foreground)] gap-2">
-          <svg class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
-          <span>Bot Gateway + Persona Webhooks</span>
+          <svg aria-hidden="true" class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
+          <span>Bot connection and room webhooks</span>
         </div>
 
         <!-- Layer 2: Proxmox Home Server -->
         <div class="space-y-2 bg-[var(--background)]/70 border-2 border-[var(--primary)]/35 rounded-xl p-3">
-          <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider px-1">
+          <div class="flex items-center justify-between text-xs font-bold px-1">
             <span>Tier 2 · Home Server (Proxmox VE)</span>
-            <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">Local &amp; Private</span>
+            <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">On-Premises</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="tier-2-grid">
             <!-- Rendered by JS -->
@@ -182,15 +191,15 @@
 
         <!-- Animated Signal Arrow -->
         <div class="flex items-center justify-center py-0.5 text-xs text-[var(--muted-foreground)] gap-2">
-          <svg class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
-          <span>Outbound HTTPS + Secret Redactor</span>
+          <svg aria-hidden="true" class="w-4 h-5" viewBox="0 0 16 20" fill="none"><line x1="8" y1="0" x2="8" y2="20" stroke="currentColor" stroke-width="1.5" class="signal-line"/></svg>
+          <span>Outbound HTTPS with secret scrubbing</span>
         </div>
 
         <!-- Layer 3: Cloud Services -->
         <div class="space-y-2">
-          <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-1">
-            <span>Tier 3 · Cloud AI, Vault &amp; Feeds</span>
-            <span>External APIs</span>
+          <div class="flex items-center justify-between text-xs font-bold text-[var(--muted-foreground)] px-1">
+            <span>Tier 3 · External AI, Vault &amp; Financial Feeds</span>
+            <span>Cloud APIs</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="tier-3-grid">
             <!-- Rendered by JS -->
@@ -200,56 +209,56 @@
       </div>
     </section>
 
-    <!-- 02: THE 6 INDEPENDENT AGENTS (MOBILE-FRIENDLY 2x3 TOUCH GRID) -->
+    <!-- 02: THE 6 INDEPENDENT AGENTS -->
     <section id="sec-agents" class="reveal space-y-3">
       <div>
-        <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">02 · Six Separate Minds</span>
-        <h2 class="text-xl font-bold">Independent Agents, Scoped Tools</h2>
+        <span class="text-xs font-semibold text-[var(--muted-foreground)]">02 · The Staff</span>
+        <h2 class="text-xl font-bold">Six Separate Agents, Scoped Tools</h2>
         <p class="text-sm text-[var(--muted-foreground)] mt-0.5">
-          Not one shared prompt pretending to be six people—each specialist is an isolated <code>Agent</code> instance with only the tools for its job. Webhooks just let them post under their own portrait in Discord.
+          Each specialist is a separate <code>Agent</code> instance with its own instructions, memory, and tool list. Cookie cannot read your email, and Aida cannot touch the grocery cart. Discord webhooks let all six post under their own name and portrait through one bot connection.
         </p>
       </div>
 
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-        <!-- 2x3 Touch Selector (Never Cramped on iPhone) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <button onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="aida" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+        <!-- 2x3 Touch Selector -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" role="tablist" aria-label="Household specialists">
+          <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="aida" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Aida</div>
               <div class="text-xs opacity-80">Chief of Staff</div>
             </div>
           </button>
-          <button onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="cookie" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="cookie" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Cookie</div>
               <div class="text-xs opacity-80">Personal Chef</div>
             </div>
           </button>
-          <button onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="scout" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="scout" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Scout</div>
               <div class="text-xs opacity-80">Product Scout</div>
             </div>
           </button>
-          <button onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="sterling" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="sterling" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Sterling</div>
               <div class="text-xs opacity-80">Cards &amp; Perks</div>
             </div>
           </button>
-          <button onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="sloan" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="sloan" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Sloan</div>
               <div class="text-xs opacity-80">Interiors</div>
             </div>
           </button>
-          <button onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
-            <img data-avatar="tazza" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
+          <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition">
+            <img data-avatar="tazza" alt="" width="40" height="40" class="w-10 h-10 rounded-full object-cover border border-[var(--border)] shrink-0" />
             <div>
               <div class="font-bold text-sm leading-tight">Tazza</div>
               <div class="text-xs opacity-80">Coffee</div>
@@ -258,46 +267,46 @@
         </div>
 
         <!-- Clean Single-Card Dossier -->
-        <div id="agent-dossier" class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3 fade-swap">
+        <div id="agent-dossier" role="tabpanel" aria-live="polite" class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3 fade-swap">
           <!-- Populated by JS -->
         </div>
       </div>
     </section>
 
-    <!-- 03: INTERACTIVE TURN SIMULATOR (COMPACT 1-SCREEN MOBILE VIEW) -->
+    <!-- 03: INTERACTIVE TURN SIMULATOR -->
     <section id="sec-sim" class="reveal space-y-3">
       <div>
-        <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">03 · Interactive Walkthrough</span>
-        <h2 class="text-xl font-bold">How a Request Moves Through the House</h2>
-        <p class="text-sm text-[var(--muted-foreground)] mt-0.5">Pick a scenario and tap <strong>Next Step ▶</strong> to see Discord vs. the Home Server.</p>
+        <span class="text-xs font-semibold text-[var(--muted-foreground)]">03 · In Practice</span>
+        <h2 class="text-xl font-bold">Three Real Workflows, Step by Step</h2>
+        <p class="text-sm text-[var(--muted-foreground)] mt-0.5">Pick an example and tap <strong>Next ▶</strong> to compare what you see in Discord with what happens on the home server.</p>
       </div>
 
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
-        <!-- 3 Scenario Buttons (Full Width on Mobile, 3 Cols on Desktop) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <button onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            🤝 1. Agent Handoff (Aida → Cookie)
+        <!-- 3 Scenario Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Workflow examples">
+          <button type="button" role="tab" aria-selected="true" onclick="selectScenario('handoff')" id="scen-handoff" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
+            1. Agent Handoff (Aida to Cookie)
           </button>
-          <button onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            🔍 2. Parallel Web Research &amp; QC
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('research')" id="scen-research" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
+            2. Parallel Web Search &amp; Fact Check
           </button>
-          <button onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
-            🛡️ 3. Private Desk &amp; 1Password Gate
+          <button type="button" role="tab" aria-selected="false" onclick="selectScenario('approval')" id="scen-approval" class="scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition">
+            3. Private Desk &amp; 1Password Login
           </button>
         </div>
 
         <!-- Why This Example + Thumb-Friendly Stepper Controls -->
         <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-3">
           <div class="flex items-center justify-between gap-2">
-            <span id="sim-step-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Step 1 of 4</span>
+            <span id="sim-step-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Step 1 of 4</span>
             <div class="flex items-center gap-1.5">
-              <button onclick="toggleAutoPlay()" id="btn-autoplay" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold">
+              <button type="button" onclick="toggleAutoPlay()" id="btn-autoplay" aria-label="Auto-play steps" class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold transition">
                 ▶ Auto
               </button>
-              <button onclick="stepSim(-1)" id="btn-prev" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold disabled:opacity-35">
-                ◀
+              <button type="button" onclick="stepSim(-1)" id="btn-prev" aria-label="Previous step" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold disabled:opacity-35 transition">
+                ◀ Prev
               </button>
-              <button onclick="stepSim(1)" id="btn-next" class="px-3.5 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold disabled:opacity-35">
+              <button type="button" onclick="stepSim(1)" id="btn-next" aria-label="Next step" class="px-3.5 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 text-xs font-semibold disabled:opacity-35 transition">
                 Next ▶
               </button>
             </div>
@@ -310,7 +319,7 @@
         </div>
 
         <!-- Compact Discord View + Backstage X-Ray -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" aria-live="polite">
           <!-- Discord View -->
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-2.5">
             <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
@@ -320,11 +329,11 @@
             <div id="sim-discord-feed" class="space-y-2 fade-swap"></div>
           </div>
 
-          <!-- Backstage X-Ray -->
+          <!-- Backstage View -->
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 flex flex-col justify-between space-y-2.5">
             <div class="space-y-2">
               <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
-                <span class="font-bold uppercase tracking-wider" id="sim-stage-title">Backstage</span>
+                <span class="font-bold" id="sim-stage-title">Home Server</span>
                 <span class="px-2 py-0.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)] font-medium" id="sim-stage-chip"></span>
               </div>
               <div id="sim-backstage-body" class="text-xs text-[var(--muted-foreground)] leading-relaxed fade-swap"></div>
@@ -335,13 +344,13 @@
       </div>
     </section>
 
-    <!-- 04: MEMORY TIERS & SAFETY LOCKS (CLEAN, SCANNABLE ROWS) -->
+    <!-- 04: MEMORY TIERS & SAFETY LOCKS -->
     <section id="sec-memory" class="reveal grid grid-cols-1 md:grid-cols-2 gap-4">
 
       <!-- Memory Tiers -->
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">04A · Memory</span>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">04A · Storage</span>
           <h2 class="text-lg font-bold">Three Backing Stores</h2>
         </div>
 
@@ -349,30 +358,30 @@
           <div class="py-3 first:pt-0 space-y-1">
             <div class="flex items-center justify-between">
               <span class="font-bold">1. Git Handbook &amp; House Binder</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">60s Reload</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">60s reload</span>
             </div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              YAML &amp; Markdown for personas, rules, and family facts. <strong>Self-writing:</strong> when staff <code>remember</code> a preference or learn an approval, they commit and push back to Git.
+              Agent instructions, schedules, permissions, and shared household notes live in a Git repo that reloads every 60 seconds. When an agent saves a new family note or you approve a permanent tool rule in Discord, the server commits and pushes that change back to Git.
             </p>
           </div>
 
           <div class="py-3 space-y-1">
             <div class="flex items-center justify-between">
               <span class="font-bold">2. Three Local SQLite Databases</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Pinned Boards</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Pinned boards</span>
             </div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              <strong>Kitchen DB</strong> (meals, pantry, groceries, lunchboxes), <strong>Perks DB</strong> (card credits, subscription audits), and <strong>Usage DB</strong> (token &amp; dollar spend).
+              Structured records stay in three local SQLite files: Kitchen DB (meal plans, pantry, grocery list, lunchbox history), Perks DB (card benefits, reset dates, subscription checks), and Usage DB (token counts and monthly cloud spend).
             </p>
           </div>
 
           <div class="py-3 last:pb-0 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="font-bold">3. On-Disk Chat &amp; Fresh Routines</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Lean Context</span>
+              <span class="font-bold">3. Thread Logs &amp; Throwaway Routines</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)]">Lean context</span>
             </div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Chat history persists per thread. Scheduled briefings run in <strong>fresh throwaway sessions</strong> so they never bloat chat history, leaving a short carry-over note.
+              Each Discord channel and thread keeps its own conversation log on disk. Scheduled morning briefings and inbox watches run in fresh throwaway sessions so daily status posts do not pile up in your chat history.
             </p>
           </div>
         </div>
@@ -381,29 +390,29 @@
       <!-- Privacy & Safety Locks -->
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">04B · Security</span>
-          <h2 class="text-lg font-bold">Four Hard Safety Locks</h2>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">04B · Boundaries</span>
+          <h2 class="text-lg font-bold">How Secrets and Data Stay Safe</h2>
         </div>
 
         <div class="divide-y divide-[var(--border)] text-sm">
           <div class="py-3 first:pt-0 space-y-1">
-            <div class="font-bold">🔐 Zero Static Passwords on Disk</div>
+            <div class="font-bold">No static passwords on disk</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              1Password resolves keys and logins on demand. An in-memory <strong>Redactor</strong> scrubs raw secrets (<code>[redacted]</code>) from all tool outputs, logs, and replies.
+              API keys, bot tokens, and website logins are fetched from 1Password in memory when needed. Every secret is registered with an output filter that replaces raw values with <code>[redacted]</code> before anything reaches Discord or a log file.
             </p>
           </div>
 
           <div class="py-3 space-y-1">
-            <div class="font-bold">🚫 "Never Guess Credentials" Lock</div>
+            <div class="font-bold">Never guess credentials</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Agents never invent logins or vault names. The browser blocks plain-text password fills and locks all logins for 15 minutes if any login fails.
+              Agents are forbidden from guessing usernames, emails, passwords, or 1Password item names. Browserless blocks plain-text typing into password fields and pauses all logins across the server for 15 minutes if any login fails.
             </p>
           </div>
 
           <div class="py-3 last:pb-0 space-y-1">
-            <div class="font-bold">🚪 Physical Private Desks &amp; Human Checkout</div>
+            <div class="font-bold">Hard channel and tool boundaries</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Personal Gmail/Calendar tools don't exist outside that partner's private desk. Instacart checkout is removed from code, and Monarch excludes net worth and paychecks.
+              Personal Gmail and calendar tools are only attached inside that partner's private desk. Instacart has no checkout or place-order code at all, and the Monarch Money integration strips out bank balances, paychecks, investments, and net worth.
             </p>
           </div>
         </div>
@@ -417,33 +426,33 @@
       <!-- 4 Quality & Cost Levers -->
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">05 · Speed, Accuracy &amp; Cost Control</span>
-          <h2 class="text-lg font-bold">How Quality Stays High &amp; Cloud Bills Stay Low</h2>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">05 · Day-to-Day Operation</span>
+          <h2 class="text-lg font-bold">Keeping Replies Accurate and Cloud Bills Low</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">⚡ Parallel Flash Sub-Agents</div>
+            <div class="font-bold text-sm">Parallel Flash sub-agents</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Up to 4 read-only Flash sub-agents read noisy web pages in throwaway sessions—keeping the main Argon chat history small and fast.
+              When an agent needs to read retail pages or documentation, it spawns up to four read-only Gemini Flash sub-agents. They read the full pages and return a short summary, keeping raw HTML out of the main Argon conversation.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">🔍 Two-Stage Backstage QC</div>
+            <div class="font-bold text-sm">Two-step reply check</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              <code>&lt;1ms</code> rule checks catch fake tool claims and unverified links, followed by a Flash critic checking house rules before any reply posts.
+              Before any reply posts to Discord, a fast rule check blocks invented links, fake Amazon IDs, and uncalled tools. Then a Gemini Flash reviewer checks the draft against that specialist's rules and the tool outputs from that turn.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">🎓 Evidence-Based Graduation</div>
+            <div class="font-bold text-sm">Routine graduation</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Routines load only 3–5 tools and start on Argon while Flash shadow-replays the same outputs; 3 matches earn a 1-click switch to Flash.
+              Scheduled routines load only the three to five tools they actually need. New routines start on Gemini Argon while Flash quietly replays the same tool outputs in the background; after three matching runs, an <code>#ops</code> button lets you switch that routine to Flash.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">🚚 Self-Healing Pull Deploys</div>
+            <div class="font-bold text-sm">Pull deploys with auto-rollback</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Home server polls Git every 5m, waits for idle, runs 8 live pre-flight checks, swaps in, and auto-rolls back if health fails.
+              Every five minutes the server checks Git for updates. When nobody is mid-conversation, it pulls the new code, runs eight live checks against 1Password, MCPJungle, and Gemini, and rolls back automatically if any check fails.
             </p>
           </div>
         </div>
@@ -452,33 +461,33 @@
       <!-- Connected Tools via MCPJungle -->
       <div class="bg-[var(--card)]/90 border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3.5">
         <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)]">Single &lt;0.1s Bridge · MCPJungle</span>
-          <h2 class="text-lg font-bold">Connected Home &amp; Cloud Tool Fleet</h2>
+          <span class="text-xs font-semibold text-[var(--muted-foreground)]">Local Gateway · MCPJungle</span>
+          <h2 class="text-lg font-bold">Tools Wired Into the House</h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">🌐 Browserless (Stealth Web)</div>
+            <div class="font-bold text-sm">Browserless (Stealth Playwright)</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Product/recipe extraction with a 10m disk cache, plus supervised browser sessions with 1Password login and final-submit locks.
+              Extracts product specs, studio photos, and recipes with a 10-minute local disk cache for follow-up questions, plus supervised browser sessions with 1Password sign-in.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">🛒 Instacart &amp; NYT Cooking</div>
+            <div class="font-bold text-sm">Instacart &amp; NYT Cooking</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Saved Recipe Box, 6-store live grocery price comparison, past order receipts, and shared Family Cart edits.
+              Searches the household NYT Cooking Recipe Box, compares live prices across six local grocery stores, reads past family order receipts, and edits the shared Instacart Family Cart.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">📅 iCloud, Tennis Club &amp; Aiden</div>
+            <div class="font-bold text-sm">iCloud Calendar, Tennis Club &amp; Fellow Aiden</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Shared &amp; private calendars with free/busy masks, court reservations at the club, and Fellow Aiden coffee brew profiles.
+              Reads and books shared family calendars (with free/busy privacy masks on personal work calendars), reserves courts at the local tennis club, and pushes custom brew profiles to the Fellow Aiden coffee maker.
             </p>
           </div>
           <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-3.5 space-y-1">
-            <div class="font-bold text-sm">💳 Google, Monarch &amp; Cards</div>
+            <div class="font-bold text-sm">Google Workspace, Monarch &amp; Card Catalogs</div>
             <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
-              Private-desk Gmail/Calendar/Drive and Monarch Money card/bill sync + CardStack &amp; MaxWorth offers, with phone-friendly OAuth in Discord.
+              Connects personal Gmail, Calendar, and Drive inside private desks, syncs credit card charges and recurring bills from Monarch Money, and checks CardStack and MaxWorth for card offers and portal rates.
             </p>
           </div>
         </div>
@@ -489,8 +498,8 @@
     <!-- FOOTER -->
     <footer class="border-t border-[var(--border)] pt-6 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--muted-foreground)]">
       <div class="flex items-center gap-2">
-        <img data-avatar="crest" alt="Crest" class="w-5 h-5 rounded-full border border-[var(--border)]" />
-        <span><strong>Leamonde AI</strong> — Household Agency Architecture</span>
+        <img data-avatar="crest" alt="" width="20" height="20" class="w-5 h-5 rounded-full border border-[var(--border)]" />
+        <span><strong>Leamonde AI</strong> · Household Staff Architecture</span>
       </div>
       <div>Proxmox VE · Antigravity SDK · Gemini · MCPJungle · 1Password</div>
     </footer>
@@ -533,7 +542,7 @@
         document.documentElement.style.setProperty(k, v);
       }
       const btn = document.getElementById('theme-toggle-btn');
-      if (btn) btn.textContent = mode === 'dark' ? '☀ Ivory' : '☾ Night';
+      if (btn) btn.textContent = mode === 'dark' ? 'Ivory' : 'Night';
     }
 
     function toggleTheme() {
@@ -548,7 +557,7 @@
       }
     })();
 
-    // 2. Ambient Architectural Signal Canvas
+    // 2. Ambient Architectural Signal Canvas (respects prefers-reduced-motion)
     (function initCanvas() {
       const canvas = document.getElementById('bg-canvas');
       if (!canvas) return;
@@ -556,6 +565,7 @@
       let w = 0, h = 0;
       const pulses = [];
       const gridSize = 84;
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -585,6 +595,8 @@
         for (let x = 0; x < w; x += gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
         for (let y = 0; y < h; y += gridSize) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
         ctx.stroke();
+
+        if (reduceMotion) return;
 
         for (const p of pulses) {
           p.x += p.vx;
@@ -633,87 +645,77 @@
     }
     bindAvatars();
 
-    // 5. Chapter 01: Inline-Expanding System Map (Zero Scrolling Up & Down on iPhone!)
+    // 5. Chapter 01: Inline-Expanding System Map
     const MAP_ITEMS = [
       {
         id: 'discord-shared',
         tier: 1,
-        icon: '🏠',
         title: 'Shared Rooms',
         sub: '#lobby, #kitchen, #shopping, #interiors, #coffee',
-        detail: 'Both partners and the specialists talk together in shared rooms. Unaddressed messages route automatically to that room\'s specialist—no @mentions required.'
+        detail: 'Both partners and the specialists talk together here. Each room has a default specialist, so you can type naturally without @mentioning a bot.'
       },
       {
         id: 'discord-desks',
         tier: 1,
-        icon: '🔒',
         title: 'Private Personal Desks',
-        sub: '#partner-a-desk & #partner-b-desk',
-        detail: 'Locked 1-on-1 rooms. Only inside a partner\'s private desk are their personal Gmail, calendar, private notes, and insurance claim tools unlocked.'
+        sub: '#partner-a-desk and #partner-b-desk',
+        detail: 'Locked 1-on-1 channels. Personal Gmail, personal calendars, private notes, and insurance claim tools only load when you talk inside your own desk.'
       },
       {
         id: 'discord-ops',
         tier: 1,
-        icon: '📌',
-        title: 'Pinned Live Boards & #ops',
-        sub: 'Menu Board, Card Perks Board, Monthly Spend',
-        detail: 'Self-updating pinned messages act as zero-maintenance dashboards inside Discord for weekly meals, credit card perks, and cloud spend.'
+        title: 'Pinned Boards & #ops',
+        sub: 'Menu Board, Perks Board, Monthly Spend',
+        detail: 'Instead of a separate web app, the bots keep pinned Discord messages updated with the week\'s dinner plan, unused card credits, and cloud spend.'
       },
       {
         id: 'harness',
         tier: 2,
-        icon: '⚡',
         title: 'Staff Harness (Antigravity SDK)',
-        sub: 'Runs 6 independent agents + Backstage QC',
-        detail: 'The Python orchestrator on Proxmox VE. Routes messages, spawns parallel read-only sub-agents for web research, and checks every reply before posting.'
+        sub: 'Runs 6 separate agents and reply checks',
+        detail: 'The Python service on Proxmox VE. It routes Discord messages to the right specialist, spins up temporary sub-agents for web reading, and checks every reply before posting.'
       },
       {
         id: 'storage',
         tier: 2,
-        icon: '🗂️',
-        title: 'Three-Tier Local Storage',
-        sub: 'Git Handbook · 3 SQLite DBs · Session History',
-        detail: '60s hot-reloaded Git repo (where staff commit new memories back to Git), 3 SQLite databases (Kitchen, Perks, Usage), and crash-resilient chat histories.'
+        title: 'Three Backing Stores',
+        sub: 'Git Handbook · 3 SQLite DBs · Thread Logs',
+        detail: 'A Git repo for agent instructions and family notes (reloaded every 60 seconds), three SQLite databases (Kitchen, Perks, Usage), and per-thread chat logs.'
       },
       {
         id: 'mcpjungle',
         tier: 2,
-        icon: '🔌',
         title: 'MCPJungle Tool Gateway',
-        sub: 'Single <0.1s bridge to all local & cloud tools',
-        detail: 'One local choke point connecting Browserless, Instacart, NYT Cooking, Calendars, Tennis Club, and Fellow Aiden—enforcing permissions and secret redaction.'
+        sub: 'Local router for home and cloud tools',
+        detail: 'One local gateway connecting Browserless, Instacart, NYT Cooking, calendars, the tennis club, and the Fellow Aiden brewer while stripping secrets from tool output.'
       },
       {
         id: 'deployer',
         tier: 2,
-        icon: '🚚',
-        title: 'Self-Healing Pull Deployer',
-        sub: '5m Git poll → 8 pre-flight checks → auto-rollback',
-        detail: 'Polls Git every 5 minutes, waits until nobody is mid-conversation, runs 8 live service checks (staff selftest), swaps in, or rolls back automatically.'
+        title: 'Pull Deployer & Self-Test',
+        sub: '5m Git check, 8 live tests, auto-rollback',
+        detail: 'Checks Git every five minutes, waits until no conversation is active, runs eight live service checks (staff selftest), and rolls back automatically if a check fails.'
       },
       {
         id: 'gemini',
         tier: 3,
-        icon: '✨',
         title: 'Google Gemini API',
-        sub: 'Argon (chat) · Flash (sub-agents/QC) · TTS',
-        detail: 'Frontier Gemini Argon handles live conversation; fast Gemini Flash handles parallel web reading, QC checks, and graduated routines; TTS voices audio notes.'
+        sub: 'Argon for chat · Flash for reading & checks · TTS',
+        detail: 'Gemini Argon runs live conversation. Gemini Flash handles parallel web reading, draft checks, and routine jobs once they prove reliable. TTS voices morning audio notes.'
       },
       {
         id: 'onepassword',
         tier: 3,
-        icon: '🔑',
-        title: '1Password Cloud Vault',
-        sub: 'Zero static passwords on disk + live Redactor',
-        detail: 'Resolves API keys and website logins on demand (cached 5m) and registers every secret with an in-memory Redactor so secrets never leak to chat or logs.'
+        title: '1Password Vault',
+        sub: 'On-demand logins and secret scrubbing',
+        detail: 'Fetches API keys and website logins on demand (cached in memory for 5 minutes) and registers every secret with an output filter so raw values never appear in Discord or logs.'
       },
       {
         id: 'external-mcps',
         tier: 3,
-        icon: '💳',
         title: 'Monarch, CardStack & MaxWorth',
-        sub: 'Read-only card, subscription & portal feeds',
-        detail: 'Syncs credit cards, recurring bills, and spending categories from Monarch Money (filtering out bank balances, paychecks, and net worth) plus live card perks.'
+        sub: 'Read-only card, bill, and offer data',
+        detail: 'Syncs credit card charges, recurring bills, and category totals from Monarch Money (leaving out bank balances, paychecks, and net worth) alongside card benefit catalogs.'
       }
     ];
 
@@ -726,14 +728,14 @@
         grid.innerHTML = items.map(item => {
           const open = (item.id === activeNodeId);
           return `
-            <div onclick="toggleMapNode('${item.id}')" class="cursor-pointer rounded-xl border p-3 transition ${open ? 'bg-[var(--card)] border-[var(--primary)] ring-2 ring-[var(--primary)]/30 shadow-sm' : 'bg-[var(--card)]/80 border-[var(--border)] hover:bg-[var(--card)]'}">
+            <button type="button" aria-expanded="${open}" onclick="toggleMapNode('${item.id}')" class="w-full text-left rounded-xl border p-3 transition ${open ? 'bg-[var(--card)] border-[var(--primary)] ring-2 ring-[var(--primary)]/30 shadow-sm' : 'bg-[var(--card)]/80 border-[var(--border)] hover:bg-[var(--card)]'}">
               <div class="flex items-center justify-between gap-2">
-                <div class="font-bold text-sm">${item.icon} ${item.title}</div>
-                <span class="text-xs text-[var(--muted-foreground)] font-bold">${open ? '−' : '+'}</span>
+                <div class="font-bold text-sm">${item.title}</div>
+                <span aria-hidden="true" class="text-xs text-[var(--muted-foreground)] font-bold">${open ? '−' : '+'}</span>
               </div>
               <div class="text-xs text-[var(--muted-foreground)] mt-0.5">${item.sub}</div>
               ${open ? `<div class="mt-2.5 pt-2.5 border-t border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed fade-swap">${item.detail}</div>` : ''}
-            </div>
+            </button>
           `;
         }).join('');
       });
@@ -750,7 +752,7 @@
         name: 'Aida',
         role: 'Chief of Staff',
         rooms: '#lobby · #foothills · Private Desks',
-        summary: 'Manages family calendars, 7 AM voice briefings, tennis bookings, email watches, and private-desk tasks (like staging medical superbills).',
+        summary: 'Coordinates family calendars, sends the 7 AM voice briefing, books tennis courts, watches email inboxes, and handles private-desk tasks like medical superbills.',
         allowed: ['iCloud Calendar', 'Tennis Club', 'Routines & Watches', 'Google (Private Desks)', 'Insurance Claims Skill'],
         blocked: ['Kitchen DB & Instacart', 'Monarch Money', 'Fellow Aiden Brewer']
       },
@@ -758,39 +760,39 @@
         name: 'Cookie',
         role: 'Personal Chef',
         rooms: '#kitchen',
-        summary: 'Plans Sunday batch cooking, tracks pantry & leftovers, manages the kid\'s school lunchbox rotation, and compares prices across 6 grocery stores on Instacart.',
+        summary: 'Plans Sunday batch cooking, tracks what is in the fridge and pantry, rotates the kid\'s school lunchboxes, and compares prices across six grocery stores on Instacart.',
         allowed: ['Kitchen SQLite DB', 'NYT Cooking', 'Instacart (6 Stores & Family Cart)', 'Shared Calendar Read'],
-        blocked: ['Personal Gmail', 'Monarch Money', 'Instacart Checkout (Removed in Code)']
+        blocked: ['Personal Gmail', 'Monarch Money', 'Instacart Checkout (Not in Code)']
       },
       scout: {
         name: 'Scout',
         role: 'Product Scout',
         rooms: '#shopping',
-        summary: 'Researches gear across retailers via parallel web sub-agents, creates 1-tap Amazon cart links from verified ASINs, and tracks incoming deliveries.',
+        summary: 'Compares products across retailers using parallel web sub-agents, builds one-tap Amazon cart links from verified product IDs, and tracks incoming deliveries.',
         allowed: ['Browserless Sub-Agents', 'MaxWorth Portals', 'Order Tracker', 'Grocery List Add'],
         blocked: ['Monarch Transactions', 'NYT Cooking', 'Personal Google Drive']
       },
       sterling: {
         name: 'Sterling',
-        role: 'Card & Perks Strategist',
+        role: 'Cards & Perks',
         rooms: '#shopping',
-        summary: 'Tracks statement credits and reset cycles, audits recurring subscriptions against comped credits, and summarizes card spending via Monarch Money.',
+        summary: 'Tracks statement credits before they reset, checks recurring subscriptions against card perks, and summarizes household card spending from Monarch Money.',
         allowed: ['Perks SQLite DB', 'Monarch (Cards & Bills Only)', 'CardStack', 'MaxWorth Offers'],
         blocked: ['Bank Balances, Paychecks & Net Worth', 'Instacart Cart', 'Fellow Aiden']
       },
       sloan: {
         name: 'Sloan',
-        role: 'Interior Designer',
+        role: 'Interiors',
         rooms: '#interiors',
-        summary: 'Sources furniture, rugs, and lighting with studio photos, exact dimensions, and weave specs—analyzing room photos and floor plans in threads.',
+        summary: 'Finds furniture, rugs, and lighting with studio photos, exact dimensions, and weave details, working from room photos and floor plans inside dedicated threads.',
         allowed: ['Browserless Sub-Agents', 'Room Photo Analysis', 'House Binder (Room Specs)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Personal Gmail']
       },
       tazza: {
         name: 'Tazza',
-        role: 'Coffee Specialist',
+        role: 'Coffee',
         rooms: '#coffee',
-        summary: 'Reads coffee bag photos, dials in espresso and pour-over recipes, tracks palate notes, and pushes custom brew profiles to the Fellow Aiden brewer.',
+        summary: 'Reads photos of new coffee bags, dials in grind and temperature for espresso or pour-over, logs tasting notes, and pushes brew profiles straight to the Fellow Aiden brewer.',
         allowed: ['Fellow Aiden Brewer', 'Roaster Web Lookup', 'House Binder (Bean Log)'],
         blocked: ['Kitchen & Instacart', 'Monarch Money', 'Calendars & Email']
       }
@@ -800,17 +802,19 @@
       const a = AGENTS[key];
       if (!a) return;
       document.querySelectorAll('.ag-btn').forEach(btn => {
-        btn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)]';
+        btn.setAttribute('aria-selected', 'false');
+        btn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const activeBtn = document.getElementById('ag-btn-' + key);
       if (activeBtn) {
+        activeBtn.setAttribute('aria-selected', 'true');
         activeBtn.className = 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
       }
 
       const container = document.getElementById('agent-dossier');
       container.innerHTML = `
         <div class="flex items-center gap-3">
-          <img data-avatar="${key}" class="w-12 h-12 rounded-full border border-[var(--border)] object-cover shrink-0" />
+          <img data-avatar="${key}" alt="" width="48" height="48" class="w-12 h-12 rounded-full border border-[var(--border)] object-cover shrink-0" />
           <div>
             <div class="font-bold text-base">${a.name} · <span class="font-normal text-xs text-[var(--muted-foreground)]">${a.role}</span></div>
             <div class="text-xs text-[var(--muted-foreground)]">Rooms: <strong>${a.rooms}</strong></div>
@@ -818,13 +822,13 @@
         </div>
         <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">${a.summary}</p>
         <div class="space-y-2 pt-1">
-          <div class="text-xs font-bold">✓ Wired into ${a.name}'s Session:</div>
+          <div class="text-xs font-bold">Tools available to ${a.name}:</div>
           <div class="flex flex-wrap gap-1.5">
             ${a.allowed.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--card)] border border-[var(--border)] font-medium">${t}</span>`).join('')}
           </div>
         </div>
         <div class="space-y-1.5 pt-2 border-t border-[var(--border)]">
-          <div class="text-xs font-bold text-[var(--muted-foreground)]">✕ Physically Absent from ${a.name}'s Context:</div>
+          <div class="text-xs font-bold text-[var(--muted-foreground)]">Not loaded in ${a.name}'s session:</div>
           <div class="flex flex-wrap gap-1.5">
             ${a.blocked.map(t => `<span class="text-xs px-2.5 py-1 rounded-lg bg-[var(--secondary)]/50 text-[var(--muted-foreground)] line-through">${t}</span>`).join('')}
           </div>
@@ -839,9 +843,9 @@
     // 7. Chapter 03: Compact Turn Simulator
     const SCENARIOS = {
       handoff: {
-        why: 'Shows why staff are separate agents: Aida checks family calendars, then hands off to Cookie (who owns Kitchen DB + Instacart).',
+        why: 'Why this example: Aida reads calendars, while Cookie owns the kitchen database and Instacart. Neither agent needs the other\'s tools.',
         channel: '#lobby',
-        thread: '🧵 Weeknight Dinner',
+        thread: 'Thread: Weeknight Dinner',
         steps: [
           {
             stageTitle: '1 · Calendar Check',
@@ -851,23 +855,23 @@
                 <div class="text-xs font-bold">Partner A</div>
                 <p class="text-xs">Which night is clearest for both of us to cook this week, and can we plan a batch dinner?</p>
               </div>
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1">-# 💭 Checking the calendar…</div>
+              <div class="text-xs text-[var(--muted-foreground)] italic px-1">Checking the calendar...</div>
             `,
-            backstageHtml: 'Aida checks both partners\' calendars and sees Wednesday is open. Because she has no Kitchen or Instacart tools, she prepares a handoff to Cookie.',
-            techNote: 'Least-privilege scoping: Aida cannot touch kitchen.sqlite.'
+            backstageHtml: 'Aida checks both partners\' calendars and sees Wednesday evening is free. She does not have kitchen or grocery tools, so she calls handoff("Cookie").',
+            techNote: 'Aida\'s session has no access to kitchen.sqlite or Instacart.'
           },
           {
             stageTitle: '2 · Agent Handoff',
             stageChip: 'handoff("Cookie")',
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="aida" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
+                <img data-avatar="aida" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
                 <div class="text-xs"><strong>Aida:</strong> Wednesday is open after 5:30 PM. Handing over to <strong>Cookie</strong> to pick a recipe.</div>
               </div>
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1">-# 💭 Cookie is checking the kitchen…</div>
+              <div class="text-xs text-[var(--muted-foreground)] italic px-1">Cookie is checking the kitchen...</div>
             `,
-            backstageHtml: 'The harness starts Cookie\'s separate Agent instance in the same thread. Cookie reads kitchen.sqlite (pantry/leftovers) and saved NYT Cooking recipes.',
-            techNote: 'Webhooks switch the display name and avatar from Aida to Cookie.'
+            backstageHtml: 'The harness starts Cookie\'s own Agent instance in the same Discord thread. Cookie checks kitchen.sqlite for pantry items and pulls saved NYT Cooking recipes.',
+            techNote: 'A Discord webhook switches the message author and portrait from Aida to Cookie.'
           },
           {
             stageTitle: '3 · Shared Cart Edit',
@@ -875,30 +879,30 @@
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
                 <div class="text-xs font-bold">Partner B</div>
-                <p class="text-xs">Let's do the Rosemary White Bean Ragù! Put it on Wednesday and add rosemary + bread to the cart.</p>
+                <p class="text-xs">Let's do the Rosemary White Bean Ragu. Put it on Wednesday and add rosemary and bread to the cart.</p>
               </div>
             `,
-            backstageHtml: 'Partner B joins the same thread. Cookie updates kitchen.sqlite and adds the missing items to the shared Instacart Family Cart without needing an approval card.',
-            techNote: 'Cart edits are frictionless because order checkout is stripped from code.'
+            backstageHtml: 'Partner B replies in the same thread. Cookie logs the meal in kitchen.sqlite and adds rosemary and bread to the shared Instacart Family Cart.',
+            techNote: 'Adding to the cart needs no confirmation prompt because the code has no checkout tool.'
           },
           {
-            stageTitle: '4 · QC & Live Board',
+            stageTitle: '4 · Reply Check & Board',
             stageChip: 'Verified & Posted',
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="cookie" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Cookie:</strong> Added <strong>White Bean Ragù</strong> to Wednesday on the Menu Board, and put rosemary + levain in the Sprouts Family Cart ($8.48).</div>
+                <img data-avatar="cookie" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
+                <div class="text-xs"><strong>Cookie:</strong> Added White Bean Ragu to Wednesday on the Menu Board, and put rosemary and levain in the Sprouts Family Cart ($8.48).</div>
               </div>
             `,
-            backstageHtml: 'The <1ms QC gate verifies kitchen_plan_meal actually ran before letting Cookie say she updated the plan, and refreshes the pinned Menu Board in #kitchen.',
-            techNote: 'Silent progress line deletes itself so phones only buzz once.'
+            backstageHtml: 'Before Cookie\'s reply posts, the backstage check confirms kitchen_plan_meal actually ran, then updates the pinned Menu Board in #kitchen.',
+            techNote: 'The temporary status line deletes itself so phones only buzz once.'
           }
         ]
       },
       research: {
-        why: 'Shows how staff browse heavy retail sites in parallel without bloating memory or hallucinating links.',
+        why: 'Why this example: Retail sites are full of noisy HTML, and models often invent broken product links. Sub-agents and link checks prevent both.',
         channel: '#interiors',
-        thread: '🧵 Warm Ivory Rugs',
+        thread: 'Thread: Warm Ivory Rugs',
         steps: [
           {
             stageTitle: '1 · Auto-Thread',
@@ -906,49 +910,49 @@
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 space-y-1">
                 <div class="text-xs font-bold">Partner A</div>
-                <p class="text-xs">Find 3 low-shed 8×10 wool rugs in warm ivory under $1,200.</p>
+                <p class="text-xs">Find 3 low-shed 8x10 wool rugs in warm ivory under $1,200.</p>
               </div>
-              <div class="text-xs bg-[var(--secondary)]/60 rounded-lg px-2.5 py-1.5">🧵 Opened thread <strong>🪑 Warm Ivory Rugs</strong></div>
+              <div class="text-xs bg-[var(--secondary)]/60 rounded-lg px-2.5 py-1.5">Opened thread: <strong>Warm Ivory Rugs</strong></div>
             `,
-            backstageHtml: 'A fast classifier detects a multi-step research request and anchors a dedicated Discord thread so top-level #interiors stays clean.',
-            techNote: 'Each thread gets its own isolated conversation history.'
+            backstageHtml: 'A quick Flash check sees that sourcing rugs will take several steps and opens a dedicated Discord thread so #interiors stays uncluttered.',
+            techNote: 'Each thread has its own conversation history.'
           },
           {
             stageTitle: '2 · Sub-Agents',
             stageChip: '3 Parallel Flash Agents',
             discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">-# 💭 Researching (3 parallel tasks)…</div>
+              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Researching across 3 parallel tasks...</div>
             `,
-            backstageHtml: 'Sloan spawns 3 parallel Gemini Flash sub-agents via Browserless. They scrape retailers, grab prices and studio photos, discard 90k tokens of raw HTML, and return compact briefs.',
-            techNote: 'Parent agents never touch raw webpage DOM—cutting token cost by >80%.'
+            backstageHtml: 'Sloan launches three Gemini Flash sub-agents in parallel. Each one opens retailer pages in Browserless, pulls prices, dimensions, and studio photos, and discards the raw HTML.',
+            techNote: 'Raw webpage markup stays in the throwaway sub-agents, keeping Sloan\'s main session small.'
           },
           {
-            stageTitle: '3 · Backstage QC',
+            stageTitle: '3 · Link & Rule Check',
             stageChip: 'Link Audit + Critic',
             discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">-# 💭 Checking details…</div>
+              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Checking links and specs...</div>
             `,
-            backstageHtml: 'Deterministic QC checks that every URL and image link in Sloan\'s draft actually appeared in the sub-agents\' tool traces. A Flash critic verifies the $1,200 budget.',
-            techNote: 'Eliminates hallucinated URLs, fake ASINs, and broken Markdown tables.'
+            backstageHtml: 'A rule check verifies that every URL and photo link in Sloan\'s draft actually came back from Browserless in this turn. A Flash reviewer also checks the $1,200 budget.',
+            techNote: 'Blocks invented URLs, fake Amazon product IDs, and Markdown tables that break on phones.'
           },
           {
             stageTitle: '4 · Verified Reply',
             stageChip: 'Complete',
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="sloan" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Sloan:</strong> Here are 3 warm-ivory 8×10 wool options under $1,200 with verified dimensions, pile heights, and studio photos…</div>
+                <img data-avatar="sloan" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
+                <div class="text-xs"><strong>Sloan:</strong> Here are 3 warm-ivory 8x10 wool options under $1,200 with verified dimensions, pile heights, and studio photos.</div>
               </div>
             `,
-            backstageHtml: 'Browserless caches the rendered pages on disk for 10 minutes—so follow-up questions about care or dimensions resolve in <5ms.',
-            techNote: 'Main-channel follow-ups automatically bridge recent thread context.'
+            backstageHtml: 'Browserless keeps the parsed product pages on disk for 10 minutes, so follow-up questions about pile height or care instructions answer right away.',
+            techNote: 'If you ask a quick follow-up in the main channel, recent thread context carries over.'
           }
         ]
       },
       approval: {
-        why: 'Shows how private desks, 1Password secret injection, and approval cards protect sensitive actions.',
+        why: 'Why this example: Medical claims need personal email, insurance passwords, and a human check before records are submitted.',
         channel: '#partner-b-desk',
-        thread: '🔒 Owner-Only',
+        thread: 'Private Desk (Owner-Only)',
         steps: [
           {
             stageTitle: '1 · Private Scope',
@@ -959,45 +963,44 @@
                 <p class="text-xs">Please stage that new acupuncture superbill from my email on the insurance portal.</p>
               </div>
             `,
-            backstageHtml: 'Because this is inside #partner-b-desk, Partner B\'s Gmail and the insurance claim skill are unlocked. Aida reads the superbill PDF as ground truth.',
-            techNote: 'In shared channels, personal Gmail and claim skills are physically absent.'
+            backstageHtml: 'Because Partner B asked inside #partner-b-desk, her personal Gmail and the insurance claim workflow are available. Aida downloads the superbill PDF from Gmail.',
+            techNote: 'In shared channels, personal Gmail and private skills are not loaded at all.'
           },
           {
             stageTitle: '2 · 1Password Login',
             stageChip: 'Server-Side op://',
             discordHtml: `
-              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">-# 💭 Signing in &amp; verifying claim fields…</div>
+              <div class="text-xs text-[var(--muted-foreground)] italic px-1 py-2">Signing in and checking claim fields...</div>
             `,
-            backstageHtml: 'Aida passes an op:// vault reference to Browserless, which fetches the login from 1Password server-side and fills the form. The AI never sees the password.',
-            techNote: 'Any failed login locks credential injection server-wide for 15 minutes.'
+            backstageHtml: 'Aida passes a 1Password reference (op://...) to Browserless. The browser container fetches the login from 1Password and fills the portal fields without exposing the password to the model.',
+            techNote: 'If any login fails, Browserless locks all credential use for 15 minutes and alerts the owner.'
           },
           {
             stageTitle: '3 · Approval Gate',
             stageChip: 'always_ask Policy',
             discordHtml: `
               <div class="bg-[var(--card)] border-2 border-[var(--primary)]/50 rounded-lg p-3 space-y-2">
-                <div class="text-xs font-bold">🔒 Approval Required · $165.00 Claim</div>
-                <p class="text-xs text-[var(--muted-foreground)]">Portal fields match PDF 100%. Review screenshot attached.</p>
+                <div class="text-xs font-bold">Approval Required · $165.00 Claim</div>
+                <p class="text-xs text-[var(--muted-foreground)]">Portal fields match the PDF. Review screenshot attached.</p>
                 <div class="flex gap-2">
-                  <span class="px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold">✓ Approve</span>
-                  <span class="px-2.5 py-1 rounded bg-[var(--secondary)] text-[var(--secondary-foreground)] text-xs font-semibold">✕ Decline</span>
+                  <button type="button" onclick="stepSim(1)" class="px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold">Approve (Tap to test)</button>
                 </div>
               </div>
             `,
-            backstageHtml: 'browser_session blocks clicking final Submit buttons. Calling browser_session_commit pauses the turn and posts a 15-minute approval card with a screenshot.',
-            techNote: 'Only the desk owner\'s Discord account can tap Approve.'
+            backstageHtml: 'The browser tool refuses to click final Submit buttons during normal browsing. Calling browser_session_commit pauses the turn and posts an approval card with a screenshot.',
+            techNote: 'Only Partner B\'s Discord account can press Approve on this card.'
           },
           {
             stageTitle: '4 · Submitted',
             stageChip: 'Approved & Labeled',
             discordHtml: `
               <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-3 flex gap-2.5 items-start">
-                <img data-avatar="aida" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
-                <div class="text-xs"><strong>Aida:</strong> Submitted! Confirmation screenshot attached, and I labeled the email <code>Anthem-Submitted</code>.</div>
+                <img data-avatar="aida" alt="" width="32" height="32" class="w-8 h-8 rounded-full border border-[var(--border)] shrink-0" />
+                <div class="text-xs"><strong>Aida:</strong> Submitted. Confirmation screenshot attached, and I labeled the email <code>Anthem-Submitted</code>.</div>
               </div>
             `,
-            backstageHtml: 'After Partner B taps Approve, the claim is submitted and labeled in Gmail so the background watch won\'t flag it again.',
-            techNote: 'For routine tools where you tap "Always allow", the rule commits back to Git.'
+            backstageHtml: 'Once Partner B taps Approve, Browserless clicks Submit, saves a confirmation screenshot, and labels the email in Gmail so the inbox watch knows it is done.',
+            techNote: 'When you tap "Always allow" on a safe everyday tool, the harness writes that rule back to Git.'
           }
         ]
       }
@@ -1012,10 +1015,12 @@
       currentScenario = key;
       currentStep = 0;
       document.querySelectorAll('.scen-btn').forEach(btn => {
-        btn.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)]';
+        btn.setAttribute('aria-selected', 'false');
+        btn.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const active = document.getElementById('scen-' + key);
       if (active) {
+        active.setAttribute('aria-selected', 'true');
         active.className = 'scen-btn px-3.5 py-2.5 rounded-xl border text-left text-xs font-bold transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]';
       }
       renderSim();
@@ -1039,7 +1044,7 @@
       if (autoPlayTimer) {
         stopAutoPlay();
       } else {
-        document.getElementById('btn-autoplay').textContent = '⏸';
+        document.getElementById('btn-autoplay').textContent = 'Pause';
         autoPlayTimer = setInterval(() => {
           const scen = SCENARIOS[currentScenario];
           currentStep = (currentStep + 1) % scen.steps.length;
@@ -1067,7 +1072,7 @@
       document.getElementById('btn-next').disabled = (currentStep === scen.steps.length - 1);
 
       document.getElementById('sim-progress-bars').innerHTML = scen.steps.map((_, i) => `
-        <button onclick="goToStep(${i})" aria-label="Step ${i + 1}" class="h-2 rounded-full transition ${i <= currentStep ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}"></button>
+        <button type="button" onclick="goToStep(${i})" aria-label="Go to step ${i + 1}" class="h-2.5 rounded-full transition ${i <= currentStep ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}"></button>
       `).join('');
 
       const feed = document.getElementById('sim-discord-feed');
