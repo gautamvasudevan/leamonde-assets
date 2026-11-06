@@ -244,7 +244,7 @@
                 <div class="flex items-center gap-2 min-w-0">
                   <span class="inline-block w-2 h-2 rounded-full bg-[#C5A059] shrink-0"></span>
                   <span class="font-bold text-[#E5C583] shrink-0" id="pavilion-focus-room">#lobby</span>
-                  <span class="truncate text-[#F8F5EE] font-medium" id="pavilion-focus-title">Aida · Syncing family calendar &amp; 7 AM briefing</span>
+                  <span class="text-[#F8F5EE] font-medium leading-snug" id="pavilion-focus-title">Aida · Syncing family calendar &amp; 7 AM briefing</span>
                 </div>
                 <span class="px-2 py-0.5 rounded bg-[#22304A] text-[#E5C583] border border-[#C5A059]/40 text-[10px] font-bold uppercase tracking-wider shrink-0" id="pavilion-phase-badge">1 · Discord</span>
               </div>
@@ -422,55 +422,55 @@
         </div>
       </div>
 
-      <!-- Horizontal Agency Call Sheet (44px+ touch targets) -->
+      <!-- Horizontal Agency Call Sheet (44px+ touch targets, zero truncation) -->
       <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2" role="tablist" aria-label="Agency specialists and hiring">
-        <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="true" onclick="selectAgent('aida')" id="ag-btn-aida" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/aida.jpg?v=13" data-avatar="aida" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Aida</div>
-            <div class="text-[11px] opacity-80 truncate">Chief of Staff</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Aida</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Chief of Staff</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('cookie')" id="ag-btn-cookie" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/cookie.jpg?v=13" data-avatar="cookie" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Cookie</div>
-            <div class="text-[11px] opacity-80 truncate">Personal Chef</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Cookie</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Personal Chef</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('scout')" id="ag-btn-scout" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/scout.jpg?v=13" data-avatar="scout" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Scout</div>
-            <div class="text-[11px] opacity-80 truncate">Product Scout</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Scout</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Product Scout</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sterling')" id="ag-btn-sterling" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/sterling.jpg?v=13" data-avatar="sterling" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Sterling</div>
-            <div class="text-[11px] opacity-80 truncate">Cards &amp; Perks</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Sterling</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Cards &amp; Perks</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('sloan')" id="ag-btn-sloan" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/sloan.jpg?v=13" data-avatar="sloan" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Sloan</div>
-            <div class="text-[11px] opacity-80 truncate">Interiors</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Sloan</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Interiors</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('tazza')" id="ag-btn-tazza" class="ag-btn flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/tazza.jpg?v=13" data-avatar="tazza" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">Tazza</div>
-            <div class="text-[11px] opacity-80 truncate">Coffee</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">Tazza</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">Coffee</div>
           </div>
         </button>
-        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('newhire')" id="ag-btn-newhire" class="ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition">
+        <button type="button" role="tab" aria-selected="false" onclick="selectAgent('newhire')" id="ag-btn-newhire" class="ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition">
           <img src="https://gautamvasudevan.github.io/leamonde-assets/avatars/server_icon.jpg?v=13" data-avatar="pavilion" alt="" width="38" height="38" class="w-9 h-9 rounded-full object-cover border border-[var(--border)] shrink-0" />
-          <div class="min-w-0">
-            <div class="font-bold text-sm leading-tight truncate">+ New Hire</div>
-            <div class="text-[11px] opacity-80 truncate">60s Git Deploy</div>
+          <div>
+            <div class="font-bold text-sm leading-tight">+ New Hire</div>
+            <div class="text-[11px] opacity-85 leading-tight mt-0.5">60s Git Deploy</div>
           </div>
         </button>
       </div>
@@ -2495,12 +2495,13 @@
       currentReelIdx = 0;
       if (reelTimer) { clearInterval(reelTimer); reelTimer = null; }
 
+      const baseBtnLayout = 'flex items-center lg:flex-col lg:items-center lg:justify-center gap-2.5 lg:gap-1.5 p-2.5 lg:px-2 lg:py-3 rounded-xl border text-left lg:text-center min-h-[56px] transition ';
       document.querySelectorAll('.ag-btn').forEach(btn => {
         btn.setAttribute('aria-selected', 'false');
         const isWide = btn.id === 'ag-btn-newhire';
         btn.className = (isWide
-          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition '
-          : 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition ') +
+          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 ' + baseBtnLayout
+          : 'ag-btn ' + baseBtnLayout) +
           'bg-[var(--card)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--secondary)]/60';
       });
       const activeBtn = document.getElementById('ag-btn-' + key);
@@ -2508,8 +2509,8 @@
         activeBtn.setAttribute('aria-selected', 'true');
         const isWide = activeBtn.id === 'ag-btn-newhire';
         activeBtn.className = (isWide
-          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition '
-          : 'ag-btn flex items-center gap-2.5 p-2.5 rounded-xl border text-left min-h-[56px] transition ') +
+          ? 'ag-btn col-span-2 sm:col-span-2 lg:col-span-1 ' + baseBtnLayout
+          : 'ag-btn ' + baseBtnLayout) +
           'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm';
       }
 
@@ -2526,7 +2527,7 @@
             <div class="rounded-xl overflow-hidden border-2 border-[#141A24] bg-[#141A24] shadow-sm">
               <!-- Solid Top Studio Control Bar -->
               <div class="bg-[#141A24] text-[#FFFFFF] border-b border-[#C5A059]/45 px-3.5 py-2 flex items-center justify-between gap-2">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-[#E5C583] truncate">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#E5C583] leading-snug">
                   ● Desk ${a.deskNum} · ${a.rooms}
                 </span>
                 <button type="button" onclick="nextAgentReelStep()" class="px-2.5 py-1 rounded-md bg-[#F8F5EE] text-[#141A24] hover:bg-white text-xs font-bold min-h-[30px] shrink-0 transition shadow-sm">
@@ -2543,8 +2544,8 @@
               <!-- 3-Step Interactive Switcher Bar Directly Beneath Image (Never Cut Off on iPhone) -->
               <div class="grid grid-cols-3 divide-x divide-[#C5A059]/35 border-t border-[#C5A059]/45 bg-[#141A24]">
                 ${a.reelSteps.map((st, idx) => `
-                  <button type="button" id="studio-tab-${idx}" onclick="selectAgentReelStep(${idx})" class="py-2 px-2 text-[11px] sm:text-xs font-bold text-center transition min-h-[40px] flex items-center justify-center">
-                    <span class="truncate">${st.shortTab}</span>
+                  <button type="button" id="studio-tab-${idx}" onclick="selectAgentReelStep(${idx})" class="py-2 px-1.5 text-[11px] sm:text-xs font-bold text-center transition min-h-[40px] flex items-center justify-center">
+                    <span class="leading-tight">${st.shortTab}</span>
                   </button>
                 `).join('')}
               </div>
@@ -2556,13 +2557,13 @@
                   <div class="text-xs text-[#F8F5EE] leading-relaxed mt-0.5" id="studio-active-step-detail">${firstStep.detail}</div>
                 </div>
                 <div class="flex items-center justify-between gap-3 pt-0.5">
-                  <div class="flex items-center gap-3 min-w-0">
+                  <div class="flex items-center gap-3">
                     <img data-avatar="${avatarKey}" alt="" width="40" height="40" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#C5A059] object-cover shrink-0" />
-                    <div class="min-w-0">
-                      <div class="font-serif-display text-base sm:text-lg leading-tight truncate text-[#FFFFFF]">
+                    <div>
+                      <div class="font-serif-display text-base sm:text-lg leading-snug text-[#FFFFFF]">
                         ${a.name} <span class="font-sans text-xs font-bold text-[#E5C583]">· ${a.role}</span>
                       </div>
-                      <div class="text-[11px] text-[#E8E2D5] truncate">${a.studioCaption}</div>
+                      <div class="text-[11px] text-[#E8E2D5] leading-snug">${a.studioCaption}</div>
                     </div>
                   </div>
                 </div>
@@ -2890,7 +2891,7 @@
               <img src="${a.image}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${a.relImage}';}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" decoding="async" />
             </div>
             <div class="px-2 py-1.5 flex items-center justify-between gap-1">
-              <span class="text-[11px] font-bold text-[var(--foreground)] truncate">${a.roman}. ${a.shortLabel}</span>
+              <span class="text-[11px] font-bold text-[var(--foreground)] leading-tight">${a.roman}. ${a.shortLabel}</span>
             </div>
           </button>
         `;
